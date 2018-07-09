@@ -909,4 +909,42 @@ tbody#signature-val-result h4{
 
 }*/
 
+
+.option-ct{
+    position: absolute;
+    z-index: 20;
+    right: 40px;
+    bottom: 10px;
+    /*height: 40px;*/
+    padding: 5px;
+    border-radius: 2px;
+    background: #ddd;
+    opacity: 0.1;
+    color: #fff;
+}
+
+.option-ct:hover{
+    opacity: 1;
+}
+
+.option-ct > span{
+    cursor: pointer;
+    padding: 3px;
+    color: #fff;
+}
+
+.option-ct > span:hover，
+.option-ct > span:active,
+.option-ct > span:focus{
+    color: #aaa;
+
+}
+
+.option-ct > #stew{
+    color: #aaa;
+    width: 40px;
+    border-radius: 2px;
+    text-align: center;
+}
+
 /*********************************carousel********************************************/

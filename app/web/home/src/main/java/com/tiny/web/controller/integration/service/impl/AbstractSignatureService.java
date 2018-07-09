@@ -3,9 +3,11 @@ package com.tiny.web.controller.integration.service.impl;
 import com.tiny.web.controller.BaseJsonResult;
 import com.tiny.web.controller.http.response.SignatureResp;
 import com.tiny.web.controller.integration.service.SignatureService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 
 import javax.annotation.PostConstruct;
+import java.util.Collections;
 
 public abstract class AbstractSignatureService implements SignatureService {
 
@@ -15,7 +17,7 @@ public abstract class AbstractSignatureService implements SignatureService {
     private static Logger logger = Logger.getLogger(AbstractSignatureService.class);
 
     @PostConstruct
-    protected void init(){
+    protected void init() {
         logger.info("init ... ");
     }
 
@@ -23,29 +25,31 @@ public abstract class AbstractSignatureService implements SignatureService {
     public BaseJsonResult scan(String imagePath, String imageName) {
         BaseJsonResult baseJsonResult = new BaseJsonResult();
         Long beginAt = System.currentTimeMillis();
-        try{
+        try {
             before(imagePath, imageName);
             SignatureResp signatureResp = process(imagePath, imageName);
+            if (signatureResp == null || CollectionUtils.isEmpty(signatureResp.getMatchArea())) {
+                throw new RuntimeException("Oops, no matched area ... ");
+            }
+
             after(imagePath, imageName);
             baseJsonResult.markeSuccess("Congratulations, signature matched!", signatureResp);
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error("scan error imagePath:" + imagePath, e);
             baseJsonResult.marketFail("Oops, " + e.getMessage());
-        }finally {
+        } finally {
             logger.info("scan total used:" + (System.currentTimeMillis() - beginAt));
         }
         return baseJsonResult;
     }
 
     /**
-     *
      * @param imagePath
      * @param imageName
      */
     protected abstract void before(String imagePath, String imageName);
 
     /**
-     *
      * @param imagePath
      * @param imageName
      * @return
@@ -53,7 +57,6 @@ public abstract class AbstractSignatureService implements SignatureService {
     protected abstract SignatureResp process(String imagePath, String imageName);
 
     /**
-     *
      * @param imagePath
      * @param imageName
      */

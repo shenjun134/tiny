@@ -1,6 +1,7 @@
 package com.tiny.web.controller.ocr.model;
 
 import com.tiny.common.base.ToString;
+import org.apache.commons.lang.StringUtils;
 
 public class NameVO extends ToString {
 
@@ -22,6 +23,25 @@ public class NameVO extends ToString {
     private String comments;
 
     private Long id;
+
+    public NameVO() {
+    }
+
+    public NameVO(Long id, String src) {
+        this.id = id;
+        if (StringUtils.isBlank(src)) {
+            return;
+        }
+        String[] arr = src.trim().split("\\|");
+        if (arr == null || arr.length != 4) {
+            return;
+        }
+        this.full = arr[0];
+        this.email = arr[1];
+        this.first = arr[2];
+        this.second = arr[3];
+
+    }
 
     public String getFirst() {
         return first;

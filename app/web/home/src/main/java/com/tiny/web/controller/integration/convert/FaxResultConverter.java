@@ -77,7 +77,10 @@ public class FaxResultConverter {
     }
 
     public static NameVO auth2Name(Author author) {
-        NameVO nameVO = RandomUtil.randomName();
+        NameVO nameVO = RandomUtil.fetch(author.getWriter_id());
+        if (nameVO == null) {
+            nameVO = new NameVO();
+        }
         double rate = author.getProbability() == null ? 0 : author.getProbability() * 100;
         DecimalFormat decimalFormat = new DecimalFormat("#0.00");
         String rateStr = decimalFormat.format(rate);

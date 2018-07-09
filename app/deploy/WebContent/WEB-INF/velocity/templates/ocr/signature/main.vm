@@ -85,6 +85,12 @@
         <div id="sign-tiff-ct" class="tiff-ct" style='height: calc(100% - 0px); overflow: auto;'>
           <div id="tiff-show" class="show-upload" style='position: relative;'><p class="blank">Please upload a signature image</p></div>
         </div>
+        <div class="option-ct">
+            <input id="stew" name="stew" type="text" ></input>
+            <span class="plus" onclick="imagePlus(this);">+</span>
+            <span class="minus" onclick="imageMinus(this);">-</span>
+            <span class="save" onclick="imageSave(this);">Save</span>
+        </div>
       </div>
 		</div>
 	</div>

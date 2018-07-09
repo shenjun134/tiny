@@ -37,7 +37,7 @@ public class RemoteSignatureService extends AbstractSignatureService {
         Assert.hasText(SystemUtils.getSystemProperty(SystemPropertyEnum.FACADE_SIGNATURE_URL), "remote url is not setup");
         Assert.hasText(imagePath, "imagePath is blank");
         Assert.hasText(imageName, "imageName is blank");
-        Assert.state(StringUtils.endsWith(imageName, ".jpg"), "Not a jpg image");
+        Assert.state(StringUtils.endsWith(imageName.toLowerCase(), ".jpg"), "Not a jpg image");
         File file = new File(imagePath + "/" + imageName);
         if (!file.exists()) {
             throw new IllegalArgumentException("Image is not existed.");

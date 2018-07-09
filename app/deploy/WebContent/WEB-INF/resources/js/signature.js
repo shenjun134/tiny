@@ -38,9 +38,11 @@ function doSignUpload() {
       } else if(resp.data.type === 'application/pdf' || resp.data.type === 'application/pdf'){
         handlePdf2Png(resp);
       }else {
+        //var optionArea = '<div class="option-ct"><input id="stew" type="text" /> <span class="plus" onclick="imagePlus(this);">+</span><span class="minus" onclick="imageMinus(this);">-</span><span class="save" onclick="imageSave(this);">Save</span></div>';
+        var optionArea = '';
         var markArea = '<div class="mark-ct"></div>';
         var canvasCover = '<canvas id="sign-canvas" width="0" height="0" style="display: none;"></canvas>';
-        var image = '<div class="cell on "><img id="upload-signature-pre" alt="display-upload-file" class="upload-img upload-img-'+0+'"  src="'+resp.data.name+'" data-path="'+resp.data.path+'" data-sname="'+resp.data.shortName+'"/>'+ markArea + canvasCover + '</div>';
+        var image = '<div class="cell on "><img id="upload-signature-pre" alt="display-upload-file" class="upload-img upload-img-'+0+'"  src="'+resp.data.name+'" data-path="'+resp.data.path+'" data-sname="'+resp.data.shortName+'"/>'+ optionArea + markArea + canvasCover + '</div>';
         $('#tiff-show').append(image);
         $('#dialog-image-signature .modal-body').html(image);
 
@@ -149,6 +151,7 @@ function beforeSignUpload(){
 	$('button#sign-sub').addClass('btn-off');
   $('button#sign-fix').addClass('btn-off');
   $('#sign-tiff-ct').css('background', '#aaa');
+  $('.option-ct').css('display', 'none');
 	cleanValResult();
   cleanImagInfo();
   cleanRectangleInfo();
@@ -160,6 +163,7 @@ function beforeSignUpload(){
 function afterSignUpload(){
 	$('button#sign-val').removeClass('btn-off');
   $('#sign-tiff-ct').css('background', 'rgb(34, 34, 34)');
+  $('.option-ct').css('display', 'block');
 }
 
 function afterValidate(){
@@ -598,6 +602,7 @@ function cleanImagInfo(){
   $("#image-w").val('');
   $("#image-h").val('');
   $("#image-scale").val('');
+  $("#stew").val('0');
 }
 
 function cleanRectangleInfo(){
@@ -1146,4 +1151,33 @@ document.onkeyup  = function(e){
     cleanRectangle();
     return false;
   }
+}
+
+function imagePlus(e){
+    var src = $("#stew").val();
+    var degree = parseFloatH(src);
+    degree = degree + 1;
+    if(degree > 360){
+        degree = 0;
+    }else if(degree < -360){
+        degree = 0;
+    }
+
+    $("#stew").val(degree);
+}
+
+function imageMinus(e){
+    var src = $("#stew").val();
+    var degree = parseFloatH(src);
+    degree = degree - 1;
+    if(degree > 360){
+        degree = 0;
+    }else if(degree < -360){
+        degree = 0;
+    }
+    $("#stew").val(degree);
+}
+
+function imageSave(e){
+
 }

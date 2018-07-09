@@ -1,15 +1,57 @@
 package com.tiny.web.controller.integration.util;
 
+import com.tiny.common.util.CommonUtil;
 import com.tiny.web.controller.http.response.SignatureResp;
 import com.tiny.web.controller.ocr.model.Box;
 import com.tiny.web.controller.ocr.model.NameVO;
+import com.tiny.web.controller.ocr.util.FileUtil;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.math.NumberUtils;
+import org.apache.log4j.Logger;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class RandomUtil {
+
+    private static final Logger logger = Logger.getLogger(RandomUtil.class);
+
+    private static Map<Long, NameVO> nameVOMap;
+
+    static {
+        String filename = "/config/signature-list.properties";
+        nameVOMap = new HashMap<>();
+
+        InputStream inputStream = null;
+        try {
+            inputStream = CommonUtil.getInputStream(filename);
+            Properties properties = CommonUtil.retrieveFileProperties(inputStream);
+            Enumeration enumeration = properties.propertyNames();
+            while (enumeration.hasMoreElements()) {
+                Object enumer = enumeration.nextElement();
+                String src = properties.getProperty(enumer.toString());
+                Long id = NumberUtils.toLong(enumer.toString(), 0);
+                NameVO nameVO = new NameVO(id, src);
+                nameVOMap.put(id, nameVO);
+            }
+        } catch (Exception e) {
+            logger.error("read file error - " + filename, e);
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    logger.error("input stream close error", e);
+                }
+            }
+        }
+
+
+    }
 
     /**
      * @param fileName
@@ -101,6 +143,14 @@ public class RandomUtil {
         return name;
     }
 
+    /**
+     * @param writerId
+     * @return
+     */
+    public static NameVO fetch(Long writerId) {
+        return nameVOMap.get(writerId);
+    }
+
     interface Constant {
         /**
          * <= 0.6 will be success
@@ -120,7 +170,18 @@ public class RandomUtil {
         DecimalFormat twoDeciaml = new DecimalFormat("#0.00");
 
         int nameSize = 5;
+    }
 
-
+    public static void main(String[] args) throws IOException {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i <= 480; i++) {
+            NameVO nameVO = randomName();
+            builder.append(i).append("=");
+            builder.append(nameVO.getFull()).append("|");
+            builder.append(nameVO.getEmail()).append("|");
+            builder.append(nameVO.getFirst()).append("|");
+            builder.append(nameVO.getSecond()).append("\n");
+        }
+        FileUtils.writeStringToFile(new File("D:\\data\\code\\github-workspace\\tiny\\app\\deploy\\src\\main\\resources\\config\\signature-list.properties"), builder.toString());
     }
 }

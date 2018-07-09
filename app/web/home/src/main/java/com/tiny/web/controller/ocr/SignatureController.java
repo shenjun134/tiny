@@ -11,6 +11,7 @@ import com.tiny.web.controller.BaseJsonResult;
 import com.tiny.web.controller.http.request.SignatureReq;
 import com.tiny.web.controller.integration.factory.SignatureFactory;
 import com.tiny.web.controller.ocr.model.Box;
+import com.tiny.web.controller.ocr.util.FileUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -166,6 +167,7 @@ public class SignatureController extends OCRController {
      */
     private FileInfo saveFile(MultipartFile file, String checkType) {
         String originalFilename = file.getOriginalFilename();
+
         if (StringUtils.isNotBlank(checkType) && !StringUtils.endsWith(originalFilename, checkType)) {
             Assert.isTrue(false, "File type no validated...");
         }
@@ -174,7 +176,9 @@ public class SignatureController extends OCRController {
         if (!dir.exists()) {
             dir.mkdirs();
         }
-        String serverFilePath = dir.getAbsolutePath() + File.separator + file.getOriginalFilename();
+        String savedName = FileUtil.randomFileName(originalFilename);
+
+        String serverFilePath = dir.getAbsolutePath() + File.separator + savedName;
         File serverFile = new File(serverFilePath);
         InputStream is = null;
         BufferedOutputStream bufferedOutputStream = null;
@@ -207,9 +211,9 @@ public class SignatureController extends OCRController {
                 }
             }
         }
-        FileInfo fileInfo = new FileInfo(resourceBasePath + originalFilename, file.getSize());
+        FileInfo fileInfo = new FileInfo(resourceBasePath + savedName, file.getSize());
         fileInfo.setPath(resourceBasePath);
-        fileInfo.setShortName(originalFilename);
+        fileInfo.setShortName(savedName);
         fileInfo.setType(file.getContentType());
         List<SubFile> subFiles = null;
         if (StringUtils.endsWith(file.getOriginalFilename(), ".pdf")) {
@@ -228,7 +232,9 @@ public class SignatureController extends OCRController {
         if (!StringUtils.endsWith(originalFile, "." + Constant.imgType)) {
             return null;
         }
-        String tiffSrc = originalFile.substring(0, originalFile.indexOf("."));
+        String tiffSrc = FileUtil.randomFileName();
+
+//        String tiffSrc = originalFile.substring(0, originalFile.indexOf("."));
         List<SubFile> subFiles = new ArrayList<SubFile>();
         File dir = new File(storeTempPath);
         if (!dir.exists()) {
@@ -253,7 +259,6 @@ public class SignatureController extends OCRController {
                 subFile.setPath(tempPath);
                 subFile.setShortName(shortName);
                 subFiles.add(subFile);
-
             }
         } catch (Exception e) {
             logger.error("splitPdf2Img error", e);
@@ -284,7 +289,8 @@ public class SignatureController extends OCRController {
         if (!StringUtils.endsWith(originalFile, ".tiff") && !StringUtils.endsWith(originalFile, ".tif")) {
             return null;
         }
-        String tiffSrc = originalFile.substring(0, originalFile.indexOf("."));
+        String tiffSrc = FileUtil.randomFileName();
+//        String tiffSrc = originalFile.substring(0, originalFile.indexOf("."));
         List<SubFile> subFiles = new ArrayList<SubFile>();
         FileSeekableStream fileSeekableStream = null;
         try {
