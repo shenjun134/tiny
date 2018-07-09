@@ -1,0 +1,67 @@
+<div class="ct-out" style="height: calc(100% - 10px);">
+	<div class="ct-block ct-s-block" style="height: 100%;">
+		<span class="title">Fax Cover Information</span>
+		<div style="display: flex; height: calc(100% - 0px);">
+			<div class="left" style="width: 500px">
+				<form id="mainUploadForm" class="form-inline" action="/tiny/ocr/multiUpload.do" method="POST" style="margin-top: 20px; margin-bottom: 20px; margin-left: 10px;">
+					<div class="form-group" style="background: #eee; border-radius: 2px;">
+							<input type="file" accept=".tiff,.tif,.png,.jpg,.bmp,.ico" name="file" style="overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 250px;width: 250px; height: 34px;"/>
+					</div>
+					<button type="button" class="btn btn-default btn-info form-group"
+						style="margin-left: 10px;" onclick="doUpload()" >Upload</button>
+					<button id="cover-scan" type="button" class="btn btn-default btn-info form-group btn-off"
+						style="margin-left: 10px;" onclick="doCoverScan()" >Cover Scan</button>
+				</form>
+				<table class="table table-hover form">
+					<tbody id="cover-result">
+						#foreach($item in $scan_cover.fieldList)
+							<tr>
+								<th>$item.htmlLabel</th>
+								<td style="position: relative;">
+										<input type="text" class="form-control" id="$item.id" name="$item.name" placeholder='' onblur="validateInput(this);" data-type="$item.type" data-rule="$item.rule" data-max-len="$item.maxLength" data-min-len="$item.minLength" data-required="$item.required">
+										<span class="error-tip" id="err-$item.id" style="display: none;"></span>
+								</td>
+							</tr>
+						#end
+					</tbody>
+				</table>
+				<form id="mainActionForm" class="form-inline" action="/tiny/ocr/multiUpload.do" method="POST" style="margin-bottom: 20px; margin-left: 10px;">
+					<div class="form-group" style="bacground: #eee; border-radius: 2px;">
+							<label style="margin-bottom: 0 !important;">Please select template</label>
+							<select name="templateName" id="templateName" onchange="onTempChange(this)" style="height: 34px;">
+							</select>
+					</div>
+					<button type="button" class="btn btn-default btn-info form-group"
+						style="margin-left: 10px;" onclick="doNext()" >Next</button>
+				</form>
+			</div>
+			<div style="border-left: 1px solid #ddd; margin-left: 20px; margin-right: 20px" >
+			</div>
+			<div id="cover-tiff-ct" class="right tiff-ct" style='width: calc(100% - 540px); overflow: auto;'>
+				<div id="tiff-show" class="show-upload"><p class="blank">Please upload a tiff image</p></div>
+			</div>
+		</div>
+
+	</div>
+</div>
+
+
+<div style="display: none">
+	#foreach($temp in $scan_temp_list)
+		<div class="scan-temp-tb" data-name="$temp.name" data-key="$temp.key" id="$temp.key">
+			<table class="table table-hover">
+					<tbody >
+						#foreach($item in $temp.fieldList)
+							<tr>
+								<th>$item.htmlLabel</th>
+								<td style="position: relative;">
+									<input type="text" class="form-control" id="$item.id" name="$item.name" placeholder='' onclick="showMarkBox(this)" onblur="hideMarkBox(this);validateInput(this);" data-type="$item.type" data-rule="$item.rule" data-max-len="$item.maxLength" data-min-len="$item.minLength" data-required="$item.required">
+									<span class="error-tip" id="err-$item.id" style="display: none;"></span>
+								</td>
+							</tr>
+						#end
+					</tbody>
+			</table>
+		</div>
+	#end
+</div>

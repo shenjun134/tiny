@@ -1,0 +1,34 @@
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Tiny</title>
+	<link rel="stylesheet" href="/tiny/resources/lib/w3c/css/w3.css" type="text/css">
+	<link rel="stylesheet" href="/tiny/resources/lib/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/tiny/resources/lib/nav3d/css/style.css">
+
+	<link rel="stylesheet" href="/tiny/resources/lib/horizon-tab/css/style.css" type="text/css">
+	<link rel="stylesheet" href="/tiny/resources/lib/datetime-picker/jquery.datetimepicker.css">
+	<link rel="stylesheet" href="/tiny/resources/css/style.css" type="text/css">
+	<link rel="stylesheet" href="/tiny/resources/lib/loading/css/style.css" type="text/css">
+	<link rel="stylesheet" href="/tiny/resources/lib/zero-modal/css/zeroModal.css" type="text/css">
+	<link rel="stylesheet" href="/tiny/resources/lib/page/css/simplePagination.css" type="text/css">
+	<link rel="stylesheet" href="/tiny/resources/lib/font-awesome/4.3.0/css/font-awesome.min.css" type="text/css">
+	<!-- <link rel="stylesheet" href="/tiny/resources/lib/tooltip/css/jquery.toolbar.css" type="text/css"> -->
+	<link rel="stylesheet" href="/tiny/resources/css/word.css" type="text/css">
+
+	<link type="image/x-icon" href="/tiny/resources/images/stone.ico" rel="icon" />
+	<script src="/tiny/resources/lib/jquery/3.2.1/jquery.min.js"></script>
+	<script src="/tiny/resources/lib/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="/tiny/resources/lib/horizon-tab/js/main.js"></script>
+	<script src="/tiny/resources/lib/canvas/js/main.js"></script>
+	<script src="/tiny/resources/lib/datetime-picker/jquery.datetimepicker.js"></script>
+	<!-- <script src="/tiny/resources/lib/tooltip/js/jquery.toolbar.js"></script> -->
+	<script src="/tiny/resources/lib/page/js/jquery.simplePagination.js"></script>
+	<script src="/tiny/resources/lib/zero-modal/js/zeroModal.js"></script>
+	<script src="/tiny/resources/lib/tiff/tiff.min.js"></script>
+	<script src="/tiny/resources/lib/fabric/fabric.min.js"></script>
+	<script src="/tiny/resources/js/common.js"></script>
+	<script src="/tiny/resources/js/jun.js"></script>
+	<script src="/tiny/resources/js/attrchange.js"></script>
+</head>

@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration PUBLIC "-//APACHE//DTD LOG4J 1.2//EN" "http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/xml/doc-files/log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+	<!-- Appenders -->
+	<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d [%t] %-5p %c{1}.%M(%L) - %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="SPRING-APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="${sys_logging_root}/tiny-spring.log" />
+		<param name="Append" value="true" />
+		<param name="encoding" value="${sys_logging_encoding}" />
+		<!-- Rollover at midnight each day -->
+		<param name="DatePattern" value="'.'yyyy-MM-dd" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<!-- The default pattern: Date Priority [Category] Message\n -->
+			<param name="ConversionPattern" value="%d [%t] %-5p %c{1}.%M(%L) - %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="DEFAULT-APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="${sys_logging_root}/common-default.log" />
+		<param name="Append" value="true" />
+		<param name="encoding" value="${sys_logging_encoding}" />
+		<!-- Rollover at midnight each day -->
+		<param name="DatePattern" value="'.'yyyy-MM-dd" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<!-- The default pattern: Date Priority [Category] Message\n -->
+			<param name="ConversionPattern" value="%d [%t] %-5p %c{1}.%M(%L) - %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="SYS-ERROR-APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="file" value="${sys_logging_root}/common-error.log" />
+		<param name="Append" value="true" />
+		<param name="encoding" value="${sys_logging_encoding}" />
+		<param name="threshold" value="error" />
+		<!-- Rollover at midnight each day -->
+		<param name="DatePattern" value="'.'yyyy-MM-dd" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<!-- The default pattern: Date Priority [Category] Message\n -->
+			<param name="ConversionPattern" value="%d [%t] %-5p %c{1}.%M(%L) - %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="SYS-WEB-APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="${sys_logging_root}/tiny-web.log" />
+		<param name="Append" value="true" />
+		<param name="encoding" value="${sys_logging_encoding}" />
+		<!-- Rollover at midnight each day -->
+		<param name="DatePattern" value="'.'yyyy-MM-dd" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<!-- The default pattern: Date Priority [Category] Message\n -->
+			<param name="ConversionPattern" value="%d [%t] %-5p %c{1}.%M(%L) - %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="SYS-DAL-DIGEST-APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="${sys_logging_root}/tiny-dal-digest.log" />
+		<param name="Append" value="true" />
+		<param name="encoding" value="${sys_logging_encoding}" />
+		<!-- Rollover at midnight each day -->
+		<param name="DatePattern" value="'.'yyyy-MM-dd" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<!-- The default pattern: Date Priority [Category] Message\n -->
+			<param name="ConversionPattern" value="%d [%t] %-5p %c{1}.%M(%L) - %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="SYS-CORE-SERVICE-APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="${sys_logging_root}/tiny-core-service.log" />
+		<param name="Append" value="true" />
+		<param name="encoding" value="${sys_logging_encoding}" />
+		<!-- Rollover at midnight each day -->
+		<param name="DatePattern" value="'.'yyyy-MM-dd" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<!-- The default pattern: Date Priority [Category] Message\n -->
+			<param name="ConversionPattern" value="%d [%t] %-5p %c{1}.%M(%L) - %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="SYS-BIZ-TASK-APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="${sys_logging_root}/tiny-biz-task.log" />
+		<param name="Append" value="true" />
+		<param name="encoding" value="${sys_logging_encoding}" />
+		<!-- Rollover at midnight each day -->
+		<param name="DatePattern" value="'.'yyyy-MM-dd" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<!-- The default pattern: Date Priority [Category] Message\n -->
+			<param name="ConversionPattern" value="%d [%t] %-5p %c{1}.%M(%L) - %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="SYS-BIZ-LISTEN-APPENDER" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="${sys_logging_root}/tiny-biz-listen.log" />
+		<param name="Append" value="true" />
+		<param name="encoding" value="${sys_logging_encoding}" />
+		<!-- Rollover at midnight each day -->
+		<param name="DatePattern" value="'.'yyyy-MM-dd" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<!-- The default pattern: Date Priority [Category] Message\n -->
+			<param name="ConversionPattern" value="%d [%t] %-5p %c{1}.%M(%L) - %m%n" />
+		</layout>
+	</appender>
+
+
+	<logger name="org.springframework.samples">
+		<level value="${sys_loggingLevel_info}" />
+		<appender-ref ref="SPRING-APPENDER" />
+		<appender-ref ref="SYS-ERROR-APPENDER" />
+	</logger>
+
+	<logger name="org.springframework.core">
+		<level value="${sys_loggingLevel_info}" />
+		<appender-ref ref="SPRING-APPENDER" />
+		<appender-ref ref="SYS-ERROR-APPENDER" />
+	</logger>
+
+	<logger name="org.springframework.beans">
+		<level value="${sys_loggingLevel_info}" />
+		<appender-ref ref="SPRING-APPENDER" />
+		<appender-ref ref="SYS-ERROR-APPENDER" />
+	</logger>
+
+	<logger name="org.springframework.context">
+		<level value="${sys_loggingLevel}" />
+		<appender-ref ref="SPRING-APPENDER" />
+		<appender-ref ref="SYS-ERROR-APPENDER" />
+	</logger>
+
+	<logger name="org.springframework.http">
+		<level value="${sys_loggingLevel}" />
+		<appender-ref ref="SPRING-APPENDER" />
+		<appender-ref ref="SYS-ERROR-APPENDER" />
+	</logger>
+
+	<logger name="org.springframework.web">
+		<level value="${sys_loggingLevel}" />
+		<appender-ref ref="SPRING-APPENDER" />
+		<appender-ref ref="SYS-ERROR-APPENDER" />
+	</logger>
+
+	<logger name="com.tiny.web">
+		<level value="${sys_loggingLevel}" />
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="SYS-WEB-APPENDER" />
+		<appender-ref ref="SYS-ERROR-APPENDER" />
+	</logger>
+
+	<logger name="com.tiny.common.dal">
+		<level value="${sys_loggingLevel}" />
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="SYS-DAL-DIGEST-APPENDER" />
+		<appender-ref ref="SYS-ERROR-APPENDER" />
+	</logger>
+
+	<logger name="com.tiny.core.service">
+		<level value="${sys_loggingLevel}" />
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="SYS-CORE-SERVICE-APPENDER" />
+		<appender-ref ref="SYS-ERROR-APPENDER" />
+	</logger>
+
+	<logger name="com.tiny.biz.task">
+		<level value="${sys_loggingLevel}" />
+		<appender-ref ref="SYS-BIZ-TASK-APPENDER" />
+		<appender-ref ref="SYS-ERROR-APPENDER" />
+	</logger>
+
+	<logger name="com.tiny.biz.listener">
+		<level value="${sys_loggingLevel}" />
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="SYS-BIZ-LISTEN-APPENDER" />
+		<appender-ref ref="SYS-ERROR-APPENDER" />
+	</logger>
+
+
+
+	<root>
+		<level value="${sys_loggingLevel}" />
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="DEFAULT-APPENDER" />
+		<appender-ref ref="SYS-ERROR-APPENDER" />
+	</root>
+
+
+
+</log4j:configuration>

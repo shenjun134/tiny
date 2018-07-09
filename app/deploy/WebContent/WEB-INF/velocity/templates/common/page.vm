@@ -1,0 +1,97 @@
+<style>
+.pageInfo {
+    text-decoration: none;
+    font-size: 13px;
+    color: #818181;
+    display: block;
+    transition: 0.3s
+}
+
+.pageInfo button, input, select, textarea {
+	font-family: inherit;
+	font-size: inherit;
+	line-height: inherit;
+	width:40px;
+}
+
+</style>
+
+<table width="100%" border=0 align=center cellpadding=0 cellspacing=0 class="pageInfo" style="margin:5px 0;">
+   <tr>
+     <td align="right">
+     	#if($page)
+			#if($page.totalItems && $page.totalItems > 0)
+				Records: $page.totalItems,Current Page: $page.currentPage / $page.totalPages&nbsp;&nbsp;|&nbsp;&nbsp;
+			   #if($page.currentPage==1)
+			               «   back
+			   #else
+			      <a href ="javascript:gotoPage(1,'$!formName')">«</a>
+			      #set($prePage=$page.currentPage - 1)
+				  <a href = "javascript:gotoPage($prePage,'$!formName')">back</a>
+			   #end
+			   
+			   #if($page.currentPage==$page.totalPages)
+			             next  »
+			   #else
+			     #set($nextPage=$page.currentPage + 1)
+				 <a href = "javascript:gotoPage($nextPage,'$!formName')">next</a>
+				 <a href ="javascript:gotoPage($page.totalPages,'$!formName')">»</a>
+			   #end
+			   
+			   &nbsp;Goto&nbsp;&nbsp;<select id ="gotoPage" name="gotoPage" onchange="gotoPages('$!formName')">
+				 #foreach($velocityCount in [1..$page.totalPages] )
+				   #if($page.currentPage == $velocityCount)
+				     <option selected value='$velocityCount'>$velocityCount</option>
+				   #else
+				     <option value='$velocityCount'>$velocityCount</option> 
+				   #end
+				#end
+		       </select>&nbsp;page
+		    #end
+		#end
+		&nbsp;&nbsp;|&nbsp;&nbsp;Page size:<input name="pageSize" type="text" value="$!{page.pageSize}"/>
+	  </td>
+   </tr>
+ </table>
+ 
+
+<script type="text/javascript">
+	function gotoPage(pageNum,formName){
+		formName = formName || 'mainForm';
+		var frm = document.getElementById(formName);
+		//frm.currentPage = new Object();
+		frm.currentPage.value = pageNum;
+		//frm.currentPage = pageNum;
+		frm.submit();
+	}
+
+	//IE11 not support
+	//function gotoPages(formName){
+	//     var pages = document.getElementById("gotoPage").value;
+	//	 if(pages < 0 || pages == "") pages = 0;
+	//
+	//	 if(isNaN(pages)){
+	//	    alert("Please input number!");
+	//		document.getElementById("gotoPage").value="go";
+	//		return false;
+	//	 }
+	//	 
+	//	 document.getElementById("currentPage").value = pages;
+	//	 var frm = document.getElementById(formName);
+	//	 frm.submit();
+	//}
+	
+	
+	function gotoPages(formName){
+	     var pageNum = $('#gotoPage').val();
+		 if(pageNum < 0 || pageNum == "") pageNum = 0;
+	
+		 if(isNaN(pageNum)){
+		    alert("Please input number!");
+			//document.getElementById("gotoPage").value="go";
+			 $('#gotoPage').val = 'go';
+			return false;
+		 }
+		gotoPage(pageNum,formName);
+	}
+</script>

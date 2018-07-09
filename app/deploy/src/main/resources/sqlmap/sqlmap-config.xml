@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMapConfig
+        PUBLIC "-//iBATIS.com//DTD SQL Map Config 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+        
+<sqlMapConfig>
+	<settings useStatementNamespaces="true"	/>
+	<!-- <sqlMap resource="/sqlmap/goldcopy-sqlmap.xml" />
+	<sqlMap resource="/sqlmap/permis-sqlmap.xml" />
+	<sqlMap resource="/sqlmap/role-sqlmap.xml" />
+	<sqlMap resource="/sqlmap/user-sqlmap.xml" />
+	<sqlMap resource="/sqlmap/user-log-sqlmap.xml" />
+	<sqlMap resource="/sqlmap/user-permis-mapping-sqlmap.xml" />
+	<sqlMap resource="/sqlmap/user-role-mapping-sqlmap.xml" />
+	<sqlMap resource="/sqlmap/url-setField-sqlmap.xml" />
+	<sqlMap resource="/sqlmap/letter-sqlmap.xml" />
+	<sqlMap resource="/sqlmap/letter-log-sqlmap.xml" /> -->
+	<sqlMap resource="/sqlmap/common-sqlmap.xml" />
+</sqlMapConfig>

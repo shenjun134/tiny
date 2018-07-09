@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>$!{systemUtils.getContextName()} Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap -->
+    <link href="#springUrl('/resources/bootstrap-master/dist/css/bootstrap.min.css')" rel="stylesheet" media="screen">
+     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+   <!--[if lt IE 9]><script src="#springUrl('/resources/html5shiv-master/dist/html5shiv.js')"></script><![endif]-->
+    <script src="#springUrl('/resources/vendors/modernizr-2.6.2-respond-1.1.0.min.js')"></script>
+    <script src="#springUrl('/resources/jquery/1.6/jquery.js')" ></script>
+	<script src="#springUrl('/resources/jqueryform/2.8/jquery.form.js')" ></script>
+    <link href="#springUrl('/resources/lemon/css/log_regis.css')" rel="stylesheet" media="screen">
+    <link rel="shortcut icon" href="#springUrl('/resources/bootstrap-master/docs/lemon_favicon.ico')" type="image/x-icon">
+  </head>
+  
+  <body id="login">
+    	<div class="container">
+    <div class="row" style="margin-top: 60px;">
+        <div class="col-md-4 col-md-offset-4">
+            <div class="pr-wrap">
+                <div class="pass-reset">
+                    <label>
+                        Enter the email you signed up with</label>
+                    <input type="email" placeholder="E-mail" />
+                    <input type="submit" value="Submit" class="pass-reset-submit btn btn-lg btn-success btn-block" />
+                </div>
+            </div>
+            <div class="wrap">
+                <p class="form-title">Welcome back! Please sign in</p>
+                <hr class="colorgraph">
+                <form class="log_regis" id="loginForm" action="login.do" method="post">
+	                <fieldset>
+		                <input type="text" placeholder="Username" id="loginId" name="loginId"/>
+		                <input type="password" placeholder="Password" id="password" name="password"/>
+		               	<div class="row-fluid">
+		                	<div class="remember-forgot  collapse in">
+		                        <div class="checkbox">
+	                                <label style="color:#333;">
+	                                    <input name="remeber" type="checkbox" value="Remember Me"></input>Remember Me
+	                                </label>
+		                        </div>
+		                        <div class="forgot-pass-content">
+		                            <a href="#" class="forgot-pass" style="color:#337ab7;">Forgot Password?</a>
+		                        </div>
+		                   </div>
+		                </div>
+		                <input type="submit" value="Login" class="btn btn-lg btn-success btn-block" />
+	               		<div class="ret_msg">
+							<span id="ret_msg" style="color:red">$!{ret_msg}</span>
+	                   	</div>
+	                   	<p class="text-center" ><a href="register" style="color:#337ab7;">Register for an account?</a></p>
+                   	</fieldset>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="posted-by">Posted By: <a href="http://www.lemon.com">Leg Brother</a></div>
+</div>
+    	
+    <script src="#springUrl('/resources/vendors/jquery-1.9.1.min.js')"></script>
+    <script src="#springUrl('/resources/bootstrap/js/bootstrap.min.js')"></script>
+    <script type="text/javascript">
+    	var homeUrl = "$!{systemUtils.getHomePage()}";
+    	$(document).ready(function() {
+    			//$("#loginForm").submit(function(e){
+    			$("#xxxx").submit(function(e){
+    				var url = "login.do";
+    				$.ajax({
+           				type: "POST",
+           				contentType: 'application/json; charset=utf-8',
+           				url: url,
+           				data: $("#loginForm").serialize(), // serializes the form's elements.
+           				dataType: "json",
+           				async: "false",
+			            success: function(response) {
+								document.location.href = homeUrl;
+								//window.location.assign(homeUrl);
+								//alert(window.location.href);
+								//$(location).attr('href',homeUrl);
+							if(response.status){
+							}
+			            },
+			            error: function(response){
+							alert("error " + response);
+							$("#message").replaceWith("login error");
+						}
+        			 });
+    			});
+			});
+    	
+    		 $(document).ready(function () {
+				    $('.forgot-pass').click(function(event) {
+				      $(".pr-wrap").toggleClass("show-pass-reset");
+				    }); 
+				    
+				    $('.pass-reset-submit').click(function(event) {
+				      $(".pr-wrap").removeClass("show-pass-reset");
+				    }); 
+			});
+    </script>
+  </body>
+</html>

@@ -1,0 +1,23 @@
+<article>
+	<h1 class="animate seven"><span>H</span><span>e</span><span>l</span><span>p</span></h1>
+	<p>You can run this Web Application via Tomcat or Jetty.</p>
+	<p>
+		Here are some properties need to setting in file(tiny\app\deploy\src\main\resources\config\system.properties).
+		<br>
+
+	</p>
+	<p>
+		Tiny can be positioned on any side of the screen: <br> <a
+			href="#">top</a> - <a href="#">right</a> - <a href="#">bottom</a> - <a
+			href="#">left</a>
+	</p>
+	<p>
+		The name, <em>Tiny</em>, is Stone Giant(a hero of Dota).
+	</p>
+	<small> Created by <a href="#">@Jun</a> / <a href="#">http://jun.com</a>
+	</small>
+</article>
+<div class="sharing">
+	<a href="#" class="twitter-share-button" data-text="jun"
+		data-url="#" data-count="small" data-related="jun"></a>
+</div>

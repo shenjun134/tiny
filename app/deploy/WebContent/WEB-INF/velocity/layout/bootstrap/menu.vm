@@ -1,0 +1,10 @@
+	#set($navItems = $!{urlUtils.getLevelXUrlListByPart(1,$CURRENT_NAV, $!{stringSupportUtil.getObject2Str($!{K_USEER.userId})})})
+	#foreach($itemlist in $navItems)
+		<ul class="nav nav-sidebar">
+		#foreach($item in $itemlist)
+			<li class="#if($item.code == $CURRENT_MENU) active#end">
+				<a href="$item.href" id="$item.code"><font size="4">$item.value</font></a>
+			</li>
+		#end
+		</ul>
+	#end

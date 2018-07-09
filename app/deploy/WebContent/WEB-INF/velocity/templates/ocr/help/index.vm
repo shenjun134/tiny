@@ -1,0 +1,1 @@
+#parse("/templates/ocr/common/index_template.vm")

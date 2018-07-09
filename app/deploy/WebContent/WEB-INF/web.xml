@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+	<!-- The definition of the Root Spring Container shared by all Servlets 
+		and Filters -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:spring/*.xml</param-value>
+	</context-param>
+	<!-- Creates the Spring Container shared by all Servlets and Filters -->
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	<listener>
+		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+	</listener>
+	<listener>
+		<listener-class>com.tiny.web.controller.listerner.SessionListenerWithMetrics</listener-class>
+	</listener>
+	<servlet>
+		<servlet-name>dispatcher</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>dispatcher</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+	
+	<filter>
+		<description>login</description>
+		<display-name>LoginFilter</display-name>
+		<filter-name>LoginFilter</filter-name>
+		<filter-class>com.tiny.web.controller.filter.LoginFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>LoginFilter</filter-name>
+		<url-pattern>/login.do</url-pattern>
+	</filter-mapping>
+
+	<display-name>tiny</display-name>
+	<error-page>
+		<error-code>500</error-code>
+		<location>/global/500.jsp</location>
+	</error-page>
+
+	<error-page>
+		<error-code>404</error-code>
+		<location>/global/404.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>403</error-code>
+		<location>/global/403.jsp</location>
+	</error-page>
+</web-app>

@@ -1,0 +1,15 @@
+#if($!{K_IS_LOGIN} == true)
+ <!DOCTYPE html>
+ <html lang="en">
+  <head>
+     #parse('/layout/bootstrap/header.vm')
+  </head>
+  <body>
+	 #parse('/layout/bootstrap/mainframe.vm')
+  	 #parse('/layout/bootstrap/tail.vm')
+  </body>
+  </html>
+#else
+	$!screen_content
+#end
+

@@ -1,0 +1,32 @@
+<div class="ct-out" style="height: calc(100% - 10px);">
+	<div class="ct-block ct-s-block" style="height: 100%;">
+		<span class="title">Trade Information</span>
+		<div style="display: flex; height: calc(100% - 0px);">
+			<div class="left" style="width: 500px">
+				<form id="templateTopForm" class="form-inline" action="/tiny/ocr/multiUpload.do" method="POST" style="margin-top: 20px; margin-bottom: 10px; margin-left: 10px; display: flex;">
+					<button id="temp-scan" type="button" class="btn btn-default btn-info form-group btn-off"
+						style="margin-left: 10px;" onclick="doTempScan()" >Scan Current Page</button>
+					<span id="scan-template-name" style="padding-left: 10px; font-size: 14px; font-weight: bold; margin-top: 10px; display: block; line-height: 34px; height: 34px;"></span>
+				</form>
+				<div id="scan-temp-ct" class="table-ct" style="height: calc(100% - 120px); overflow: auto;">
+				</div>
+				<form id="templateBottomForm" class="form-inline" action="/tiny/ocr/multiUpload.do" method="POST" style="margin-left: 10px; display: flex;">
+					<button id="temp-click-mark" type="button" class="btn btn-default btn-info form-group btn-off"
+						style="margin-left: 10px;" onclick="clickMark(this)" >Show Mark</button>
+					<button id="temp-submit" type="button" class="btn btn-default btn-info form-group btn-off"
+						style="margin-left: 10px;" onclick="doTempSubmit()" >Validate</button>
+						<div id="submit-result"></div>
+				</form>
+			</div>
+			<div style="border-left: 1px solid #ddd; margin-left: 20px; margin-right: 20px" >
+			</div>
+			<div id="temp-tiff-ct" class="right tiff-ct" style='width: calc(100% - 540px); overflow: auto;'>
+				<div id="tiff-show-next" class="show-upload"><p class="blank">Please upload a tiff image</p></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div id="temp-scan-result" style="display: none">
+</div>

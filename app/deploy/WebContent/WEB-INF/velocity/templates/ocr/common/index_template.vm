@@ -1,0 +1,24 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+#parse("/templates/ocr/head.vm")
+<body onload="init();" class="w3-animate-bottom">
+	#parse("/templates/ocr/nav.vm")
+	<div id="top"></div>
+	<div class="meny-arrow"></div>
+	<canvas id="c"></canvas>
+	<div id="g-load-ct" class="g-loading g-loading-hide">
+			<div class="loading" id="loading_data" >
+					<div class="k-line k-line6-1" ></div>
+					<div class="k-line k-line6-2" ></div>
+					<div class="k-line k-line6-3" ></div>
+					<div class="k-line k-line6-4" ></div>
+					<div class="k-line k-line6-5" ></div>
+			</div>
+	</div>
+	<div id="g-mesg-ct" class="g-message g-message-off">
+	</div>
+	<div id="main_content" class="contents">#parse("/templates/$!{view_path}/content.vm")</div>
+	#parse("/templates/ocr/tail.vm")
+	#parse("/templates/ocr/dialog.vm")
+</body>
+</html>

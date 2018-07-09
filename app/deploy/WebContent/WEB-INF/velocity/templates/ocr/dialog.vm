@@ -1,0 +1,29 @@
+<div id="dialog-image-temp" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-image-temp" aria-hidden="true">
+  <div class="modal-dialog" role="document" style="width: 100%; height: calc(100% -  60px); padding: 40px;">
+    <div class="modal-content" style="height: 100%;">
+      <div class="modal-body" style="height: 100%;">
+        ...
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="dialog-image-cover" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-image-cover" aria-hidden="true">
+  <div class="modal-dialog" role="document" style="width: 100%; height: calc(100% -  60px); padding: 40px;">
+    <div class="modal-content" style="height: 100%;">
+      <div class="modal-body" style="height: 100%;">
+        ...
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="dialog-image-signature" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-image-signature" aria-hidden="true">
+  <div class="modal-dialog" role="document" style="width: 100%; height: calc(100% -  60px); padding: 40px;">
+    <div class="modal-content" style="height: 100%;">
+      <div class="modal-body" style="height: 100%; padding: 0px; overflow: auto;">
+        ...
+      </div>
+    </div>
+  </div>
+</div>

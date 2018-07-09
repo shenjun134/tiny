@@ -1,0 +1,14 @@
+<div class="ct-out">
+	<div class="ct-block ct-s-block">
+		<span>Preview</span>
+		<form id="templateForm" class="form-inline"
+			action="#" method="post">
+			<div class="form-group">
+
+			</div>
+		</form>
+		<br />
+		Not implement yet.
+
+	</div>
+</div>

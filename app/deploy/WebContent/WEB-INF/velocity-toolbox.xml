@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<toolbox>
+	<!-- Velocity View Tools Start -->
+	<tool>
+		<key>dateUtils</key>
+		<scope>application</scope>
+		<class>com.tiny.common.util.DateUtils</class>
+	</tool>
+	<tool>
+		<key>systemUtils</key>
+		<scope>application</scope>
+		<class>com.tiny.common.util.SystemUtils</class>
+	</tool>
+	<tool>
+		<key>stringUtils</key>
+		<scope>application</scope>
+		<class>org.apache.commons.lang.StringUtils</class>
+	</tool>
+	<tool>
+		<key>stringSupportUtil</key>
+		<scope>application</scope>
+		<class>com.tiny.common.util.StringSupportUtils</class>
+	</tool>
+	<tool>
+		<key>enumColl</key>
+		<scope>application</scope>
+		<class>com.tiny.web.controller.enums.EnumCollection</class>
+	</tool>
+	
+</toolbox>

@@ -1,0 +1,26 @@
+<!DOCTYPE HTML >
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE" />
+<title>Tiny-OCR</title>
+
+<script src="/tiny/resources/lib/jquery/3.2.1/jquery.min.js"></script>
+<link rel="stylesheet" href="/tiny/resources/lib/w3c/css/w3.css" type="text/css">
+<link rel="stylesheet" href="/tiny/resources/css/word.css" type="text/css">
+</head>
+<link rel="stylesheet" href="/tiny/resources/lib/canvas/css/home.css" type="text/css">
+<link type="image/x-icon" href="/tiny/resources/images/stone.ico" rel="icon" />
+
+</head>
+<body class="w3-animate-bottom">
+<div class="title">
+    <h3 class="animate one"><span>I</span><span>n</span><span>s</span><span>t</span><span>r</span><span>u</span><span>c</span><span>t</span><span style="padding-left: 10px"></span><span>L</span><span>i</span><span>t</span><span>e</span><span> - </span><span>2</span><span>0</span><span>1</span><span>8</span></h3>
+    <h1><a href="/tiny/ocr" style="color: #fff;text-decoration:none;" class="animate one"><span>O</span><span style="padding-right: 5px;"> </span><span>C</span><span style="padding-right: 5px;"> </span><span>R</span></a></h1>
+
+</div>
+
+<script src="/tiny/resources/lib/canvas/js/home.js"></script>
+
+</body>
+</html>
