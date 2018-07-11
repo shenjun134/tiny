@@ -484,6 +484,13 @@ label.show-max{
     cursor: pointer;
     margin-right: 5px;
 }
+span.action{
+    cursor: pointer;
+}
+
+span.action:hover{
+    opacity: 0.8;
+}
 
 label.action:hover,
 label.show-max:hover,
@@ -684,6 +691,10 @@ div#submit-result{
 
 .g-message span.error{
     color: #555;
+}
+
+.g-message span.warning{
+    color: orange;
 }
 
 .mark-box{
@@ -912,7 +923,7 @@ tbody#signature-val-result h4{
 
 .option-ct{
     position: absolute;
-    z-index: 20;
+    z-index: 2000;
     right: 40px;
     bottom: 10px;
     /*height: 40px;*/
@@ -929,15 +940,18 @@ tbody#signature-val-result h4{
 
 .option-ct > span{
     cursor: pointer;
-    padding: 3px;
+    padding: 0 5px;
     color: #fff;
+    display: inline-block;
+    background: #555;
+    border-radius: 2px;
 }
 
 .option-ct > span:hover，
 .option-ct > span:active,
 .option-ct > span:focus{
     color: #aaa;
-
+    background: #888;
 }
 
 .option-ct > #stew{

@@ -66,6 +66,7 @@ public class FaxResultConverter {
         box.setH("" + matchResult.getHeight());
         box.setX("" + matchResult.getXmin());
         box.setY("" + matchResult.getYmin());
+        box.setRate("" + (matchResult.getScore() != null ? matchResult.getScore() * 100 : 0));
 
         if (matchResult.getWriters() != null) {
             for (Author author : matchResult.getWriters()) {

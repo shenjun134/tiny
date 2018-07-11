@@ -29,7 +29,7 @@ public abstract class AbstractSignatureService implements SignatureService {
             before(imagePath, imageName);
             SignatureResp signatureResp = process(imagePath, imageName);
             if (signatureResp == null || CollectionUtils.isEmpty(signatureResp.getMatchArea())) {
-                throw new RuntimeException("Oops, no matched area ... ");
+                throw new RuntimeException("no matched area ... ");
             }
 
             after(imagePath, imageName);

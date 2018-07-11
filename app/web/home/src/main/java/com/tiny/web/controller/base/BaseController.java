@@ -41,6 +41,8 @@ abstract public class BaseController {
             String HOME = "/ocr";
             String DEMO = "/ocr/demo";
             String SIGNATURE = "/ocr/signature";
+            String ROTATE_IMAGE = "/ocr/image/rotate.do";
+
             String HELP = "/ocr/help";
 
             String FIND_IMAGE = "/ocr/find/image";

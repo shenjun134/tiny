@@ -10,10 +10,13 @@ import com.tiny.core.model.SubFile;
 import com.tiny.web.controller.BaseJsonResult;
 import com.tiny.web.controller.http.request.SignatureReq;
 import com.tiny.web.controller.integration.factory.SignatureFactory;
+import com.tiny.web.controller.integration.util.RandomUtil;
 import com.tiny.web.controller.ocr.model.Box;
 import com.tiny.web.controller.ocr.util.FileUtil;
+import com.tiny.web.controller.ocr.util.ImageUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
@@ -28,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.imageio.ImageIO;
 import javax.media.jai.JAI;
 import javax.media.jai.RenderedOp;
 import javax.servlet.ServletContext;
@@ -117,6 +121,53 @@ public class SignatureController extends OCRController {
             logger.error("signatureUpload error -- " + e.getMessage(), e);
             baseJsonResult.marketFail("signature upload fail--" + e.getMessage());
         }
+        return baseJsonResult;
+    }
+
+    @RequestMapping(path = UrlCenter.OCR.ROTATE_IMAGE, method = RequestMethod.POST)
+    @ResponseBody
+    public Object imageRotate(@RequestParam("imgPath") String imgPath, @RequestParam("imgName") String imgName, @RequestParam("degree") String degree) {
+        logger.info("begin to rotate with imgPath：" + imgPath + ", imgName:" + imgName);
+        BaseJsonResult baseJsonResult = new BaseJsonResult();
+        if (StringUtils.isBlank(imgPath)) {
+            logger.error("Cannot find your file path");
+            return baseJsonResult.marketFail("Cannot find your file path.");
+        }
+        if (StringUtils.isBlank(imgName)) {
+            logger.error("Cannot find your file name ");
+            return baseJsonResult.marketFail("Cannot find your file name.");
+        }
+        try {
+            double degreeD = NumberUtils.toDouble(degree, 0);
+            if (degreeD % 360 == 0) {
+                return baseJsonResult.marketFail("degree is zero");
+            }
+            String type = imgName.substring(imgName.lastIndexOf(".") + 1);
+            String targetName = FileUtil.randomFileName(imgName);
+            String realPath = imgPath;
+            String contextPath = context.getContextPath();
+            String join = "/";
+            if (StringUtils.endsWith(imgPath, "/") || StringUtils.endsWith(imgPath, "\\")) {
+                join = "";
+            }
+            if (StringUtils.startsWith(imgPath, contextPath)) {
+                realPath = imgPath.substring(contextPath.length(), imgPath.length());
+            }
+
+            BufferedImage src = ImageIO.read(new File(webInfAbsolutePath + realPath + join + imgName));
+            BufferedImage rotate = (BufferedImage) ImageUtils.rotateImage(src, degreeD);
+            ImageIO.write(rotate, type, new File(webInfAbsolutePath + realPath + join + targetName));
+            FileInfo fileInfo = new FileInfo(imgPath + join + targetName, 0L);
+            fileInfo.setPath(imgPath);
+            fileInfo.setShortName(targetName);
+            fileInfo.setType(type);
+            baseJsonResult.markeSuccess("rotate succ", fileInfo);
+
+        } catch (Exception e) {
+            logger.error("image rotate error", e);
+        }
+
+
         return baseJsonResult;
     }
 

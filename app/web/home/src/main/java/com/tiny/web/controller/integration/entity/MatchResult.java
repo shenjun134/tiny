@@ -10,7 +10,7 @@ public class MatchResult {
 
     private Double width;
 
-    private Long score;
+    private Double score;
 
     private Double xmin;
 
@@ -40,11 +40,11 @@ public class MatchResult {
         this.width = width;
     }
 
-    public Long getScore() {
+    public Double getScore() {
         return score;
     }
 
-    public void setScore(Long score) {
+    public void setScore(Double score) {
         this.score = score;
     }
 

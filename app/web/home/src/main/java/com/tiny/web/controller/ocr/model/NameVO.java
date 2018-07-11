@@ -33,14 +33,21 @@ public class NameVO extends ToString {
             return;
         }
         String[] arr = src.trim().split("\\|");
-        if (arr == null || arr.length != 4) {
+        if (arr == null || arr.length == 0) {
             return;
         }
-        this.full = arr[0];
-        this.email = arr[1];
-        this.first = arr[2];
-        this.second = arr[3];
-
+        if (arr.length > 0) {
+            this.full = arr[0];
+        }
+        if (arr.length > 1) {
+            this.email = arr[1];
+        }
+        if (arr.length > 2) {
+            this.first = arr[2];
+        }
+        if (arr.length > 3) {
+            this.second = arr[3];
+        }
     }
 
     public String getFirst() {

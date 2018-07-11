@@ -61,7 +61,7 @@ public class RandomUtil {
     public static SignatureResp matchSignature(String fileName, String page) {
         boolean matched = random() <= Constant.succ;
         if (!matched) {
-            throw new RuntimeException("Oops, signature not matched!!!");
+            throw new RuntimeException("signature not matched!!!");
         }
         SignatureResp signatureResp = new SignatureResp();
         signatureResp.setMatchArea(randomMatchList());

@@ -28,43 +28,14 @@ function doSignUpload() {
         $('#tiff-show').html('<p class="warning">No File info Return....</p>');
         return;
       }
-      afterSignUpload();
-      $('#tiff-show').html('');
-      $('#tiff-show-next').html('');
-      $('#tiff-show').append('<div class="head"><a href="' + resp.data.name + '" title="download"><span>' + resp.data.name + '</span></a><span>' + resp.data.length + '</span></div><label class="show-max" data-target="#dialog-image-signature" data-toggle="modal">Max</label>');
-      var showHtml = '';
+      handleUploadRespBefore(resp);
       if (resp.data.type === 'image/tiff' || resp.data.type === 'image/tiff') {
         split2Png(resp);
       } else if(resp.data.type === 'application/pdf' || resp.data.type === 'application/pdf'){
         handlePdf2Png(resp);
       }else {
-        //var optionArea = '<div class="option-ct"><input id="stew" type="text" /> <span class="plus" onclick="imagePlus(this);">+</span><span class="minus" onclick="imageMinus(this);">-</span><span class="save" onclick="imageSave(this);">Save</span></div>';
-        var optionArea = '';
-        var markArea = '<div class="mark-ct"></div>';
-        var canvasCover = '<canvas id="sign-canvas" width="0" height="0" style="display: none;"></canvas>';
-        var image = '<div class="cell on "><img id="upload-signature-pre" alt="display-upload-file" class="upload-img upload-img-'+0+'"  src="'+resp.data.name+'" data-path="'+resp.data.path+'" data-sname="'+resp.data.shortName+'"/>'+ optionArea + markArea + canvasCover + '</div>';
-        $('#tiff-show').append(image);
-        $('#dialog-image-signature .modal-body').html(image);
-
-        // showHtml = $('<img id="upload-signature-pre" alt="display-upload-file" />')
-        //   .attr({
-        //     class: 'upload-img',
-        //     width: '100%',
-        //     height: 'auto',
-        //     src: resp.data.name
-        //   });
-        // $('#tiff-show').append(showHtml);
-        // var markArea = '<div class="mark-ct"></div>';
-        // var canvasCt = '<canvas id="sign-canvas" width="0" height="0" style="display: none;"></canvas>'
-        // $('#tiff-show').append(canvasCt);
-
-				// var image = '<img id="upload-signature-org" alt="display-upload-file" width="auto" height="auto" src="'+resp.data.name+'" style="border-radius: 6px;"/>';
-
-				// $('#dialog-image-signature .modal-body').html(image);
-				showMessage('success', 'Upload successfully');
-        setTimeout( function() {
-          afterImageLoad();
-        }, 1000);
+        handleSinglePageUploadResp(resp);
+        showMessage('success', 'Upload successfully');
       }
 
     },
@@ -74,6 +45,28 @@ function doSignUpload() {
 			showMessage('error', 'Upload failed.' + err);
     }
   });
+}
+
+function handleUploadRespBefore(resp){
+    afterSignUpload();
+    $('#tiff-show').html('');
+    $('#tiff-show-next').html('');
+    $('#tiff-show').append('<div class="head"><a href="' + resp.data.name + '" title="download"><span>' + resp.data.name + '</span></a><span>' + resp.data.length + '</span></div>');
+
+}
+
+function handleSinglePageUploadResp(resp){
+
+    var optionArea = '';
+    var markArea = '<div class="mark-ct"></div>';
+    var canvasCover = '<canvas id="sign-canvas" width="0" height="0" style="display: none;"></canvas>';
+    var image = '<div class="cell on "><img id="upload-signature-pre" alt="display-upload-file" class="upload-img upload-img-'+0+'"  src="'+resp.data.name+'" data-path="'+resp.data.path+'" data-sname="'+resp.data.shortName+'"/>'+ optionArea + markArea + canvasCover + '</div>';
+    $('#tiff-show').append(image);
+    $('#dialog-image-signature .modal-body').html(image);
+
+    setTimeout( function() {
+      afterImageLoad();
+    }, 1000);
 }
 
 function handlePdf2Png(resp){
@@ -147,28 +140,48 @@ function showObjectPDF(resp){
 }
 
 function beforeSignUpload(){
-	$('button#sign-val').addClass('btn-off');
-	$('button#sign-sub').addClass('btn-off');
-  $('button#sign-fix').addClass('btn-off');
-  $('#sign-tiff-ct').css('background', '#aaa');
-  $('.option-ct').css('display', 'none');
-	cleanValResult();
-  cleanImagInfo();
-  cleanRectangleInfo();
-  canvasOff();
-  cleanCut();
-  canvas = null;
+    $('button#sign-val').addClass('btn-off');
+    $('button#sign-sub').addClass('btn-off');
+    $('button#sign-fix').addClass('btn-off');
+    $('#sign-tiff-ct').css('background', '#aaa');
+    $('.option-ct').css('display', 'none');
+    resetStew();
+    cleanValResult();
+    cleanImagInfo();
+    cleanRectangleInfo();
+    canvasOff();
+    cleanCut();
+    canvas = null;
+}
+
+function resetStew(){
+    $('#stew').val(0);
+    $("#upload-signature-pre").css('-ms-transform', 'rotate(0deg)');
+    $("#upload-signature-pre").css('-webkit-transform',  'rotate(0deg)');
+    $("#upload-signature-pre").css('transform',  'rotate(0deg)');
 }
 
 function afterSignUpload(){
-	$('button#sign-val').removeClass('btn-off');
-  $('#sign-tiff-ct').css('background', 'rgb(34, 34, 34)');
-  $('.option-ct').css('display', 'block');
+    $('button#sign-val').removeClass('btn-off');
+    $('#sign-tiff-ct').css('background', 'rgb(34, 34, 34)');
+    $('.option-ct').css('display', 'block');
+
+    var stewInput = document.getElementById('stew');
+    stewInput.addEventListener("keyup", function(event){
+        event.preventDefault();
+        if(event.keyCode != 13 ){
+            return;
+        }
+        stewPress();
+    }
+    );
+
+
 }
 
 function afterValidate(){
-  $('button#sign-sub').removeClass('btn-off');
-  $('button#sign-fix').removeClass('btn-off');
+    $('button#sign-sub').removeClass('btn-off');
+    $('button#sign-fix').removeClass('btn-off');
 }
 
 function removeCanvas(){
@@ -290,6 +303,12 @@ function displayCanvas(show){
 
 
 function doSignVal(){
+
+    var degree = $('#stew').val();
+    if(degree != '0'){
+        showMessage('warning', 'Your rotated image has not been saved!');
+        return;
+    }
 	var uploadLink = $('#tiff-show a');
   if(uploadLink === undefined){
     console.log('no file upload here');
@@ -1104,8 +1123,8 @@ function buildName(name, i){
   var nameStr = JSON.stringify(name);
   var clz = i === 0 ? 'name-ct name-active' : 'name-ct';
   var html = "<div class='"+clz+"' data-name='"+nameStr+"' onclick='pickName(this)'>";
-  html = html + '<label class="name">' + name.full + '</label>';
-  html = html + '<label class="email">' + name.email + '</label>';
+  html = html + '<label class="name">' + (name.full ?  name.full : '') + '</label>';
+  html = html + '<label class="email">' + (name.email ? name.email : '') + '</label>';
   html = html + '<label class="flg"><i class="fa fa-check-circle-o" aria-hidden="true"></i></label>';
   html = html + '</div>';
   return html;
@@ -1153,7 +1172,7 @@ document.onkeyup  = function(e){
   }
 }
 
-function imagePlus(e){
+function imagePlus(){
     var src = $("#stew").val();
     var degree = parseFloatH(src);
     degree = degree + 1;
@@ -1162,11 +1181,12 @@ function imagePlus(e){
     }else if(degree < -360){
         degree = 0;
     }
-
     $("#stew").val(degree);
+
+    imageStewApply();
 }
 
-function imageMinus(e){
+function imageMinus(){
     var src = $("#stew").val();
     var degree = parseFloatH(src);
     degree = degree - 1;
@@ -1176,8 +1196,82 @@ function imageMinus(e){
         degree = 0;
     }
     $("#stew").val(degree);
+    imageStewApply();
 }
 
-function imageSave(e){
+function stewPress(){
+    var src = $("#stew").val();
+    var degree = parseFloatH(src);
+
+    if(degree > 360 || degree < -360){
+        degree = 0;
+    }
+    $("#stew").val(degree);
+    imageStewApply();
+}
+
+function imageStewApply(){
+    //upload-signature-pre
+    var src = $("#stew").val();
+    var rotate = "rotate(" + src + "deg)"
+
+    $("#upload-signature-pre").css('-ms-transform', rotate);
+    $("#upload-signature-pre").css('-webkit-transform', rotate);
+    $("#upload-signature-pre").css('transform', rotate);
+}
+
+function imageSave(){
+    var src = $("#stew").val();
+    var degree = parseFloatH(src);
+    if(degree%360 === 0){
+        showMessage('warning', 'No degree rotate!!!');
+        return;
+    }
+
+    //upload-signature-pre
+    var imgObj = $('#upload-signature-pre');
+    var imgPath = imgObj.attr("data-path");
+    var imgName = imgObj.attr("data-sname");
+    var url = '/tiny/ocr/image/rotate.do?imgPath=' + imgPath + '&imgName=' + imgName + '&degree='+degree;
+
+    showLoading();
+
+    $.ajax({
+           type: "POST",
+           url: url,
+           contentType: "application/json",
+           success: function(resp)
+           {
+              hideLoading();
+
+              if(resp.status){
+                showMessage('success', resp.message);
+                beforeSignUpload();
+
+                handleUploadRespBefore(resp);
+                handleSinglePageUploadResp(resp);
+
+              }else{
+                showMessage('error', resp.message);
+              }
+
+           },
+           error: function(err){
+             hideLoading();
+             showMessage('error', 'Save fail!');
+
+           }
+    });
+}
+
+
+function optionSwitch(e){
+    var display = $(".option-ct").css("display");
+    console.log('optionSwitch', display);
+    if(display !== undefined && display === 'none'){
+        $(".option-ct").css("display", "block");
+    }else{
+        $(".option-ct").css("display", "none");
+    }
 
 }

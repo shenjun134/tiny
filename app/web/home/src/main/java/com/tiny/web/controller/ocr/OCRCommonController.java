@@ -12,4 +12,5 @@ public class OCRCommonController extends OCRController {
         model.addAttribute("view_path", UrlCenter.OCR.HELP);
         return View.HELP;
     }
+
 }
