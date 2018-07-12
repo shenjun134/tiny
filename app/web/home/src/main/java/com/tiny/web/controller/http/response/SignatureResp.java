@@ -12,6 +12,8 @@ public class SignatureResp extends ToString {
      */
     private static final long serialVersionUID = -4308540007069175138L;
 
+    private String faxId;
+
 
     private List<Box> matchArea = new ArrayList<>();
 
@@ -23,5 +25,14 @@ public class SignatureResp extends ToString {
     public void setMatchArea(List<Box> matchArea) {
         this.matchArea = matchArea;
     }
+
+    public String getFaxId() {
+        return faxId;
+    }
+
+    public void setFaxId(String faxId) {
+        this.faxId = faxId;
+    }
+
 
 }

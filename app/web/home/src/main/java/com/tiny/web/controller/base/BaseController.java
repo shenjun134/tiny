@@ -51,6 +51,8 @@ abstract public class BaseController {
 
             String SIGNATURE_UPLOAD = "/ocr/signUpload.do";
 
+            String SIGNATURE_LOAD_SAMPLE_NAME = "/ocr/sign/sampleLoad";
+
             String COVER_SCAN = "/ocr/coverScan.do";
 
             String TEMP_SCAN = "/ocr/tempScan.do";

@@ -104,6 +104,7 @@ public class SignatureController extends OCRController {
     @RequestMapping(path = {UrlCenter.OCR.SIGNATURE})
     public String index(ModelMap model) {
         model.addAttribute("view_path", UrlCenter.OCR.SIGNATURE);
+        model.addAttribute("writer-list", RandomUtil.loadNameList());
         return View.SIGNATURE;
     }
 
@@ -166,8 +167,22 @@ public class SignatureController extends OCRController {
         } catch (Exception e) {
             logger.error("image rotate error", e);
         }
+        return baseJsonResult;
+    }
 
-
+    @RequestMapping(path = UrlCenter.OCR.SIGNATURE_LOAD_SAMPLE_NAME, method = RequestMethod.GET)
+    @ResponseBody
+    public Object sampleNameLoad(@RequestParam("name") String name) {
+        BaseJsonResult baseJsonResult = new BaseJsonResult();
+        if (StringUtils.isBlank(name)) {
+            return baseJsonResult.markeSuccess("load succ", RandomUtil.loadNameList());
+        }
+        try {
+            return baseJsonResult.markeSuccess("load succ", RandomUtil.queryName(name));
+        } catch (Exception e) {
+            logger.error("sampleNameLoad error - " + name, e);
+            baseJsonResult.marketFail(e.getLocalizedMessage());
+        }
         return baseJsonResult;
     }
 
@@ -200,6 +215,7 @@ public class SignatureController extends OCRController {
     @RequestMapping(path = {UrlCenter.OCR.SIGNATURE_SUBMIT}, method = RequestMethod.POST)
     @ResponseBody
     public Object submit(@RequestBody SignatureReq signatureReq) {
+        logger.info("submit signatureReq:" + signatureReq);
         BaseJsonResult baseJsonResult = new BaseJsonResult();
         try {
             baseJsonResult.markeSuccess("submit succ", true);

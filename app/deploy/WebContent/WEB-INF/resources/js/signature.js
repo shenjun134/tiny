@@ -145,6 +145,8 @@ function beforeSignUpload(){
     $('button#sign-fix').addClass('btn-off');
     $('#sign-tiff-ct').css('background', '#aaa');
     $('.option-ct').css('display', 'none');
+    $('#writer-list').addClass('opt-off');
+    document.getElementById("writer-list").options[0].selected = true;
     resetStew();
     cleanValResult();
     cleanImagInfo();
@@ -165,6 +167,7 @@ function afterSignUpload(){
     $('button#sign-val').removeClass('btn-off');
     $('#sign-tiff-ct').css('background', 'rgb(34, 34, 34)');
     $('.option-ct').css('display', 'block');
+    $('#writer-list').removeClass('opt-off');
 
     var stewInput = document.getElementById('stew');
     stewInput.addEventListener("keyup", function(event){
@@ -345,7 +348,9 @@ function doSignVal(){
                 markStatus('success', resp.message);
                 $('#signature-val-result input#name').val(resp.data.name ? resp.data.name : '');
                 $('#signature-val-result input#email').val(resp.data.email ? resp.data.email : '');
+                $('#signature-val-result input#writerId').val(resp.data.id ? resp.data.id : '');
                 $('#signature-val-result input#comments').val(resp.data.comments ? resp.data.comments : '');
+                $('#signature-val-result input#validateImageId').val(resp.data.faxId ? resp.data.faxId : '');
                 createMarkBox(resp.data.matchArea);
               }else{
                 markStatus('danger', resp.message);
@@ -426,29 +431,38 @@ function doSignSumbit(){
   confirmArea.y = boxOn.attr('data-y');
   confirmArea.rate = boxOn.attr('data-rate');
 
-  var pageIndex = page.html();
+    var pageIndex = page.html();
 	showLoading();
 	var url = '/tiny/ocr/signSub.do';
+	var writerId = '';
 	var whois = '';
 	var email = '';
 	var comments = '';
+	var validateImageId = '';
   $('#signature-val-result input').each(function (index){
     var value = $(this).val();
     var id = $(this).attr('id');
+    //console.log('doSignSumbit', id + '- ' + value);
     if(value === undefined){
       value = '';
     }
-    if(id = 'name'){
-			whois = value;
-		}
-		if(id = 'email'){
-			email = value;
-		}
-		if(id = 'comments'){
-			comments = value;
-		}
+    if(id === 'name'){
+        whois = value;
+    }
+    if(id === 'writerId'){
+        writerId = value;
+    }
+    if(id === 'email'){
+        email = value;
+    }
+    if(id === 'comments'){
+        comments = value;
+    }
+    if(id === 'validateImageId'){
+        validateImageId = value;
+    }
   });
-	var body = {'whois': whois, 'email': email, 'comments': comments, 'fileName': link, 'pageIndex': pageIndex, 'confirmArea': confirmArea};
+	var body = {'name': whois, 'writerId': writerId, 'email': email, 'comments': comments, 'fixedImage': link, 'validateId': validateImageId, 'pageIndex': pageIndex, 'confirmArea': confirmArea};
 
 	$.ajax({
            type: "POST",
@@ -488,24 +502,32 @@ function doSignFix(){
   }
   var pageIndex = page.html();
   var url = '/tiny/ocr/signSub.do';
+  var writerId = '';
 	var whois = '';
 	var email = '';
 	var comments = '';
+	var validateImageId = '';
   $('#signature-val-result input').each(function (index){
     var value = $(this).val();
     var id = $(this).attr('id');
     if(value === undefined){
       value = '';
     }
-    if(id = 'name'){
-			whois = value;
-		}
-		if(id = 'email'){
-			email = value;
-		}
-		if(id = 'comments'){
-			comments = value;
-		}
+    if(id === 'name'){
+        whois = value;
+    }
+    if(id === 'writerId'){
+        writerId = value;
+    }
+    if(id === 'email'){
+        email = value;
+    }
+    if(id === 'comments'){
+        comments = value;
+    }
+    if(id === 'validateImageId'){
+        validateImageId = value;
+    }
   });
   var x = $('#box-x').val();
   var y = $('#box-y').val();
@@ -517,7 +539,7 @@ function doSignFix(){
   }else{
     fixedArea = {'x': x, 'y': y, 'w': w, 'h': h };
   }
-	var body = {'whois': whois, 'email': email, 'comments': comments, 'fileName': link, 'fixedArea': fixedArea, 'pageIndex': pageIndex};
+	var body = {'name': whois, 'writerId': writerId, 'email': email, 'comments': comments, 'fixedImage': link, 'validateId': validateImageId, 'fixedArea': fixedArea, 'pageIndex': pageIndex};
 	$.ajax({
            type: "POST",
            url: url,
@@ -537,11 +559,12 @@ function doSignFix(){
 }
 
 function cleanValResult(){
-	$('#signature-val-result input').each(function (index){
-    $(this).val('');
-  });
-  cleanStatus();
-  cleanMarkBox();
+    $('#signature-val-result input').each(function (index){
+        $(this).val('');
+    });
+    $('#signature-val-result input#validateImageId').val('');
+    cleanStatus();
+    cleanMarkBox();
 }
 
 
@@ -1013,10 +1036,10 @@ function createMarkBox(matchArea){
     var nameList = temp.nameList;
     var nameStr = JSON.stringify(nameList);
 
-    var innderText = buildNameStr(nameStr);
+    var innerText = buildNameStr(nameStr);
     var dataSrc = 'width:' + w + 'px;height:' + h + 'px;left:' + x + 'px;top:' + y + 'px;';
     var dataScale = 'width:' + w + 'px; height:' + h + 'px; left:' + x + 'px; top:' + y + 'px; line-height:' + h + 'px; text-align: center;';
-    var box = '<div id="mb-'+i+'" data-x="' + x + '" data-y="'+y+'" data-w="'+w+'" data-h="'+h+'" data-rate="'+rate+'"  onclick="markBoxClick(this)" class="mark-box box-off" style="' + dataScale + '">'+innderText+'</div>';
+    var box = '<div id="mb-'+i+'" data-x="' + x + '" data-y="'+y+'" data-w="'+w+'" data-h="'+h+'" data-rate="'+rate+'"  onclick="markBoxClick(this)" class="mark-box box-off" style="' + dataScale + '">'+innerText+'</div>';
     $('#tiff-show .mark-ct').append(box);
   }
   setTimeout( function () {
@@ -1025,8 +1048,8 @@ function createMarkBox(matchArea){
 }
 
 function buildNameStr(nameStr){
-  var innderText = "<input type=hidden value='" + nameStr + "'></input>";
-  return innderText;
+  var innerText = "<input type=hidden value='" + nameStr + "'></input>";
+  return innerText;
 }
 
 function getNameStrHtml(id){
@@ -1145,6 +1168,7 @@ function pickName(e){
 function printName(name){
   $('#signature-val-result input#name').val(name.full);
   $('#signature-val-result input#email').val(name.email);
+  $('#signature-val-result input#writerId').val(name.id);
   $('#signature-val-result input#comments').val(name.comments);
 }
 
@@ -1273,5 +1297,14 @@ function optionSwitch(e){
     }else{
         $(".option-ct").css("display", "none");
     }
+}
 
+function onWriterChange(element){
+    var id = $(element).val();
+    var name = $("#writer-list option:selected").text();
+
+    $('#signature-val-result input#writerId').val(id);
+    $('#signature-val-result input#name').val(name);
+    $('#signature-val-result input#email').val('');
+    $('#signature-val-result input#comments').val('fixed writer id:' + id);
 }

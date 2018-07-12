@@ -14,31 +14,33 @@
 				</form>
 				<table class="table table-hover form" style="margin: 0px">
 					<tbody id="signature-val-result">
+					    <input type="hidden" class="form-control" id="validateImageId" name="validateImageId" />
 						<tr>
-								<th>Name</th>
-								<td style="position: relative;">
-									<input type="text" class="form-control" id="name" name="name" placeholder='' data-type="" data-rule="" data-max-len="" data-min-len="" data-required="">
-									<span class="error-tip" id="err-$item.id" style="display: none;"></span>
-								</td>
-							</tr>
-							<tr>
-								<th>E-Mail</th>
-								<td style="position: relative;">
-									<input type="text" class="form-control" id="email" name="email" placeholder='' data-type="" data-rule="" data-max-len="" data-min-len="" data-required="">
-									<span class="error-tip" id="err-$item.id" style="display: none;"></span>
-								</td>
-							</tr>
-							<tr>
-								<th>Comments</th>
-								<td style="position: relative;">
-									<input type="text" class="form-control" id="comments" name="comments" placeholder='' data-type="" data-rule="" data-max-len="" data-min-len="" data-required="">
-									<span class="error-tip" id="err-$item.id" style="display: none;"></span>
-								</td>
-							</tr>
-              <tr>
-								<th id="status" colspan="2">
-                </th>
-							</tr>
+                            <th>Name</th>
+                            <td style="position: relative;">
+                                <input type="text" class="form-control" id="name" name="name" placeholder='' data-type="" data-rule="" data-max-len="" data-min-len="" data-required="">
+                                <input type="hidden" class="form-control" id="writerId" name="writerId" placeholder='' data-type="" data-rule="" data-max-len="" data-min-len="" data-required="">
+                                <span class="error-tip" id="err-$item.id" style="display: none;"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>E-Mail</th>
+                            <td style="position: relative;">
+                                <input type="text" class="form-control" id="email" name="email" placeholder='' data-type="" data-rule="" data-max-len="" data-min-len="" data-required="">
+                                <span class="error-tip" id="err-$item.id" style="display: none;"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Comments</th>
+                            <td style="position: relative;">
+                                <input type="text" class="form-control" id="comments" name="comments" placeholder='' data-type="" data-rule="" data-max-len="" data-min-len="" data-required="">
+                                <span class="error-tip" id="err-$item.id" style="display: none;"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th id="status" colspan="2">
+                            </th>
+                        </tr>
 					</tbody>
 				</table>
 				<form id="signSubmitForm" class="form-inline" action="" method="POST" style="margin-bottom: 20px; margin-left: 10px;">
@@ -46,6 +48,12 @@
 						style="margin-left: 10px;" onclick="doSignSumbit()" >Submit</button>
 					<button id="sign-fix" type="button" class="btn btn-default btn-info form-group btn-off"
 						style="margin-left: 10px;" onclick="doSignFix()" >Fix</button>
+					<select id="writer-list" class="form-group opt-off" onchange="onWriterChange(this);">
+					    <option value="-1">Blank</option>
+					    #foreach($temp in $writer-list)
+                            <option value="$temp.id">$temp.full</option>
+					    #end
+                    </select>
 				</form>
         <div id="cut-ct" style="padding: 20px; overflow: auto;  border-top-right-radius: 4px; border-bottom-right-radius: 4px; width: 500px; height: 300px;">
 
@@ -65,23 +73,23 @@
             <span>X:</span><input type="text" id="box-x" name="box-x" disabled/>
             <span>Y:</span><input type="text" id="box-y" name="box-y" disabled/>
             <label id="clean-btn" class="action show-m-info"
-							style="margin-left: 15px; padding-left: 2px; padding-right: 2px; background: #555; color: #fff; border-radius: 2px; line-height: 18px; cursor: pointer;"
-							onclick="cleanRectangle()" tooltip="CTRL + ALT + C" flow="left">
-							Clean
-						</label>
+                style="margin-left: 15px; padding-left: 2px; padding-right: 2px; background: #555; color: #fff; border-radius: 2px; line-height: 18px; cursor: pointer;"
+                onclick="cleanRectangle()" tooltip="CTRL + ALT + C" flow="left">
+                Clean
+            </label>
 
             <label class="action" id="sign-canvas-switch" style="margin-left: 15px; cursor: pointer; display: none; " onclick="canvasSwitchClick(this)"><i class="fa fa-toggle-off"></i></label>
-						<label class="action show-m-info" id="sign-image-cut"
-							style="margin-left: 15px; opacity: 0.6; color: #222; width: 20px; text-align: center; border-radius: 2px; padding-right: 5px;"
-							onclick="canvasSwitchClick(this)" tooltip="CTRL + ALT + A" flow="left">
-							<i class="fa fa-scissors" aria-hidden="true"></i>
-						</label>
+                <label class="action show-m-info" id="sign-image-cut"
+                    style="margin-left: 15px; opacity: 0.6; color: #222; width: 20px; text-align: center; border-radius: 2px; padding-right: 5px;"
+                    onclick="canvasSwitchClick(this)" tooltip="CTRL + ALT + A" flow="left">
+                    <i class="fa fa-scissors" aria-hidden="true"></i>
+                </label>
           </div>
         </div>
-			</div>
-			<div style="border-left: 1px solid #ddd; margin-left: 20px; margin-right: 20px" >
-			</div>
-      <div class="right " style='width: calc(100% - 540px); '>
+    </div>
+    <div style="border-left: 1px solid #ddd; margin-left: 20px; margin-right: 20px" >
+    </div>
+    <div class="right " style='width: calc(100% - 540px); '>
         <div id="sign-tiff-ct" class="tiff-ct" style='height: calc(100% - 0px); overflow: auto;'>
           <div id="tiff-show" class="show-upload" style='position: relative;'><p class="blank">Please upload a signature image</p></div>
         </div>
@@ -94,6 +102,6 @@
             <span class="show-max" data-target="#dialog-image-signature" data-toggle="modal"><i class="fa fa-expand"  aria-hidden="true"></i></span>
         </div>
       </div>
-		</div>
-	</div>
+    </div>
+    </div>
 </div>

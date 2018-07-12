@@ -961,4 +961,14 @@ tbody#signature-val-result h4{
     text-align: center;
 }
 
+#writer-list{
+    margin-left: 10px;
+    height: 32px;
+    text-align: left:
+}
+
+.opt-off{
+    display: none !important;
+}
+
 /*********************************carousel********************************************/

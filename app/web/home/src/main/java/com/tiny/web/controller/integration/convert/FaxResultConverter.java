@@ -47,6 +47,7 @@ public class FaxResultConverter {
 //                Box box = match2Box(signatureResult);
 //            }
             SignatureResult signatureResult = faxResult.getFaxes()[0];
+            signatureResp.setFaxId(signatureResult.getFax_id());
             if (signatureResult.getSignatures() != null) {
                 for (MatchResult matchResult : signatureResult.getSignatures()) {
                     Box box = match2Box(matchResult);

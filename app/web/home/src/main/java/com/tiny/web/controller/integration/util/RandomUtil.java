@@ -7,6 +7,7 @@ import com.tiny.web.controller.ocr.model.NameVO;
 import com.tiny.web.controller.ocr.util.FileUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 
@@ -49,8 +50,32 @@ public class RandomUtil {
                 }
             }
         }
+    }
 
+    /**
+     * @return
+     */
+    public static List<NameVO> loadNameList() {
+        return new ArrayList<>(nameVOMap.values());
+    }
 
+    /**
+     * @param name
+     * @return
+     */
+    public static List<NameVO> queryName(String name) {
+        List<NameVO> list = new ArrayList<>();
+        if (StringUtils.isBlank(name)) {
+            return list;
+        }
+        String temp = name.toLowerCase().trim();
+        for (NameVO nameVO : nameVOMap.values()) {
+            String fullName = StringUtils.isBlank(nameVO.getFull()) ? "" : nameVO.getFull().toLowerCase();
+            if (StringUtils.contains(fullName, temp)) {
+                list.add(nameVO);
+            }
+        }
+        return list;
     }
 
     /**
@@ -64,6 +89,7 @@ public class RandomUtil {
             throw new RuntimeException("signature not matched!!!");
         }
         SignatureResp signatureResp = new SignatureResp();
+        signatureResp.setFaxId("" + randomInt(999999, 100000) + ".jpg");
         signatureResp.setMatchArea(randomMatchList());
         return signatureResp;
     }
@@ -140,6 +166,7 @@ public class RandomUtil {
         name.setEmail(email.toString());
         name.setComments("mocked");
         name.setRate(randomPerc());
+        name.setId(Long.valueOf(randomInt(480, 0)));
         return name;
     }
 
@@ -170,6 +197,16 @@ public class RandomUtil {
         DecimalFormat twoDeciaml = new DecimalFormat("#0.00");
 
         int nameSize = 5;
+    }
+
+    public static int randomInt(int maxRow, int minRow) {
+        int length = (int) (Math.random() * Integer.MAX_VALUE % maxRow);
+        if (length < minRow && length > 0) {
+            length = minRow;
+        } else if (length == 0) {
+            length = maxRow;
+        }
+        return length;
     }
 
     public static void main(String[] args) throws IOException {

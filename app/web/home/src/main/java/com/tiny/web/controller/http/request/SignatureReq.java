@@ -12,6 +12,8 @@ public class SignatureReq extends ToString {
 
     private String pageIndex;
 
+    private String writerId;
+
     private String name;
 
     private String email;
@@ -23,6 +25,11 @@ public class SignatureReq extends ToString {
      * but user want to match it, it will be the fixed signature pic
      */
     private String fixedImage;
+
+    /**
+     * a image id which come from learn machine
+     */
+    private String validateId;
 
     /**
      * below W,H,X,Y will be the fixed rectangle area in the signature picture
@@ -92,5 +99,36 @@ public class SignatureReq extends ToString {
 
     public void setConfirmArea(Box confirmArea) {
         this.confirmArea = confirmArea;
+    }
+
+    public String getWriterId() {
+        return writerId;
+    }
+
+    public void setWriterId(String writerId) {
+        this.writerId = writerId;
+    }
+
+    public String getValidateId() {
+        return validateId;
+    }
+
+    public void setValidateId(String validateId) {
+        this.validateId = validateId;
+    }
+
+    @Override
+    public String toString() {
+        return "SignatureReq{" +
+                "pageIndex='" + pageIndex + '\'' +
+                ", writerId='" + writerId + '\'' +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", comments='" + comments + '\'' +
+                ", fixedImage='" + fixedImage + '\'' +
+                ", validateId='" + validateId + '\'' +
+                ", fixedArea=" + fixedArea +
+                ", confirmArea=" + confirmArea +
+                '}';
     }
 }
