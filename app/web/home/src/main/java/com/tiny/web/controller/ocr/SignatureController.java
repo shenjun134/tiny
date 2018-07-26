@@ -9,6 +9,7 @@ import com.tiny.core.model.FileInfo;
 import com.tiny.core.model.SubFile;
 import com.tiny.web.controller.BaseJsonResult;
 import com.tiny.web.controller.http.request.SignatureReq;
+import com.tiny.web.controller.integration.entity.FixedFax;
 import com.tiny.web.controller.integration.factory.SignatureFactory;
 import com.tiny.web.controller.integration.util.RandomUtil;
 import com.tiny.web.controller.ocr.model.Box;
@@ -127,7 +128,7 @@ public class SignatureController extends OCRController {
 
     @RequestMapping(path = UrlCenter.OCR.ROTATE_IMAGE, method = RequestMethod.POST)
     @ResponseBody
-    public Object imageRotate(@RequestParam("imgPath") String imgPath, @RequestParam("imgName") String imgName, @RequestParam("degree") String degree) {
+    public Object imageRotate(@RequestParam("imgPath") String imgPath, @RequestParam("imgName") String imgName, @RequestParam("degree") String degree, @RequestParam("transparency") String transparency) {
         logger.info("begin to rotate with imgPath：" + imgPath + ", imgName:" + imgName);
         BaseJsonResult baseJsonResult = new BaseJsonResult();
         if (StringUtils.isBlank(imgPath)) {
@@ -156,7 +157,7 @@ public class SignatureController extends OCRController {
             }
 
             BufferedImage src = ImageIO.read(new File(webInfAbsolutePath + realPath + join + imgName));
-            BufferedImage rotate = (BufferedImage) ImageUtils.rotateImage(src, degreeD);
+            BufferedImage rotate = (BufferedImage) ImageUtils.rotateImage(src, degreeD, NumberUtils.toInt(transparency, 1));
             ImageIO.write(rotate, type, new File(webInfAbsolutePath + realPath + join + targetName));
             FileInfo fileInfo = new FileInfo(imgPath + join + targetName, 0L);
             fileInfo.setPath(imgPath);
@@ -218,6 +219,9 @@ public class SignatureController extends OCRController {
         logger.info("submit signatureReq:" + signatureReq);
         BaseJsonResult baseJsonResult = new BaseJsonResult();
         try {
+            if (signatureReq.getFixedArea() != null) {
+                signatureFactory.getService().fix(convert2FixFax(signatureReq));
+            }
             baseJsonResult.markeSuccess("submit succ", true);
         } catch (Exception e) {
             logger.error("submit error -- " + e.getMessage(), e);
@@ -413,5 +417,25 @@ public class SignatureController extends OCRController {
         return subFiles;
     }
 
+
+    private FixedFax convert2FixFax(SignatureReq signatureReq) {
+        FixedFax fixedFax = new FixedFax();
+        Box box = signatureReq.getFixedArea();
+        fixedFax.setWidth(NumberUtils.toDouble(box.getW(), 0));
+        fixedFax.setHeight(NumberUtils.toDouble(box.getH(), 0));
+        fixedFax.setXmin(NumberUtils.toDouble(box.getX(), 0));
+        fixedFax.setYmin(NumberUtils.toDouble(box.getY(), 0));
+
+        fixedFax.setFixedImageId(signatureReq.getValidateId());
+        fixedFax.setWriterId(NumberUtils.toLong(signatureReq.getWriterId(), 0));
+
+        fixedFax.setWriterName(signatureReq.getName());
+
+        fixedFax.setWriterEmail(signatureReq.getEmail());
+
+        fixedFax.setComments(signatureReq.getComments());
+
+        return fixedFax;
+    }
 
 }

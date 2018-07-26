@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public class ImageUtils {
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         String src = "C:\\Users\\smile\\Pictures\\Saved Pictures\\微信图片_20180704212104.JPG";
         String taraget = "C:\\Users\\smile\\Pictures\\Saved Pictures\\微信图片_20180704212104------.JPG";
 
@@ -21,9 +21,9 @@ public class ImageUtils {
         try {
             BufferedImage bufferedImage = ImageIO.read(new File(src));
 
-            Image image = rotateImage(bufferedImage, degree);
+            Image image = rotateImage(bufferedImage, degree, Transparency.OPAQUE);
 
-            ImageIO.write((BufferedImage)image, type, new File(taraget));
+            ImageIO.write((BufferedImage) image, type, new File(taraget));
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -33,19 +33,32 @@ public class ImageUtils {
     }
 
 
-    public static Image rotateImage(Image img, double degree) {
+    public static Image rotateImage(Image img, double degree, int transparency) {
         BufferedImage bufImg = toBufferedImage(img);
         double angle = Math.toRadians(degree);
 
-        return tilt(bufImg, angle);
+        return tilt(bufImg, angle, transparency);
     }
 
-    public static BufferedImage tilt(BufferedImage image, double angle) {
+    public static int getTransparency(int transparency) {
+        if (transparency == Transparency.OPAQUE) {
+            return Transparency.OPAQUE;
+        }
+            if (transparency == Transparency.BITMASK) {
+            return Transparency.BITMASK;
+        }
+        if (transparency == Transparency.TRANSLUCENT) {
+            return Transparency.TRANSLUCENT;
+        }
+        return Transparency.OPAQUE;
+    }
+
+    public static BufferedImage tilt(BufferedImage image, double angle, int transparency) {
         double sin = Math.abs(Math.sin(angle)), cos = Math.abs(Math.cos(angle));
         int w = image.getWidth(), h = image.getHeight();
         int neww = (int) Math.floor(w * cos + h * sin), newh = (int) Math.floor(h * cos + w * sin);
         GraphicsConfiguration gc = getDefaultConfiguration();
-        BufferedImage result = gc.createCompatibleImage(neww, newh, Transparency.OPAQUE);
+        BufferedImage result = gc.createCompatibleImage(neww, newh, getTransparency(transparency));
         Graphics2D g = result.createGraphics();
         g.translate((neww - w) / 2, (newh - h) / 2);
         g.rotate(angle, w / 2, h / 2);

@@ -64,7 +64,12 @@
             <span>W:</span><input type="text" id="image-w" name="image-w" disabled/>
             <span>H:</span><input type="text" id="image-h" name="image-h" disabled/>
             <span id="image-option-switch" class="action" onclick="optionSwitch(this);"><i class="fa fa-cogs"  aria-hidden="true"></i></span>
-            <span style="padding-left: 150px;">Scale:</span><input type="text" id="image-scale" name="image-scale" disabled/><span>%</span>
+            <select id="transparency" class="action">
+                <option value="1">OPAQUE</option>
+                <option value="2">BITMASK</option>
+                <option value="3">TRANSLUCENT</option>
+            </select>
+            <span style="padding-left: 20px;">Scale:</span><input type="text" id="image-scale" name="image-scale" disabled/><span>%</span>
           </div>
           <div>
             <label style="padding-left: 10px; width: 80px">Rectangle</label>

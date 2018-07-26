@@ -432,7 +432,7 @@ function doSignSumbit(){
   confirmArea.rate = boxOn.attr('data-rate');
 
     var pageIndex = page.html();
-	showLoading();
+
 	var url = '/tiny/ocr/signSub.do';
 	var writerId = '';
 	var whois = '';
@@ -462,8 +462,12 @@ function doSignSumbit(){
         validateImageId = value;
     }
   });
+   if(validateImageId === undefined || validateImageId === null || validateImageId.trim().length === 0){
+      showMessage('warning', 'Please validate first!');
+      return;
+    }
 	var body = {'name': whois, 'writerId': writerId, 'email': email, 'comments': comments, 'fixedImage': link, 'validateId': validateImageId, 'pageIndex': pageIndex, 'confirmArea': confirmArea};
-
+    showLoading();
 	$.ajax({
            type: "POST",
            url: url,
@@ -473,7 +477,10 @@ function doSignSumbit(){
            success: function(resp)
            {
               hideLoading();
-              showMessage('success', 'Submit successfully');
+                var type = resp.status ? 'success' : 'error';
+                var message = resp.message ? resp.message : 'Submit ' + type + ' !';
+
+                showMessage(type, message);
            },
            error: function(err){
              hideLoading();
@@ -493,7 +500,6 @@ function doSignFix(){
     console.log('doSignSumbit no link here');
     return;
   }
-	showLoading();
   var page = $('#current-p-index span');
   if (page == undefined && page.html() === undefined)
   {
@@ -529,6 +535,11 @@ function doSignFix(){
         validateImageId = value;
     }
   });
+  if(validateImageId === undefined || validateImageId === null || validateImageId.trim().length === 0){
+    showMessage('warning', 'Please validate first!');
+    return;
+  }
+
   var x = $('#box-x').val();
   var y = $('#box-y').val();
   var w = $('#box-w').val();
@@ -540,6 +551,7 @@ function doSignFix(){
     fixedArea = {'x': x, 'y': y, 'w': w, 'h': h };
   }
 	var body = {'name': whois, 'writerId': writerId, 'email': email, 'comments': comments, 'fixedImage': link, 'validateId': validateImageId, 'fixedArea': fixedArea, 'pageIndex': pageIndex};
+	showLoading();
 	$.ajax({
            type: "POST",
            url: url,
@@ -549,7 +561,10 @@ function doSignFix(){
            success: function(resp)
            {
               hideLoading();
-              showMessage('success', 'Fix Submit successfully');
+              var type = resp.status ? 'success' : 'error';
+              var message = resp.message ? resp.message : 'Fix ' + type + ' !';
+
+              showMessage(type, message);
            },
            error: function(err){
              hideLoading();
@@ -1252,11 +1267,12 @@ function imageSave(){
         return;
     }
 
+    var transparency = $('#transparency').val();
     //upload-signature-pre
     var imgObj = $('#upload-signature-pre');
     var imgPath = imgObj.attr("data-path");
     var imgName = imgObj.attr("data-sname");
-    var url = '/tiny/ocr/image/rotate.do?imgPath=' + imgPath + '&imgName=' + imgName + '&degree='+degree;
+    var url = '/tiny/ocr/image/rotate.do?imgPath=' + imgPath + '&imgName=' + imgName + '&degree='+degree + "&transparency=" + transparency;
 
     showLoading();
 

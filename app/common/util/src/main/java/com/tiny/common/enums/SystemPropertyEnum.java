@@ -37,6 +37,8 @@ public enum SystemPropertyEnum implements EnumBase {
 
     FACADE_SIGNATURE_URL("facade.signature.url"),
 
+    FACADE_SIGN_FIX_URL("facade.sign.fix.url"),
+
     SIGNATURE_MODE("signature.impl.mode"),
 
     SESSION_MAXINACTIVEINTERVAL("session.maxInactiveInterval"),

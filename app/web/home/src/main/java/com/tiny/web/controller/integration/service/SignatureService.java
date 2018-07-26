@@ -1,6 +1,7 @@
 package com.tiny.web.controller.integration.service;
 
 import com.tiny.web.controller.BaseJsonResult;
+import com.tiny.web.controller.integration.entity.FixedFax;
 
 public interface SignatureService {
 
@@ -12,4 +13,11 @@ public interface SignatureService {
      * @return
      */
     BaseJsonResult scan(String imagePath, String imageName);
+
+    /**
+     *
+     * @param fixedFax
+     * @return
+     */
+    BaseJsonResult fix(FixedFax fixedFax);
 }
