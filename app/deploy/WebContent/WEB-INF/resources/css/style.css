@@ -54,14 +54,12 @@
     text-align: center;
 }
 
-input.error{
+input.error {
     text-align: left;
     border: 1px solid #CB4335;
 }
 
-input.error:focus,
-input.error:hover,
-input.error:active{
+input.error:focus, input.error:hover, input.error:active {
     border: 1px solid #CB4335 !important;
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(255, 0, 0, 0.6) !important;
 }
@@ -95,11 +93,11 @@ input.error:active{
     padding-bottom: 40px;
 }
 
-.simple-pagination > ul {
+.simple-pagination>ul {
     margin-left: 20px !important;
 }
 
-.simple-pagination > ul > li {
+.simple-pagination>ul>li {
     padding: 0 !important;
     margin: 0 !important;
     border: 0 !important;
@@ -118,25 +116,25 @@ input.error:active{
     background-color: #ddd;
 }
 
-.tag-row > .tag {}
+.tag-row>.tag {}
 
-.tag-row > .time {}
+.tag-row>.time {}
 
 .call-stack {}
 
-.call-stack > .timestamp {
+.call-stack>.timestamp {
     padding-left: 5px;
 }
 
-.call-stack > .host {
+.call-stack>.host {
     padding-left: 5px;
 }
 
-.call-stack > .framework {
+.call-stack>.framework {
     padding-left: 5px;
 }
 
-.m-cs-row > .row-at {
+.m-cs-row>.row-at {
     padding-left: 20px;
 }
 
@@ -163,7 +161,6 @@ input.error:active{
 }
 
 .jump-link {}
-
 
 /*********************************************tooltip below*********************************************/
 
@@ -218,7 +215,6 @@ input.error:active{
     display: block;
 }
 
-
 /* don't show empty tooltips */
 
 [tooltip='']::before, [tooltip='']::after {
@@ -247,9 +243,7 @@ input.error:active{
     animation: tooltips-horz 300ms ease-out forwards;
 }
 
-
 /**up**/
-
 
 /* ONLY the ::before */
 
@@ -259,13 +253,11 @@ input.error:active{
     border-top-color: #333;
 }
 
-
 /* ONLY the ::after */
 
 [tooltip]:not([flow])::after, [tooltip][flow^="up"]::after {
     bottom: calc(100% + 5px);
 }
-
 
 /* Both ::before & ::after */
 
@@ -273,7 +265,6 @@ input.error:active{
     left: 50%;
     transform: translate(-50%, -.5em);
 }
-
 
 /**down**/
 
@@ -292,7 +283,6 @@ input.error:active{
     transform: translate(-50%, .5em);
 }
 
-
 /**left**/
 
 [tooltip][flow^="left"]::before {
@@ -308,7 +298,6 @@ input.error:active{
     right: calc(100% + 5px);
     transform: translate(-.5em, -50%);
 }
-
 
 /**right**/
 
@@ -326,7 +315,6 @@ input.error:active{
     transform: translate(.5em, -50%);
 }
 
-
 /*********************************************tooltip finish*********************************************/
 
 .shortcut-menu {
@@ -334,7 +322,6 @@ input.error:active{
     right: 25px;
     bottom: 10px;
     padding-bottom: 45px;
-
     z-index: 999;
 }
 
@@ -348,49 +335,45 @@ input.error:active{
 }
 
 .shortcut-menu .btn-top {
-
     background-color: #DDD;
     display: none;
     border-radius: 5px;
-	color: #FFF;
-	font-size: 12px;
-	line-height: 30px;
-	text-align: center;
-
+    color: #FFF;
+    font-size: 12px;
+    line-height: 30px;
+    text-align: center;
 }
 
 .shortcut-menu .btn-top:hover {
     background-color: #707b7c;
 }
 
-button.btn{
+button.btn {
     padding-left: 12px !important;
     padding-right: 12px !important;
 }
 
-table.form input{
+table.form input {
     padding-top: 0;
     padding-bottom: 0;
     font-size: 16px;
 }
 
-
-
-table.form th{
-	font-size: 16px;
-	line-height: 34px !important;
+table.form th {
+    font-size: 16px;
+    line-height: 34px !important;
 }
 
-.tiff-ct .head{
-	position: absolute;
-	padding: 10px;
-	padding-top: 0;
-	background: rgba(255, 255, 220, 0.2);
-	margin-top: 5px;
-	font-size: 12px;
-	height: 20px;
-	line-height: 20px !important;
-	border-radius: 2px;
+.tiff-ct .head {
+    position: absolute;
+    padding: 10px;
+    padding-top: 0;
+    background: rgba(255, 255, 220, 0.2);
+    margin-top: 5px;
+    font-size: 12px;
+    height: 20px;
+    line-height: 20px !important;
+    border-radius: 2px;
     z-index: 20;
     opacity: 0.2;
     max-width: 200px;
@@ -398,74 +381,71 @@ table.form th{
     white-space: nowrap;
     text-overflow: ellipsis;
 }
-.tiff-ct .head:focus,
-.tiff-ct .head:active,
-.tiff-ct .head:hover{
+
+.tiff-ct .head:focus, .tiff-ct .head:active, .tiff-ct .head:hover {
     opacity: 1;
 }
 
-#tiff-show label.show-max{
+#tiff-show label.show-max {
     position: absolute;
     top: 20px;
-    right: 0px;
+    right: 20px;
     z-index: 20;
 }
 
-.tiff-ct  .head > span{
-	padding-right: 10px;
+.tiff-ct .head>span {
+    padding-right: 10px;
 }
 
-.tiff-ct p.error{
-	color: #CB4335;
-	padding: 20px;
-	font-size: 20px;
+.tiff-ct p.error {
+    color: #CB4335;
+    padding: 20px;
+    font-size: 20px;
 }
 
-.tiff-ct p.warning{
-	color: #ff6600;
-	padding: 20px;
-	font-size: 20px;
+.tiff-ct p.warning {
+    color: #ff6600;
+    padding: 20px;
+    font-size: 20px;
 }
 
-.show-upload div.on{
-	display: block;
+.show-upload div.on {
+    display: block;
 }
 
-.show-upload div.off{
-	display: none;
+.show-upload div.off {
+    display: none;
 }
 
-.show-upload div.page-ct{
-	position: absolute;
-	top: 20px;
-	right: 40px;
+.show-upload div.page-ct {
+    position: absolute;
+    top: 20px;
+    right: 40px;
     display: flex;
     z-index: 20;
 }
 
-.show-upload div.page-ct label{
+.show-upload div.page-ct label {
     margin-bottom: 0px !important;
 }
 
-.show-upload div.page-ct label.page{
-	margin-right: 2px;
-	padding-left: 5px;
-	padding-right: 5px;
-	border-radius: 2px;
-	cursor: pointer;
+.show-upload div.page-ct label.page {
+    margin-right: 2px;
+    padding-left: 5px;
+    padding-right: 5px;
+    border-radius: 2px;
+    cursor: pointer;
 }
 
-
-.show-upload div.page-ct label.on{
-	background: #555;
-	border: 1px solid #555;
+.show-upload div.page-ct label.on {
+    background: #555;
+    border: 1px solid #555;
     color: #eee;
 }
 
-label.clean,
-label.show-max{
+label.clean, label.show-max {
     background: #555;
-	border: 1px solid #555;
+    border: 1px solid #555;
     color: #eee;
     font-size: 12px;
     border-radius: 2px;
@@ -475,85 +455,74 @@ label.show-max{
     padding-left: 2px;
     padding-right: 2px;
 }
-.jump-ct label.page{
+
+.jump-ct label.page {
     background: #555;
-	border: 1px solid #555;
+    border: 1px solid #555;
     color: #eee;
     font-size: 12px;
     border-radius: 2px;
     cursor: pointer;
     margin-right: 5px;
 }
-span.action{
+
+span.action {
     cursor: pointer;
 }
 
-span.action:hover{
+span.action:hover {
     opacity: 0.8;
 }
 
-label.action:hover,
-label.show-max:hover,
-label.page:hover{
+label.action:hover, label.show-max:hover, label.page:hover {
     opacity: 0.8;
     color: #fff;
 }
 
-label#sign-image-cut:hover{
+label#sign-image-cut:hover {
     background: #555 !important;
     color: #fff !important;
     opacity: 0.8 !important;
 }
 
-
-.box-on{
+.box-on {
     opacity: 1 !important;
     border: 2px solid green !important;
     color: green !important;
     font-size: 30px;
 }
 
-.box-off{
+.box-off {
     opacity: 0.2 !important;
     border: 2px solid green !important;
     color: #555 !important;
     font-size: 30px;
 }
-.box-on i,
-.box-off i{
+
+.box-on i, .box-off i {
     position: absolute;
     right: 5px;
     bottom: 5px;
 }
 
-.box-on > label,
-.box-off > label{
+.box-on>label, .box-off>label {
     display: none;
 }
-.box-off:hover > label,
-.box-on:hover >label{
+
+.box-off:hover>label, .box-on:hover>label {
     display: block !important;
 }
 
-.box-on:hover,
-.box-off:hover,
-.box-on:focus,
-.box-off:focus,
-.box-on:active,
-.box-off:active{
+.box-on:hover, .box-off:hover, .box-on:focus, .box-off:focus, .box-on:active, .box-off:active {
     background: rgba(0, 250, 0, 0.3) !important;
 }
 
-
-
-#current-p-index{
+#current-p-index {
     position: absolute;
     top: 20px;
     font-size: 12px;
     font-weight: bold;
-
     background: #555;
-
     padding-left: 5px;
     padding-right: 5px;
     border-radius: 2px;
@@ -561,11 +530,10 @@ label#sign-image-cut:hover{
     z-index: 20;
 }
 
-#current-p-index span{
+#current-p-index span {
     padding-left: 5px;
     color: #eee;
 }
-
 
 /*.show-upload div.page-ct label.on:active,
 .show-upload div.page-ct label.on:hover,
@@ -574,92 +542,83 @@ label#sign-image-cut:hover{
     color: #222;
 }*/
 
-.show-upload div.page-ct label.off{
+.show-upload div.page-ct label.off {
     background: #eee;
-	border: 1px solid #eee;
+    border: 1px solid #eee;
 }
 
-.jump-ct span:active,
-.jump-ct span:hover,
-.jump-ct span:focus,
-.show-upload div.page-ct label.off:active,
-.show-upload div.page-ct label.off:hover,
-.show-upload div.page-ct label.off:focus{
+.jump-ct span:active, .jump-ct span:hover, .jump-ct span:focus, .show-upload div.page-ct label.off:active, .show-upload div.page-ct label.off:hover, .show-upload div.page-ct label.off:focus {
     background: #777;
-	border: 1px solid #777;
+    border: 1px solid #777;
     color: #eee;
 }
 
-.table-ct table th,
-.table-ct table td{
-	/*padding-top: 6px !important;*/
-	/*padding-bottom: 6px !important;*/
+.table-ct table th, .table-ct table td {
+    /*padding-top: 6px !important;*/
+    /*padding-bottom: 6px !important;*/
     font-size: 16px !important;
     line-height: 34px !important;
 }
-.table-ct table .form-control{
+
+.table-ct table .form-control {
     font-size: 16px !important;
     padding-top: 4px !important;
     padding-bottom: 4px !important;
 }
 
-form input,
-form select{
+form input, form select {
     border-radius: 2px;
 }
 
-button.btn-off{
+button.btn-off {
     background: #bbb !important;
     border: 1px solid #bbb !important;
 }
 
-button.btn-on{
+button.btn-on {}
 
-}
-
-span.result-succ{
+span.result-succ {
     color: green;
 }
 
-span.result-error{
+span.result-error {
     color: darkred;
 }
 
-span.result-error,
-span.result-succ{
+span.result-error, span.result-succ {
     padding-left: 20px;
     font-size: 14px;
     font-weight: bold;
     line-height: 34px;
 }
-div#submit-result{
+
+div#submit-result {
     padding-top: 10px;
 }
 
-.g-loading-show{
+.g-loading-show {
     display: block;
 }
 
-.g-loading-hide{
+.g-loading-hide {
     display: none;
 }
 
-.g-loading{
+.g-loading {
     position: absolute;
     z-index: 100;
     top: 0;
     left: 0;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0, 0, 0, 0.5);
     height: 100%;
     width: 100%;
 }
 
-.g-loading .loading{
+.g-loading .loading {
     margin-top: 25%;
 }
 
-
-.g-message{
+.g-message {
     text-align: center;
     width: 100%;
     position: absolute;
@@ -669,112 +628,130 @@ div#submit-result{
     font-weight: bold;
 }
 
-.g-message-on{
+.g-message-on {
     display: block;
 }
 
-.g-message-off{
+.g-message-off {
     display: none;
 }
 
-.g-message span.error{
+.g-message span.error {
     color: darkred;
 }
 
-.g-message span.success{
+.g-message span.success {
     color: green;
 }
 
-.g-message span.info{
+.g-message span.info {
     color: #1298EA;
 }
 
-.g-message span.error{
+.g-message span.error {
     color: #555;
 }
 
-.g-message span.warning{
+.g-message span.warning {
     color: orange;
 }
 
-.mark-box{
+.mark-box {
     border-radius: 2px;
     border: 2px solid #CB4335;
     position: absolute;
     z-index: 100;
 }
 
-.mark-box:hover,
-.mark-box:focus,
-.mark-box:active{
+.mark-box:hover, .mark-box:focus, .mark-box:active {
     background: rgba(250, 200, 200, 0.5);
 }
 
-.mark-box:active{
+.mark-box:active {
     border: 2px solid darkred;
 }
 
-.mark-ct{
-  background: rgba(208,211,202,0.05);
-  position: absolute;
-  top: 0px;
-  /*border-bottom: 1px solid #555;*/
-  border: 1px dashed #999;
+.mark-ct {
+    background: rgba(208, 211, 202, 0.05);
+    position: absolute;
+    top: 0px;
+    /*border-bottom: 1px solid #555;*/
+    border: 1px dashed #999;
 }
 
-#tiff-show-next .cell{
-  position: relative;
-
+.mark-ct .cell-ct{
+	position: absolute;
+	border: 2px solid #f4856f;
+	border-radius: 2px;
 }
-#cover-canvas,
-#temp-canvas{
+
+.mark-ct .cell-hide{
+	display: none;
+}
+
+.mark-ct .cell-show{
+	display: block;
+}
+
+.mark-ct .cell-ct .cell-char{
+	position: absolute;
+	border: 1px solid #f4856f;
+	border-radius: 2px;
+}
+
+#tiff-show-next .cell {
+    position: relative;
+}
+
+#cover-canvas, #temp-canvas {
     position: absolute;
     top: 10px;
     right: 10px;
     z-index: 10;
-    background-color: rgba(0,0,0,0.02);
+    background-color: rgba(0, 0, 0, 0.02);
 }
-#temp-canvas{
+
+#temp-canvas {
     top: 0px;
     right: 0px;
 }
 
-label.clean{
+label.clean {
     position: absolute;
     bottom: 20px;
     right: 20px;
     z-index: 20;
 }
 
-#temp-clean{
+#temp-clean {
     right: 40px;
 }
 
-p.blank{
+p.blank {
     width: 100%;
     text-align: center;
     padding-top: 20%;
     color: #fff;
     font-size: 54px;
     font-family: 'Love Ya Like A Sister', cursive;
-    text-shadow: 0px 4px 3px rgba(0,0,0,0.4), 0px 8px 13px rgba(0,0,0,0.1), 0px 18px 23px rgba(0,0,0,0.1);
+    text-shadow: 0px 4px 3px rgba(0, 0, 0, 0.4), 0px 8px 13px rgba(0, 0, 0, 0.1), 0px 18px 23px rgba(0, 0, 0, 0.1);
 }
 
-#tiff-show .cell img{
+.show-upload .cell img {
     /*width: 100%;
     height: auto;*/
     max-width: 100%;
     max-height: 100%;
 }
 
-#tiff-show-next .cell img{
+#tiff-show-next .cell img {
     /*width: 100%;
     height: auto;*/
     max-width: 100%;
     max-height: 100%;
 }
 
-.tiff-ct{
+.tiff-ct {
     padding: 5px;
     /*background: rgb(34, 34, 34);*/
     background: #999;
@@ -782,20 +759,19 @@ p.blank{
     border-bottom-right-radius: 5px;
 }
 
-.ct-s-block > span.title{
+.ct-s-block>span.title {
     display: block;
     position: absolute;
     border: 0px solid #fff !important;
     padding-left: 10px;
 }
 
-
-.modal-body .cell{
+.modal-body .cell {
     overflow: auto;
     height: 100%;
 }
 
-span.error-tip{
+span.error-tip {
     position: absolute;
     font-size: 10px;
     color: #CB4335;
@@ -804,7 +780,7 @@ span.error-tip{
     margin-top: -1px;
 }
 
-.matched-ct{
+.matched-ct {
     background: #fff;
     text-align: center;
     /*border: 1px solid #ddd;
@@ -812,14 +788,13 @@ span.error-tip{
     border-bottom-right-radius: 5px;*/
 }
 
-.no-matched{
+.no-matched {
     font-size: 20px !important;
     text-align: center !important;
     color: #999 !important;
-
 }
 
-.position-ct{
+.position-ct {
     /*position: absolute;*/
     font-size: 12px;
     color: #555;
@@ -827,50 +802,44 @@ span.error-tip{
     margin-top: 40px;
 }
 
-.position-ct input{
+.position-ct input {
     width: 50px !important;
     padding-left: 5px;
 }
 
-.show-upload .canvas-container{
+.show-upload .canvas-container {
     width: 0px !important;
     height: 0px !important;
     position: static !important;
 }
 
-.show-upload .canvas-container .lower-canvas,
-.show-upload .canvas-container .upper-canvas {
+.show-upload .canvas-container .lower-canvas, .show-upload .canvas-container .upper-canvas {
     display: block;
     position: absolute;
     top: 0px;
-
 }
 
-.show-upload .canvas-container .lower-canvas{
+.show-upload .canvas-container .lower-canvas {
     z-index: 2;
 }
 
-.show-upload .canvas-container .upper-canvas{
+.show-upload .canvas-container .upper-canvas {
     z-index: 3;
     background: rgba(0, 0, 0, 0.3);
 }
 
-.alert{
+.alert {
     padding: 10px !important;
 }
 
-.name-ct:hover,
-.name-ct:active,
-.name-ct:focus,
-.name-active{
+.name-ct:hover, .name-ct:active, .name-ct:focus, .name-active {
     border: 2px solid green !important;
     color: green !important;
 }
 
-.name-ct{
+.name-ct {
     border: 2px solid #fff;
     border-radius: 4px;
-
     font-size: 14px;
     margin-top: 5px;
     padding-left: 5px;
@@ -878,21 +847,23 @@ span.error-tip{
     line-height: 30px;
     position: relative;
 }
-.name-ct label{
+
+.name-ct label {
     margin: 0px;
 }
-.name-active label.flg{
+
+.name-active label.flg {
     opacity: 1 !important;
 }
 
-.name-ct label.flg{
+.name-ct label.flg {
     opacity: 0;
     position: absolute;
     right: 5px;
     font-size: 20px;
 }
 
-.name-ct label.name{
+.name-ct label.name {
     margin-right: 10px;
 }
 
@@ -900,28 +871,26 @@ span.error-tip{
     display: none;
 }
 
-tbody#signature-val-result th,
-tbody#signature-val-result td,
-tbody#signature-val-result input,
-tbody#signature-val-result h4{
+tbody#signature-val-result th, tbody#signature-val-result td, tbody#signature-val-result input, tbody#signature-val-result h4 {
     font-size: 16px !important;
     line-height: 28px !important;
     height: 28px !important;
     padding-top: 5px !important;
     padding-bottom: 5px !important;
 }
-tbody#signature-val-result h4{
+
+tbody#signature-val-result h4 {
     line-height: 14px !important;
     height: 14px !important;
     padding-top: 0px !important;
     padding-bottom: 0px !important;
 }
+
 /*tbody#signature-val-result .alert{
 
 }*/
-
-
-.option-ct{
+.syn-option-ct,
+.option-ct {
     position: absolute;
     z-index: 2000;
     right: 40px;
@@ -933,12 +902,13 @@ tbody#signature-val-result h4{
     opacity: 0.1;
     color: #fff;
 }
-
-.option-ct:hover{
+.syn-option-ct:hover,
+.option-ct:hover {
     opacity: 1;
 }
 
-.option-ct > span{
+.syn-option-ct>span,
+.option-ct>span {
     cursor: pointer;
     padding: 0 5px;
     color: #fff;
@@ -946,29 +916,234 @@ tbody#signature-val-result h4{
     background: #555;
     border-radius: 2px;
 }
-
-.option-ct > span:hover，
-.option-ct > span:active,
-.option-ct > span:focus{
+.syn-option-ct>span:hover, .syn-option-ct>span:active, .syn-option-ct>span:focus,
+.option-ct>span:hover, .option-ct>span:active, .option-ct>span:focus {
     color: #aaa;
     background: #888;
 }
 
-.option-ct > #stew{
+.option-ct>#stew {
     color: #aaa;
     width: 40px;
     border-radius: 2px;
     text-align: center;
 }
 
-#writer-list{
+#writer-list {
     margin-left: 10px;
     height: 32px;
-    text-align: left:
+    text-align: left;
 }
 
-.opt-off{
+.opt-off {
     display: none !important;
+}
+
+.page-arrow {
+    position: absolute;
+    left: 525px;
+    top: 20px;
+    cursor: pointer;
+    border-radius: 2px;
+    padding: 2px 5px;
+    display: inline-block;
+}
+
+.page-arrow i {
+    font-size: 14px !important;
+    color: #555 !important;
+}
+
+.page-arrow:hover {
+    background: #ddd;
+}
+
+i.btn-off {
+    color: #aaa !important;
+}
+
+table.recon-ct tr, table.recon-ct th, table.recon-ct td {
+    background: #fff;
+}
+
+table.recon-ct th, table.recon-ct td {
+    padding: 5px;
+    border: 1px solid red;
+}
+
+table.recon-ct input {
+    padding-left: 5px;
+    height: 18px !important;
+    line-height: 18px !important;
+    width: 120px;
+}
+
+.detail-ct .textarea-readonly, table.recon-ct input.input-readonly {
+    color: #CB4335 !important;
+    background: #ddd !important;
+}
+
+.rect .opera,
+table.recon-ct span.opera {
+    margin-right: 3px;
+    margin-left: 3px;
+    display: inline-block;
+    cursor: pointer;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    background: #ddd;
+    color: #000;
+    padding: 3px;
+    font-size: 12px;
+    height: 18px !important;
+    line-height: 12px !important;
+    opacity: 0.6;
+}
+
+.rect .opera-submit, table.recon-ct .opera-submit {
+    border: 1px solid green !important;
+    background: green !important;
+    color: #fff !important;
+}
+
+.rect .opera-reset, table.recon-ct .opera-reset {
+    border: 1px solid #ccc !important;
+    background: #ccc !important;
+    color: #000 !important;
+}
+table.recon-ct tr.recon-row:nth-child(even) td,
+table.recon-ct tr.recon-row:nth-child(even){
+    background: #eee;
+}
+
+table.recon-ct tr.recon-row-sub input{
+    background: lightgreen;
+}
+
+.rect .opera-readonly{
+    border: 1px solid transparent !important;
+    background: transparent !important;
+    color: #ddd !important;
+}
+
+.rect span.opera:hover, table.recon-ct span.opera:hover {
+    opacity: 0.9;
+}
+
+.rect span.opera:active, .rect span.opera:focus, table.recon-ct span.opera:active, table.recon-ct span.opera:focus {
+    opacity: 1;
+}
+
+.ocr-result-ct {
+    padding-top: 20px;
+    padding-left: 20px;
+}
+
+.ocr-result-ct .grid-ly {
+    position: relative;
+}
+
+.ocr-result-ct .table-ly {
+    padding-bottom: 20px;
+    display: flex;
+}
+
+.ocr-result-ct .table-ly .end-padding {
+    padding-right: 20px;
+}
+
+.detail-ct {
+    /*overflow: auto;
+    margin-right: 20px;
+    margin-bottom: 20px;
+    width: calc(100% - 20px);
+    height: calc(100% - 20px);*/
+}
+
+.detail-ct .rect-ct {
+    position: absolute;
+    background: transparent;
+    padding-right: 20px;
+    padding-bottom: 20px;
+}
+
+.detail-ct .rect-ct .rect {
+    /*padding: 20px;*/
+    padding: 0px;
+    border: 2px solid #fff;
+    border-radius: 2px;
+    /*color: #fff;*/
+    font-size: 14px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.detail-ct .rect-ct .rect textarea {
+    width: calc(100% - 0px);
+    height: calc(100% - 40px);
+    overflow: auto;
+    resize: none;
+    padding: 5px;
+    border-radius: 2px;
+}
+.detail-ct .rect-ct .rect textarea:hover{
+    border-color: #1298EA;
+}
+
+.detail-ct .rect-ct .rect .opera-ct {
+    height: 40px;
+    margin: 0px;
+    padding-left: 20px;
+    background: transparent;
+    padding-top: 10px;
+}
+
+#ocr-result:hover .toolbar-ct {
+    opacity: 1;
+}
+
+.toolbar-ct {
+    position: absolute;
+    top: 100px;
+    left: 240px;
+    /*width: 100px;*/
+    border: 1px solid #eee;
+    border-radius: 4px;
+    background: #eee;
+    padding: 3px;
+    opacity: 0;
+    transition: 0.6s;
+}
+
+.toolbar-ct span.opera {
+    display: inline-block;
+    padding: 3px;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    height: 18px;
+    line-height: 12px;
+    cursor: pointer;
+    color: #222;
+}
+
+.toolbar-ct span.opera:active, .toolbar-ct span.opera:focus, .toolbar-ct span.opera:hover {
+    background: #ccc;
+}
+
+.toolbar-ct span.opera:active, .toolbar-ct span.opera:focus {
+    background: #bbb;
+}
+
+.toolbar-ct span.opera i {
+    font-size: 12px !important;
+    color: #222 !important;
+}
+
+.ocr-result-ct .rect-1 {}
+
+#layout-dropdown .dropdown-menu button{
+    font-size: 12px !important;
 }
 
 /*********************************carousel********************************************/

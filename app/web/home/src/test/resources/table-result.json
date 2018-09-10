@@ -1,0 +1,128 @@
+{
+  "faxes": [
+    {
+      "width": 2480,
+      "cells": [
+        {
+          "ocr": {
+            "a": {
+              "xmin": 139,
+              "width": 17,
+              "ymin": 139,
+              "height": 14
+            },
+            "e": {
+              "xmin": 182,
+              "width": 22,
+              "ymin": 182,
+              "height": 14
+            },
+            "g": {
+              "xmin": 25,
+              "width": 7,
+              "ymin": 25,
+              "height": 5
+            },
+            "i": {
+              "xmin": 5,
+              "width": 2,
+              "ymin": 5,
+              "height": 2
+            },
+            "o": {
+              "xmin": 90,
+              "width": 7,
+              "ymin": 90,
+              "height": 5
+            },
+            "P": {
+              "xmin": 63,
+              "width": 0,
+              "ymin": 63,
+              "height": 6
+            },
+            "U": {
+              "xmin": 46,
+              "width": 17,
+              "ymin": 46,
+              "height": 6
+            }
+          },
+          "height": 1111.332,
+          "width": 2433.12,
+          "score": 0.9735237956047058,
+          "xmin": 0.25756836,
+          "ymin": 1767.2241
+        },
+        {
+          "ocr": {},
+          "height": 435.72168,
+          "width": 464.31494,
+          "score": 0.9213871359825134,
+          "xmin": 930.33203,
+          "ymin": 2806.4304
+        },
+        {
+          "ocr": {
+            "a": {
+              "xmin": 19,
+              "width": 7,
+              "ymin": 19,
+              "height": 20
+            },
+            "e": {
+              "xmin": 171,
+              "width": 42,
+              "ymin": 171,
+              "height": 16
+            },
+            "h": {
+              "xmin": 1,
+              "width": 14,
+              "ymin": 1,
+              "height": 15
+            },
+            "n": {
+              "xmin": 150,
+              "width": 18,
+              "ymin": 150,
+              "height": 11
+            },
+            "s": {
+              "xmin": 28,
+              "width": 3,
+              "ymin": 28,
+              "height": 4
+            },
+            "t": {
+              "xmin": 107,
+              "width": 18,
+              "ymin": 107,
+              "height": 13
+            },
+            "char":"s",
+              "xmin": 28,
+              "width": 3,
+              "ymin": 28,
+              "height": 4
+            },
+            "char": "t",
+              "xmin": 107,
+              "width": 18,
+              "ymin": 107,
+              "height": 13
+            }
+          },
+          "height": 1172.7424,
+          "width": 2305.8535,
+          "score": 0.8757027387619019,
+          "xmin": 173.14636,
+          "ymin": 0.0
+        }
+      ],
+      "fax_id": "000000",
+      "height": 3508
+    }
+  ],
+  "page": 1
+}

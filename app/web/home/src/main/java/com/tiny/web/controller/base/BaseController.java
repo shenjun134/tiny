@@ -63,6 +63,14 @@ abstract public class BaseController {
 
             String SIGNATURE_SUBMIT = "/ocr/signSub.do";
         }
+
+        interface API {
+            String LAYOUT_RECON = "/api/layout/recon.do";
+
+            String DETAIL_RECON = "/api/detail/recon.do";
+
+            String SUBMIT_RECON = "/api/detail/subRecon.do";
+        }
     }
 
 }

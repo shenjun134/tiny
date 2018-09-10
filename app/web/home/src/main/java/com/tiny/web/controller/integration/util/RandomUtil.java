@@ -23,11 +23,15 @@ public class RandomUtil {
 
     private static Map<Long, NameVO> nameVOMap;
 
+    private static Properties layoutList;
+
     static {
         String filename = "/config/signature-list.properties";
+        String layoutListFN = "/config/layout-list.properties";
         nameVOMap = new HashMap<>();
 
         InputStream inputStream = null;
+        InputStream inputStream4Layout = null;
         try {
             inputStream = CommonUtil.getInputStream(filename);
             Properties properties = CommonUtil.retrieveFileProperties(inputStream);
@@ -39,6 +43,9 @@ public class RandomUtil {
                 NameVO nameVO = new NameVO(id, src);
                 nameVOMap.put(id, nameVO);
             }
+
+            inputStream4Layout = CommonUtil.getInputStream(layoutListFN);
+            layoutList = CommonUtil.retrieveFileProperties(inputStream4Layout);
         } catch (Exception e) {
             logger.error("read file error - " + filename, e);
         } finally {
@@ -49,7 +56,29 @@ public class RandomUtil {
                     logger.error("input stream close error", e);
                 }
             }
+            if (inputStream4Layout != null) {
+                try {
+                    inputStream4Layout.close();
+                } catch (IOException e) {
+                    logger.error("input stream close error", e);
+                }
+            }
         }
+    }
+
+    /**
+     * @param classId
+     * @return
+     */
+    public static String fetchType(String classId) {
+        if (StringUtils.isBlank(classId)) {
+            return null;
+        }
+        Object obj = layoutList.getProperty(StringUtils.trim(classId));
+        if (obj == null) {
+            return null;
+        }
+        return obj.toString();
     }
 
     /**

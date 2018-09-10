@@ -19,21 +19,22 @@ function doSignUpload() {
     enctype: 'multipart/form-data',
     success: function (resp) {
       console.log('doUpload ret...', resp);
-      hideLoading();
       if (resp.status === false) {
         $('#tiff-show').html('<p class="error">' + resp.message + '</p>');
+        hideLoading();
         return;
       }
       if (resp.data === undefined || resp.data === null) {
         $('#tiff-show').html('<p class="warning">No File info Return....</p>');
+        hideLoading();
         return;
       }
       handleUploadRespBefore(resp);
       if (resp.data.type === 'image/tiff' || resp.data.type === 'image/tiff') {
         split2Png(resp);
-      } else if(resp.data.type === 'application/pdf' || resp.data.type === 'application/pdf'){
+      } else if (resp.data.type === 'application/pdf' || resp.data.type === 'application/pdf') {
         handlePdf2Png(resp);
-      }else {
+      } else {
         handleSinglePageUploadResp(resp);
         showMessage('success', 'Upload successfully');
       }
@@ -42,42 +43,42 @@ function doSignUpload() {
     error: function (err) {
       console.error('tiff err handle', err);
       hideLoading();
-			showMessage('error', 'Upload failed.' + err);
+      showMessage('error', 'Upload failed.' + err);
     }
   });
 }
 
-function handleUploadRespBefore(resp){
-    afterSignUpload();
-    $('#tiff-show').html('');
-    $('#tiff-show-next').html('');
-    $('#tiff-show').append('<div class="head"><a href="' + resp.data.name + '" title="download"><span>' + resp.data.name + '</span></a><span>' + resp.data.length + '</span></div>');
+function handleUploadRespBefore(resp) {
+  afterSignUpload();
+  $('#tiff-show').html('');
+  $('#tiff-show-next').html('');
+  $('#tiff-show').append('<div class="head"><a href="' + resp.data.name + '" title="download"><span>' + resp.data.name + '</span></a><span>' + resp.data.length + '</span></div>');
 
 }
 
-function handleSinglePageUploadResp(resp){
+function handleSinglePageUploadResp(resp) {
 
-    var optionArea = '';
-    var markArea = '<div class="mark-ct"></div>';
-    var canvasCover = '<canvas id="sign-canvas" width="0" height="0" style="display: none;"></canvas>';
-    var image = '<div class="cell on "><img id="upload-signature-pre" alt="display-upload-file" class="upload-img upload-img-'+0+'"  src="'+resp.data.name+'" data-path="'+resp.data.path+'" data-sname="'+resp.data.shortName+'"/>'+ optionArea + markArea + canvasCover + '</div>';
-    $('#tiff-show').append(image);
-    $('#dialog-image-signature .modal-body').html(image);
+  var optionArea = '';
+  var markArea = '<div class="mark-ct"></div>';
+  var canvasCover = '<canvas id="sign-canvas" width="0" height="0" style="display: none;"></canvas>';
+  var image = '<div class="cell on "><img id="upload-signature-pre" alt="display-upload-file" class="upload-img upload-img-' + 0 + '"  src="' + resp.data.name + '" data-path="' + resp.data.path + '" data-sname="' + resp.data.shortName + '"/>' + optionArea + markArea + canvasCover + '</div>';
+  $('#tiff-show').append(image);
+  $('#dialog-image-signature .modal-body').html(image);
 
-    setTimeout( function() {
-      afterImageLoad();
-    }, 1000);
+  setTimeout(function () {
+    afterImageLoad();
+  }, 1000);
 }
 
-function handlePdf2Png(resp){
-  if(resp.data.subFileList && resp.data.subFileList.length > 0){
+function handlePdf2Png(resp) {
+  if (resp.data.subFileList && resp.data.subFileList.length > 0) {
     split2Png(resp);
-  }else{
+  } else {
     showObjectPDF(resp);
   }
 }
 
-function split2Png(resp){
+function split2Png(resp) {
   var fileInfo = resp.data;
   var pageHtml = '<div class="page-ct">';
   var firstImage = fileInfo.subFileList[0].name;
@@ -85,36 +86,36 @@ function split2Png(resp){
   var imageEndStr = firstImage.substr(firstImage.lastIndexOf('.'), firstImage.length);
   var pageJumpHtml = '<select class="current-pick">';
   var maxPageShow = 5;
-  for(let i = 0, len = fileInfo.subFileList.length; i < len; i++){
+  for (let i = 0, len = fileInfo.subFileList.length; i < len; i++) {
     var subTemp = fileInfo.subFileList[i];
     var tiffClz = i === 0 ? 'cell on' : 'cell off';
 
     if (i === 0) {
       var markArea = '<div class="mark-ct"></div>';
       var canvasCover = '<canvas id="sign-canvas" width="0" height="0" style="display: none;"></canvas>';
-      var image = '<div class="cell on "><img id="upload-signature-pre" alt="display-upload-file" class="upload-img upload-img-'+i+'"  src="'+subTemp.name+'" data-path="'+subTemp.data.path+'" data-sname="'+subTemp.data.shortName+'" />'+ markArea + canvasCover + '</div>';
+      var image = '<div class="cell on "><img id="upload-signature-pre" alt="display-upload-file" class="upload-img upload-img-' + i + '"  src="' + subTemp.name + '" data-path="' + subTemp.data.path + '" data-sname="' + subTemp.data.shortName + '" />' + markArea + canvasCover + '</div>';
       $('#tiff-show').append(image);
       $('#dialog-image-signature .modal-body').html(image);
     }
-    if(i < maxPageShow){
+    if (i < maxPageShow) {
       var pageIndex = i + 1;
       var pageCls = i === 1 ? 'page off' : 'page off';
-      var pi = i -1;
-      pageHtml = pageHtml + '<label class="' + pageCls + '" image-type="'+imageEndStr+'" image-data="'+imageStartStr+'" page-index="'+i+'" onclick="turnPage(this)">Page-' + pageIndex + '</label>';
+      var pi = i - 1;
+      pageHtml = pageHtml + '<label class="' + pageCls + '" image-type="' + imageEndStr + '" image-data="' + imageStartStr + '" page-index="' + i + '" onclick="turnPage(this)">Page-' + pageIndex + '</label>';
     }
     var pageIndex = i + 1;
-    pageJumpHtml = pageJumpHtml + '<option value="' + i + '">'+ pageIndex + '</option>';
+    pageJumpHtml = pageJumpHtml + '<option value="' + i + '">' + pageIndex + '</option>';
   }
-  pageJumpHtml = '<div class="jump-ct"><label class="page" onclick="pageJump(this)" image-type="'+imageEndStr+'" image-data="'+imageStartStr+'">Go to</label>'+  pageJumpHtml + '</select></div>';
+  pageJumpHtml = '<div class="jump-ct"><label class="page" onclick="pageJump(this)" image-type="' + imageEndStr + '" image-data="' + imageStartStr + '">Go to</label>' + pageJumpHtml + '</select></div>';
   pageHtml = pageHtml + pageJumpHtml + '</div><div id="current-p-index">Current:<span>1</span></div>';
   $('#tiff-show').append(pageHtml);
-  setTimeout( function() {
+  setTimeout(function () {
     afterImageLoad();
   }, 1000);
 }
 
 
-function showObjectPDF(resp){
+function showObjectPDF(resp) {
   // <object data="/pdf/sample-3pp.pdf#page=2" type="application/pdf" width="100%" height="100%">
   //   <p><b>Example fallback content</b>: This browser does not support PDFs. Please download the PDF to view it: <a href="/pdf/sample-3pp.pdf">Download PDF</a>.</p>
   // </object>
@@ -123,71 +124,97 @@ function showObjectPDF(resp){
   // </iframe>
 
   var height = $('#sign-tiff-ct').height();
-  var showHtml = '<object id="upload-signature-pre" class="upload-img" data="'+resp.data.name+'" type="application/pdf" width="100%" height="'+height+'px">';
+  var showHtml = '<object id="upload-signature-pre" class="upload-img" data="' + resp.data.name + '" type="application/pdf" width="100%" height="' + height + 'px">';
   showHtml = showHtml + '<p><b>Example fallback content</b>: This browser does not support PDFs. Please download the PDF to view it:';
-  showHtml = showHtml + '<a href="'+resp.data.name+'">Download PDF</a>.</p></object>';
+  showHtml = showHtml + '<a href="' + resp.data.name + '">Download PDF</a>.</p></object>';
   $('#tiff-show').append(showHtml);
 
   var canvasCt = '<canvas id="sign-canvas" width="0" height="0" style="display: none;"></canvas>'
   $('#tiff-show').append(canvasCt);
 
-  var image = '<object id="upload-signature-org" class="upload-img" data="'+resp.data.name+'" type="application/pdf" width="100%" height="100%">';
+  var image = '<object id="upload-signature-org" class="upload-img" data="' + resp.data.name + '" type="application/pdf" width="100%" height="100%">';
   image = image + '<p><b>Example fallback content</b>: This browser does not support PDFs. Please download the PDF to view it:';
-  image = image + '<a href="'+resp.data.name+'">Download PDF</a>.</p></object>';
+  image = image + '<a href="' + resp.data.name + '">Download PDF</a>.</p></object>';
 
   $('#dialog-image-signature .modal-body').html(image);
   showMessage('success', 'Upload successfully');
 }
 
-function beforeSignUpload(){
-    $('button#sign-val').addClass('btn-off');
-    $('button#sign-sub').addClass('btn-off');
-    $('button#sign-fix').addClass('btn-off');
-    $('#sign-tiff-ct').css('background', '#aaa');
-    $('.option-ct').css('display', 'none');
-    $('#writer-list').addClass('opt-off');
-    document.getElementById("writer-list").options[0].selected = true;
-    resetStew();
-    cleanValResult();
-    cleanImagInfo();
-    cleanRectangleInfo();
-    canvasOff();
-    cleanCut();
-    canvas = null;
+function beforeSignUpload() {
+  $('button#sign-val').addClass('btn-off');
+  $('button#sign-sub').addClass('btn-off');
+  $('button#sign-fix').addClass('btn-off');
+  $('#sign-tiff-ct').css('background', '#aaa');
+  $('.option-ct').css('display', 'none');
+  $('.syn-option-ct').css('display', 'none');
+  $('#writer-list').addClass('opt-off');
+  document.getElementById("writer-list").options[0].selected = true;
+  resetStew();
+  cleanValResult();
+  cleanImagInfo();
+  cleanRectangleInfo();
+  canvasOff();
+  cleanCut();
+  canvas = null;
+  cleanNextInfo();
 }
 
-function resetStew(){
-    $('#stew').val(0);
-    $("#upload-signature-pre").css('-ms-transform', 'rotate(0deg)');
-    $("#upload-signature-pre").css('-webkit-transform',  'rotate(0deg)');
-    $("#upload-signature-pre").css('transform',  'rotate(0deg)');
+function cleanNextInfo() {
+  $('i#sign-next').addClass('btn-off');
+  $('button#layout-recon').addClass('btn-off');
+  $('button#content-recon').addClass('btn-off');
+
+  $('input#layout-type').val('');
+  $('input#content-type').val('');
+  $('#ocr-result').html('<p class="blank">No data</p>');
+
+
+  $('#layout-tiff-ct').css('background', '#999');
+  $('#tiff-show-layout').html('<p class="blank">Please upload a signature image</p>');
+  $('div#type-list').html('<button class="dropdown-item" type="button">No Data</button>');
 }
 
-function afterSignUpload(){
-    $('button#sign-val').removeClass('btn-off');
-    $('#sign-tiff-ct').css('background', 'rgb(34, 34, 34)');
-    $('.option-ct').css('display', 'block');
-    $('#writer-list').removeClass('opt-off');
+function enableNextInfo() {
+  setTimeout(function () {
+    $('i#sign-next').removeClass('btn-off');
+    $('button#layout-recon').removeClass('btn-off');
+    $('button#content-recon').removeClass('btn-off');
+    synUploadImage();
+  }, 200);
+}
 
-    var stewInput = document.getElementById('stew');
-    stewInput.addEventListener("keyup", function(event){
-        event.preventDefault();
-        if(event.keyCode != 13 ){
-            return;
-        }
-        stewPress();
+function resetStew() {
+  $('#stew').val(0);
+  $("#upload-signature-pre").css('-ms-transform', 'rotate(0deg)');
+  $("#upload-signature-pre").css('-webkit-transform', 'rotate(0deg)');
+  $("#upload-signature-pre").css('transform', 'rotate(0deg)');
+}
+
+function afterSignUpload() {
+  $('button#sign-val').removeClass('btn-off');
+  $('#sign-tiff-ct').css('background', 'rgb(34, 34, 34)');
+  $('.option-ct').css('display', 'block');
+  $('.syn-option-ct').css('display', 'block');
+  $('#writer-list').removeClass('opt-off');
+
+  var stewInput = document.getElementById('stew');
+  stewInput.addEventListener("keyup", function (event) {
+    event.preventDefault();
+    if (event.keyCode != 13) {
+      return;
     }
-    );
-
-
+    stewPress();
+  }
+  );
+  enableNextInfo();
 }
 
-function afterValidate(){
-    $('button#sign-sub').removeClass('btn-off');
-    $('button#sign-fix').removeClass('btn-off');
+function afterValidate() {
+  $('button#sign-sub').removeClass('btn-off');
+  $('button#sign-fix').removeClass('btn-off');
 }
 
-function removeCanvas(){
+function removeCanvas() {
   //var canvasCover = '<canvas id="sign-canvas" width="0" height="0" style="display: none;"></canvas>';
 }
 
@@ -198,7 +225,7 @@ function turnPage(element) {
 
   var pageIndex = $(element).attr('page-index');
   pageIndex = parseInt(pageIndex);
-  if(currentPage === (pageIndex + 1)){
+  if (currentPage === (pageIndex + 1)) {
     console.log('turnPageturnPage no need to turn page');
     return;
   }
@@ -210,7 +237,7 @@ function turnPage(element) {
   var imageUrl = $(element).attr('image-data');
   var imageType = $(element).attr('image-type');
   var srcUrl = imageUrl + pageIndex + imageType;
-  var imageHtml = '<img id="upload-signature-pre" alt="display-upload-file" class="upload-img "  src="'+srcUrl+'"/>';
+  var imageHtml = '<img id="upload-signature-pre" alt="display-upload-file" class="upload-img "  src="' + srcUrl + '"/>';
   var markArea = '<div class="mark-ct"></div>';
   var canvasCover = '<canvas id="sign-canvas" width="0" height="0" style="display: none;"></canvas>';
   $('#tiff-show  .cell').html(imageHtml)
@@ -220,15 +247,15 @@ function turnPage(element) {
   //$('#tiff-show img').attr('src', imageUrl + pageIndex + imageType);
   $('#dialog-image-signature img').attr('src', imageUrl + pageIndex + imageType);
   $('#current-p-index span').html(pageIndex + 1);
-  setTimeout( function(){
+  setTimeout(function () {
     hideLoading();
   }, 300);
-   setTimeout( function() {
+  setTimeout(function () {
     afterImageLoad();
   }, 1000);
 }
 
-function pageJump(element){
+function pageJump(element) {
   //console.log('pageJumppageJump', element);
   var currentPage = $('#current-p-index span').html();
   currentPage = parseInt(currentPage);
@@ -236,7 +263,7 @@ function pageJump(element){
   var pageIndex = $('select.current-pick').val();
   pageIndex = parseInt(pageIndex);
 
-  if(currentPage === (pageIndex + 1)){
+  if (currentPage === (pageIndex + 1)) {
     console.log('pageJumppageJump no need to jump page');
     return;
   }
@@ -248,7 +275,7 @@ function pageJump(element){
   var imageUrl = $(element).attr('image-data');
   var imageType = $(element).attr('image-type');
   var srcUrl = imageUrl + pageIndex + imageType;
-  var imageHtml = '<img id="upload-signature-pre" alt="display-upload-file" class="upload-img "  src="'+srcUrl+'"/>';
+  var imageHtml = '<img id="upload-signature-pre" alt="display-upload-file" class="upload-img "  src="' + srcUrl + '"/>';
   var markArea = '<div class="mark-ct"></div>';
   var canvasCover = '<canvas id="sign-canvas" width="0" height="0" style="display: none;"></canvas>';
   $('#tiff-show  .cell').html(imageHtml)
@@ -258,34 +285,34 @@ function pageJump(element){
   // $('#tiff-show img').attr('src', imageUrl + pageIndex + imageType);
   $('#dialog-image-signature img').attr('src', imageUrl + pageIndex + imageType);
   $('#current-p-index span').html(pageIndex + 1);
-  setTimeout( function(){
+  setTimeout(function () {
     hideLoading();
   }, 1000);
-  setTimeout( function() {
+  setTimeout(function () {
     afterImageLoad();
   }, 1000);
 }
 
-function canvasSwitchClick(e){
+function canvasSwitchClick(e) {
   var currentClz = $('#sign-canvas-switch i').attr('class');
-  if(currentClz.indexOf('fa-toggle-on') > -1){
+  if (currentClz.indexOf('fa-toggle-on') > -1) {
     canvasOff();
-  }else{
+  } else {
     canvasOn();
   }
 }
 
-function canvasOff(){
+function canvasOff() {
   $('#sign-canvas-switch i').removeClass('fa-toggle-on');
   $('#sign-canvas-switch i').addClass('fa-toggle-off');
   displayCanvas(false);
   disableCut()
 }
 
-function canvasOn(){
+function canvasOn() {
   $('#sign-canvas-switch i').removeClass('fa-toggle-off');
   $('#sign-canvas-switch i').addClass('fa-toggle-on');
-  if(canvas === null){
+  if (canvas === null) {
     afterPDFLoad();
   }
   displayCanvas(true);
@@ -293,9 +320,9 @@ function canvasOn(){
 }
 
 
-function displayCanvas(show){
+function displayCanvas(show) {
   var canvasObj = $('#sign-canvas');
-  if(canvasObj === undefined || canvasObj === null){
+  if (canvasObj === undefined || canvasObj === null) {
     return;
   }
   $('.canvas-container').css('display', show ? 'block' : 'none');
@@ -305,122 +332,174 @@ function displayCanvas(show){
 
 
 
-function doSignVal(){
+function doSignVal() {
 
-    var degree = $('#stew').val();
-    if(degree != '0'){
-        showMessage('warning', 'Your rotated image has not been saved!');
-        return;
-    }
-	var uploadLink = $('#tiff-show a');
-  if(uploadLink === undefined){
+  var degree = $('#stew').val();
+  if (degree != '0') {
+    showMessage('warning', 'Your rotated image has not been saved!');
+    return;
+  }
+  var uploadLink = $('#tiff-show a');
+  if (uploadLink === undefined) {
     console.log('no file upload here');
     return;
   }
   var link = uploadLink.attr('href');
-  if(link === undefined){
+  if (link === undefined) {
     console.log('doSignVal no link here');
     return;
   }
   cleanValResult();
-	showLoading();
+  showLoading();
   var page = $('#current-p-index span');
-//  if (page == undefined || page.html() === undefined)
-//  {
-//    console.log('no page info here');
-//    return;
-//  }
+  //  if (page == undefined || page.html() === undefined)
+  //  {
+  //    console.log('no page info here');
+  //    return;
+  //  }
   //var url = '/tiny/ocr/signVal.do?fileName=' + link + '&page=' + page.html();
   var imgObj = $('#upload-signature-pre');
   var imgPath = imgObj.attr("data-path");
   var imgName = imgObj.attr("data-sname");
   var url = '/tiny/ocr/signVal.do?fileName=' + link + '&page=' + page.html() + '&imgPath=' + imgPath + '&imgName=' + imgName;
-	$.ajax({
-           type: "POST",
-           url: url,
-           contentType: "application/json",
-           success: function(resp)
-           {
-              hideLoading();
-              afterValidate();
-              // showMessage('success', 'Validate successfully');
-              if(resp.status){
-                markStatus('success', resp.message);
-                $('#signature-val-result input#name').val(resp.data.name ? resp.data.name : '');
-                $('#signature-val-result input#email').val(resp.data.email ? resp.data.email : '');
-                $('#signature-val-result input#writerId').val(resp.data.id ? resp.data.id : '');
-                $('#signature-val-result input#comments').val(resp.data.comments ? resp.data.comments : '');
-                $('#signature-val-result input#validateImageId').val(resp.data.faxId ? resp.data.faxId : '');
-                createMarkBox(resp.data.matchArea);
-              }else{
-                markStatus('danger', resp.message);
-              }
+  $.ajax({
+    type: "POST",
+    url: url,
+    contentType: "application/json",
+    success: function (resp) {
+      hideLoading();
+      afterValidate();
+      // showMessage('success', 'Validate successfully');
+      if (resp.status) {
+        markStatus('success', resp.message);
+        $('#signature-val-result input#name').val(resp.data.name ? resp.data.name : '');
+        $('#signature-val-result input#email').val(resp.data.email ? resp.data.email : '');
+        $('#signature-val-result input#writerId').val(resp.data.id ? resp.data.id : '');
+        $('#signature-val-result input#comments').val(resp.data.comments ? resp.data.comments : '');
+        $('#signature-val-result input#validateImageId').val(resp.data.faxId ? resp.data.faxId : '');
+        createMarkBox(resp.data.matchArea);
+      } else {
+        markStatus('danger', resp.message);
+      }
 
-           },
-           error: function(err){
-             hideLoading();
-            //  showMessage('error', 'Validate fail!');
-             markStatus('danger', 'Validate error!');
-           }
-    });
+    },
+    error: function (err) {
+      hideLoading();
+      //  showMessage('error', 'Validate fail!');
+      markStatus('danger', 'Validate error!');
+    }
+  });
 }
 
-function markStatus(type, message){
+function doSignNext() {
+  if ($('#sign-next').hasClass('btn-off')) {
+    showMessage('warning', 'Please upload a image first!!!');
+    return;
+  }
+  console.log('do next begin....');
+  //synUploadImage();
+  var liWidth = $('#th-main').width();
+  $('#th-main').attr('class', '');
+  $('#th-detail').attr('class', 'on');
+
+  $('#tc-main').css('display', 'none');
+  $('#tc-detail').css('display', 'block');
+
+  $('.contents .title-list p').stop(false, true).animate({
+    'left': 1 * liWidth + 'px'
+  }, 300);
+  console.log('do next end.');
+}
+
+function doDetailBack() {
+  console.log('do back begin....');
+  var liWidth = $('#th-detail').width();
+  var liWidth2 = $('#th-main').width();
+  $('#th-main').attr('class', 'on');
+  $('#th-detail').attr('class', '');
+
+  $('#tc-main').css('display', 'block');
+  $('#tc-detail').css('display', 'none');
+
+  $('.contents .title-list p').stop(false, true).animate({
+    'left': -0 * liWidth + 'px'
+  }, 300);
+  console.log('do back end.');
+}
+
+function synUploadImage() {
+  //tiff-show-layout
+  showLoading();
+  $('#layout-tiff-ct').css('background', 'rgb(34, 34, 34)');
+  $('#tiff-show-layout').html('<div class="cell on"></div>');
+  var uploadImg = $('#tiff-show .cell > img');
+  var cloneImg = uploadImg.clone();
+  cloneImg.attr('id', 'syn-signature-pre');
+  cloneImg.appendTo('#tiff-show-layout .cell');
+  $('#tiff-show-layout .cell').append('<div class="mark-ct"></div>');
+
+  setTimeout(
+    function () {
+      hideLoading();
+    }, 500
+  );
+}
+
+function markStatus(type, message) {
   var alert = 'alert-success';
   var icon = 'fa-check';
-  if(type === 'success'){
+  if (type === 'success') {
     alert = 'alert-success';
     icon = 'fa-check';
-  }else if(type === 'info'){
+  } else if (type === 'info') {
     alert = 'alert-info';
     icon = 'fa-check';
-  }else if(type === 'danger'){
+  } else if (type === 'danger') {
     alert = 'alert-danger';
     icon = 'fa-times';
-  }else if(type === 'warning'){
+  } else if (type === 'warning') {
     alert = 'alert-warning';
     icon = 'fa-exclamation';
-  }else if(type === 'light'){
+  } else if (type === 'light') {
     alert = 'alert-light';
-  }else if(type === 'dark'){
+  } else if (type === 'dark') {
     alert = 'alert-dark';
-  }else if(type === 'primary'){
+  } else if (type === 'primary') {
     alert = 'alert-primary';
-  }else if(type === 'secondary'){
+  } else if (type === 'secondary') {
     alert = 'alert-secondary';
   }
-  var html = '<div class="alert '+alert+' " style="display: flex; margin: 0px" role="alert">';
-  html = html + '<h4 class="alert-heading" style="padding-right: 10px; margin: 0px;">'+message+'</h4>';
-  html = html + '<i class="fa '+icon+'" aria-hidden="true"></i></div>';
+  var html = '<div class="alert ' + alert + ' " style="display: flex; margin: 0px" role="alert">';
+  html = html + '<h4 class="alert-heading" style="padding-right: 10px; margin: 0px;">' + message + '</h4>';
+  html = html + '<i class="fa ' + icon + '" aria-hidden="true"></i></div>';
 
   $('#signature-val-result #status').html(html);
 
 }
 
-function cleanStatus(){
+function cleanStatus() {
   $('#signature-val-result #status').html('');
 }
 
 
-function doSignSumbit(){
-	var uploadLink = $('#tiff-show a');
-  if(uploadLink === undefined){
+function doSignSumbit() {
+  var uploadLink = $('#tiff-show a');
+  if (uploadLink === undefined) {
     console.log('no file upload here');
     return;
   }
   var link = uploadLink.attr('href');
-  if(link === undefined){
+  if (link === undefined) {
     console.log('doSignSumbit no link here');
     return;
   }
   var page = $('#current-p-index span');
-  if (page == undefined && page.html() === undefined)
-  {
+  if (page == undefined && page.html() === undefined) {
     console.log('no page info here');
     return;
   }
   var boxOn = $('.mark-ct .box-on');
-  if(boxOn === undefined){
+  if (boxOn === undefined) {
     console.log('doSignSumbit confirm area here');
     return;
   }
@@ -431,111 +510,109 @@ function doSignSumbit(){
   confirmArea.y = boxOn.attr('data-y');
   confirmArea.rate = boxOn.attr('data-rate');
 
-    var pageIndex = page.html();
+  var pageIndex = page.html();
 
-	var url = '/tiny/ocr/signSub.do';
-	var writerId = '';
-	var whois = '';
-	var email = '';
-	var comments = '';
-	var validateImageId = '';
-  $('#signature-val-result input').each(function (index){
+  var url = '/tiny/ocr/signSub.do';
+  var writerId = '';
+  var whois = '';
+  var email = '';
+  var comments = '';
+  var validateImageId = '';
+  $('#signature-val-result input').each(function (index) {
     var value = $(this).val();
     var id = $(this).attr('id');
     //console.log('doSignSumbit', id + '- ' + value);
-    if(value === undefined){
+    if (value === undefined) {
       value = '';
     }
-    if(id === 'name'){
-        whois = value;
+    if (id === 'name') {
+      whois = value;
     }
-    if(id === 'writerId'){
-        writerId = value;
+    if (id === 'writerId') {
+      writerId = value;
     }
-    if(id === 'email'){
-        email = value;
+    if (id === 'email') {
+      email = value;
     }
-    if(id === 'comments'){
-        comments = value;
+    if (id === 'comments') {
+      comments = value;
     }
-    if(id === 'validateImageId'){
-        validateImageId = value;
+    if (id === 'validateImageId') {
+      validateImageId = value;
     }
   });
-   if(validateImageId === undefined || validateImageId === null || validateImageId.trim().length === 0){
-      showMessage('warning', 'Please validate first!');
-      return;
-    }
-	var body = {'name': whois, 'writerId': writerId, 'email': email, 'comments': comments, 'fixedImage': link, 'validateId': validateImageId, 'pageIndex': pageIndex, 'confirmArea': confirmArea};
-    showLoading();
-	$.ajax({
-           type: "POST",
-           url: url,
-           contentType: "application/json",
-					 data: JSON.stringify(body),
-           dataType : 'json',
-           success: function(resp)
-           {
-              hideLoading();
-                var type = resp.status ? 'success' : 'error';
-                var message = resp.message ? resp.message : 'Submit ' + type + ' !';
+  if (validateImageId === undefined || validateImageId === null || validateImageId.trim().length === 0) {
+    showMessage('warning', 'Please validate first!');
+    return;
+  }
+  var body = { 'name': whois, 'writerId': writerId, 'email': email, 'comments': comments, 'fixedImage': link, 'validateId': validateImageId, 'pageIndex': pageIndex, 'confirmArea': confirmArea };
+  showLoading();
+  $.ajax({
+    type: "POST",
+    url: url,
+    contentType: "application/json",
+    data: JSON.stringify(body),
+    dataType: 'json',
+    success: function (resp) {
+      hideLoading();
+      var type = resp.status ? 'success' : 'error';
+      var message = resp.message ? resp.message : 'Submit ' + type + ' !';
 
-                showMessage(type, message);
-           },
-           error: function(err){
-             hideLoading();
-             showMessage('error', 'Submit fail!');
-           }
-    });
+      showMessage(type, message);
+    },
+    error: function (err) {
+      hideLoading();
+      showMessage('error', 'Submit fail!');
+    }
+  });
 }
 
-function doSignFix(){
+function doSignFix() {
   var uploadLink = $('#tiff-show a');
-  if(uploadLink === undefined){
+  if (uploadLink === undefined) {
     console.log('no file upload here');
     return;
   }
   var link = uploadLink.attr('href');
-  if(link === undefined){
+  if (link === undefined) {
     console.log('doSignSumbit no link here');
     return;
   }
   var page = $('#current-p-index span');
-  if (page == undefined && page.html() === undefined)
-  {
+  if (page == undefined && page.html() === undefined) {
     console.log('no page info here');
     return;
   }
   var pageIndex = page.html();
   var url = '/tiny/ocr/signSub.do';
   var writerId = '';
-	var whois = '';
-	var email = '';
-	var comments = '';
-	var validateImageId = '';
-  $('#signature-val-result input').each(function (index){
+  var whois = '';
+  var email = '';
+  var comments = '';
+  var validateImageId = '';
+  $('#signature-val-result input').each(function (index) {
     var value = $(this).val();
     var id = $(this).attr('id');
-    if(value === undefined){
+    if (value === undefined) {
       value = '';
     }
-    if(id === 'name'){
-        whois = value;
+    if (id === 'name') {
+      whois = value;
     }
-    if(id === 'writerId'){
-        writerId = value;
+    if (id === 'writerId') {
+      writerId = value;
     }
-    if(id === 'email'){
-        email = value;
+    if (id === 'email') {
+      email = value;
     }
-    if(id === 'comments'){
-        comments = value;
+    if (id === 'comments') {
+      comments = value;
     }
-    if(id === 'validateImageId'){
-        validateImageId = value;
+    if (id === 'validateImageId') {
+      validateImageId = value;
     }
   });
-  if(validateImageId === undefined || validateImageId === null || validateImageId.trim().length === 0){
+  if (validateImageId === undefined || validateImageId === null || validateImageId.trim().length === 0) {
     showMessage('warning', 'Please validate first!');
     return;
   }
@@ -545,51 +622,50 @@ function doSignFix(){
   var w = $('#box-w').val();
   var h = $('#box-h').val();
   var fixedArea = {};
-  if(x === undefined || x === null || x === ''){
+  if (x === undefined || x === null || x === '') {
     fixedArea = {};
-  }else{
-    fixedArea = {'x': x, 'y': y, 'w': w, 'h': h };
+  } else {
+    fixedArea = { 'x': x, 'y': y, 'w': w, 'h': h };
   }
-	var body = {'name': whois, 'writerId': writerId, 'email': email, 'comments': comments, 'fixedImage': link, 'validateId': validateImageId, 'fixedArea': fixedArea, 'pageIndex': pageIndex};
-	showLoading();
-	$.ajax({
-           type: "POST",
-           url: url,
-           contentType: "application/json",
-					 data: JSON.stringify(body),
-           dataType : 'json',
-           success: function(resp)
-           {
-              hideLoading();
-              var type = resp.status ? 'success' : 'error';
-              var message = resp.message ? resp.message : 'Fix ' + type + ' !';
+  var body = { 'name': whois, 'writerId': writerId, 'email': email, 'comments': comments, 'fixedImage': link, 'validateId': validateImageId, 'fixedArea': fixedArea, 'pageIndex': pageIndex };
+  showLoading();
+  $.ajax({
+    type: "POST",
+    url: url,
+    contentType: "application/json",
+    data: JSON.stringify(body),
+    dataType: 'json',
+    success: function (resp) {
+      hideLoading();
+      var type = resp.status ? 'success' : 'error';
+      var message = resp.message ? resp.message : 'Fix ' + type + ' !';
 
-              showMessage(type, message);
-           },
-           error: function(err){
-             hideLoading();
-             showMessage('error', 'Fix Submit fail!');
-           }
-    });
+      showMessage(type, message);
+    },
+    error: function (err) {
+      hideLoading();
+      showMessage('error', 'Fix Submit fail!');
+    }
+  });
 }
 
-function cleanValResult(){
-    $('#signature-val-result input').each(function (index){
-        $(this).val('');
-    });
-    $('#signature-val-result input#validateImageId').val('');
-    cleanStatus();
-    cleanMarkBox();
+function cleanValResult() {
+  $('#signature-val-result input').each(function (index) {
+    $(this).val('');
+  });
+  $('#signature-val-result input#validateImageId').val('');
+  cleanStatus();
+  cleanMarkBox();
 }
 
 
-function cleanRectangle(){
+function cleanRectangle() {
   cleanRectangleInfo();
   cleanCanvas();
   cleanCut();
 }
 
-function afterImageLoad(){
+function afterImageLoad() {
   printImagInfo();
   //sign-canvas
 
@@ -605,7 +681,7 @@ function afterImageLoad(){
   makeCanvas2('sign-canvas', width, height, offsetX, offsetY, 'sign-tiff-ct');
 }
 
-function afterPDFLoad(){
+function afterPDFLoad() {
   printPDFInfo();
   //sign-canvas
 
@@ -623,12 +699,12 @@ function afterPDFLoad(){
   makeCanvas2('sign-canvas', width, height, offsetX, offsetY, 'sign-tiff-ct');
 }
 
-function printImagInfo(){
+function printImagInfo() {
   var myImg = document.querySelector("#upload-signature-pre");
   var realWidth = myImg.naturalWidth;
   var realHeight = myImg.naturalHeight;
   var width = $("#upload-signature-pre").width();
-  var scale = (width/realWidth).toFixed(2);
+  var scale = (width / realWidth).toFixed(2);
   $("#image-w").val(realWidth);
   $("#image-h").val(realHeight);
   $("#image-scale").attr('data-org-w', width);
@@ -636,7 +712,7 @@ function printImagInfo(){
   $("#image-scale").val(scale);
 }
 
-function printPDFInfo(){
+function printPDFInfo() {
   //page = $('object').contents().find('div');
   var myImg = document.querySelector("object#upload-signature-pre");
   var selector = '#viewerContainer .page';
@@ -647,7 +723,7 @@ function printPDFInfo(){
   var realWidth = canvasCt.width();
   var realHeight = canvasCt.height();
   var width = $("#viewerContainer .page").width();
-  var scale = (width/realWidth).toFixed(2);
+  var scale = (width / realWidth).toFixed(2);
   $("#image-w").val(realWidth);
   $("#image-h").val(realHeight);
   $("#image-scale").attr('data-org-w', width);
@@ -655,49 +731,49 @@ function printPDFInfo(){
   $("#image-scale").val(scale);
 }
 
-function cleanImagInfo(){
+function cleanImagInfo() {
   $("#image-w").val('');
   $("#image-h").val('');
   $("#image-scale").val('');
   $("#stew").val('0');
 }
 
-function cleanRectangleInfo(){
+function cleanRectangleInfo() {
   $("#box-w").val('');
   $("#box-h").val('');
   $("#box-x").val('');
   $("#box-y").val('');
 }
 
-function activeCut(){
+function activeCut() {
   $('#sign-image-cut').css('cursor', 'pointer');
   $('#sign-image-cut').css('opacity', '1');
   $('#sign-image-cut').css('color', '#fff');
   $('#sign-image-cut').css('background', '#555');
 }
 
-function disableCut(){
+function disableCut() {
   $('#sign-image-cut').css('cursor', 'pointer');
   $('#sign-image-cut').css('opacity', '0.6');
   $('#sign-image-cut').css('color', '#000');
   $('#sign-image-cut').css('background', '#fff');
 }
 
-function drawRectangleInfoXY(x, y){
+function drawRectangleInfoXY(x, y) {
   var scale = getScale();
 
   $("#box-x").val((x / scale).toFixed(2));
   $("#box-y").val((y / scale).toFixed(2));
 }
 
-function drawRectangleInfoWH(w, h){
+function drawRectangleInfoWH(w, h) {
   var scale = getScale();
 
   $("#box-w").val((w / scale).toFixed(2));
   $("#box-h").val((h / scale).toFixed(2));
 }
 
-function makeCanvas(id, width, height, offsetX, offsetY, containerDiv){
+function makeCanvas(id, width, height, offsetX, offsetY, containerDiv) {
   $('#' + id).attr('width', '' + width);
   $('#' + id).attr('height', '' + height);
   var offsetTopScroll = 0;
@@ -706,79 +782,79 @@ function makeCanvas(id, width, height, offsetX, offsetY, containerDiv){
 
   var rect, isDown, origX, origY;
 
-  canvas.on('mouse:down', function(o){
-      cleanRectangleInfo();
+  canvas.on('mouse:down', function (o) {
+    cleanRectangleInfo();
 
-      canvas.clear();
-      isDown = true;
-      var pointer = canvas.getPointer(o.e);
+    canvas.clear();
+    isDown = true;
+    var pointer = canvas.getPointer(o.e);
 
-      var currentX = pointer.x;
-      var currentY = pointer.y;
-      var realX = currentX;
-      var realY = currentY;
+    var currentX = pointer.x;
+    var currentY = pointer.y;
+    var realX = currentX;
+    var realY = currentY;
 
+    drawRectangleInfoXY(currentX, currentY);
+
+    origX = pointer.x;
+    origY = pointer.y;
+
+    var pointer = canvas.getPointer(o.e);
+
+    var width = Math.abs(pointer.x - origX);
+    var height = Math.abs(pointer.y - origY);
+
+    rect = new fabric.Rect({
+      left: realX,
+      top: realY,
+      originX: 'left',
+      originY: 'top',
+      width: width,
+      height: height,
+      angle: 0,
+      fill: fillColor,
+      transparentCorners: false
+    });
+    canvas.add(rect);
+
+    drawRectangleInfoWH(width, height);
+  });
+
+  canvas.on('mouse:move', function (o) {
+    if (!isDown) return;
+    var pointer = canvas.getPointer(o.e);
+    var currentX = pointer.x;
+    var currentY = pointer.y;
+    var realX = currentX;
+    var realY = currentY;
+
+    if (origX > realX) {
+      rect.set({ left: Math.abs(realX) });
+    }
+    if (origY > realY) {
+      rect.set({ top: Math.abs(realY) });
+    }
+
+    if (origX > realX && origY > realY) {
       drawRectangleInfoXY(currentX, currentY);
+    } else if (origY > realY && origX < realX) {
+      drawRectangleInfoXY(origX, currentY);
+    } else if (origX > realX && origY < realY) {
+      drawRectangleInfoXY(currentX, origY);
+    }
 
-      origX = pointer.x;
-      origY = pointer.y;
 
-      var pointer = canvas.getPointer(o.e);
+    var width = Math.abs(origX - currentX);
+    var height = Math.abs(origY - currentY);
 
-      var width = Math.abs(pointer.x - origX);
-      var height = Math.abs(pointer.y - origY);
+    rect.set({ width: width });
+    rect.set({ height: height });
+    drawRectangleInfoWH(width, height);
 
-      rect = new fabric.Rect({
-          left: realX,
-          top: realY,
-          originX: 'left',
-          originY: 'top',
-          width: width,
-          height: height,
-          angle: 0,
-          fill: fillColor,
-          transparentCorners: false
-      });
-      canvas.add(rect);
-
-      drawRectangleInfoWH(width, height);
+    canvas.renderAll();
   });
 
-  canvas.on('mouse:move', function(o){
-      if (!isDown) return;
-      var pointer = canvas.getPointer(o.e);
-      var currentX = pointer.x;
-      var currentY = pointer.y;
-      var realX = currentX;
-      var realY = currentY;
-
-      if(origX > realX){
-        rect.set({ left: Math.abs(realX) });
-      }
-      if(origY > realY){
-        rect.set({ top: Math.abs(realY) });
-      }
-
-      if(origX > realX && origY > realY){
-          drawRectangleInfoXY(currentX, currentY);
-      }else if(origY > realY && origX < realX){
-          drawRectangleInfoXY(origX, currentY);
-      }else if(origX > realX && origY < realY){
-          drawRectangleInfoXY(currentX, origY);
-      }
-
-
-      var width = Math.abs(origX - currentX);
-      var height = Math.abs(origY - currentY);
-
-      rect.set({ width: width });
-      rect.set({ height: height });
-      drawRectangleInfoWH(width, height);
-
-      canvas.renderAll();
-  });
-
-  canvas.on('mouse:up', function(o){
+  canvas.on('mouse:up', function (o) {
     isDown = false;
     imageCut();
   });
@@ -787,7 +863,7 @@ function makeCanvas(id, width, height, offsetX, offsetY, containerDiv){
 /**
  * fill oppsite
  */
-function makeCanvas2(id, width, height, offsetX, offsetY, containerDiv){
+function makeCanvas2(id, width, height, offsetX, offsetY, containerDiv) {
   $('#' + id).attr('width', '' + width);
   $('#' + id).attr('height', '' + height);
   var offsetTopScroll = 0;
@@ -815,108 +891,108 @@ function makeCanvas2(id, width, height, offsetX, offsetY, containerDiv){
   canvas = new fabric.Canvas(id, { selection: false });
 
 
-  canvas.on('mouse:down', function(o){
-      cleanRectangleInfo();
+  canvas.on('mouse:down', function (o) {
+    cleanRectangleInfo();
 
-      canvas.clear();
-      $('.show-upload .canvas-container .upper-canvas').css('background', fillColor);
-      isDown = true;
+    canvas.clear();
+    $('.show-upload .canvas-container .upper-canvas').css('background', fillColor);
+    isDown = true;
 
-      var pointer = canvas.getPointer(o.e);
-      origX = pointer.x;
-      origY = pointer.y;
+    var pointer = canvas.getPointer(o.e);
+    origX = pointer.x;
+    origY = pointer.y;
 
 
-       leftRect = new fabric.Rect({
-          left: 0,
-          top: 0,
-          originX: 'left',
-          originY: 'top',
-          width: 0,
-          height: 0,
-          angle: 0,
-          fill: leftCol,
-          transparentCorners: false
-      });
+    leftRect = new fabric.Rect({
+      left: 0,
+      top: 0,
+      originX: 'left',
+      originY: 'top',
+      width: 0,
+      height: 0,
+      angle: 0,
+      fill: leftCol,
+      transparentCorners: false
+    });
 
-      upRect = new fabric.Rect({
-          left: 0,
-          top: 0,
-          originX: 'left',
-          originY: 'top',
-          width: 0,
-          height: 0,
-          angle: 0,
-          fill: upCol,
-          transparentCorners: false
-      });
+    upRect = new fabric.Rect({
+      left: 0,
+      top: 0,
+      originX: 'left',
+      originY: 'top',
+      width: 0,
+      height: 0,
+      angle: 0,
+      fill: upCol,
+      transparentCorners: false
+    });
 
-      downRect = new fabric.Rect({
-          left: 0,
-          top: 0,
-          originX: 'left',
-          originY: 'top',
-          width: 0,
-          height: 0,
-          angle: 0,
-          fill: downCol,
-          transparentCorners: false
-      });
+    downRect = new fabric.Rect({
+      left: 0,
+      top: 0,
+      originX: 'left',
+      originY: 'top',
+      width: 0,
+      height: 0,
+      angle: 0,
+      fill: downCol,
+      transparentCorners: false
+    });
 
-      rightRect = new fabric.Rect({
-          left: 0,
-          top: 0,
-          originX: 'left',
-          originY: 'top',
-          width: 0,
-          height: 0,
-          angle: 0,
-          fill: rightCol,
-          transparentCorners: false
-      });
-      canvas.add(leftRect);
-      canvas.add(upRect);
-      canvas.add(downRect);
-      canvas.add(rightRect);
+    rightRect = new fabric.Rect({
+      left: 0,
+      top: 0,
+      originX: 'left',
+      originY: 'top',
+      width: 0,
+      height: 0,
+      angle: 0,
+      fill: rightCol,
+      transparentCorners: false
+    });
+    canvas.add(leftRect);
+    canvas.add(upRect);
+    canvas.add(downRect);
+    canvas.add(rightRect);
 
   });
 
-  canvas.on('mouse:move', function(o){
-      if (!isDown) return;
-      $('.show-upload .canvas-container .upper-canvas').css('background', 'transparent');
-      var pointer = canvas.getPointer(o.e);
-      var currentX = pointer.x;
-      var currentY = pointer.y;
+  canvas.on('mouse:move', function (o) {
+    if (!isDown) return;
+    $('.show-upload .canvas-container .upper-canvas').css('background', 'transparent');
+    var pointer = canvas.getPointer(o.e);
+    var currentX = pointer.x;
+    var currentY = pointer.y;
 
-      if(currentX > origX){
-        x1 = origX;
-        x2 = currentX;
-      }else{
-        x2 = origX;
-        x1 = currentX;
-      }
+    if (currentX > origX) {
+      x1 = origX;
+      x2 = currentX;
+    } else {
+      x2 = origX;
+      x1 = currentX;
+    }
 
-      if(currentY > origY){
-        y1 = origY;
-        y2 = currentY;
-      }else{
-        y2 = origY;
-        y1 = currentY;
-      }
-      var offset = 0.05;
-      leftRect.set({ left: 0, top: 0, width: x1 + offset, height: totalH });
-      upRect.set({ left: x1, top: 0, width: x2 - x1, height: y1 });
-      downRect.set({ left: x1, top: y2, width: x2 - x1, height: totalH - y2 });
-      rightRect.set({ left: x2 - offset, top: 0, width: totalW - x2, height: totalH });
+    if (currentY > origY) {
+      y1 = origY;
+      y2 = currentY;
+    } else {
+      y2 = origY;
+      y1 = currentY;
+    }
+    var offset = 0.05;
+    leftRect.set({ left: 0, top: 0, width: x1 + offset, height: totalH });
+    upRect.set({ left: x1, top: 0, width: x2 - x1, height: y1 });
+    downRect.set({ left: x1, top: y2, width: x2 - x1, height: totalH - y2 });
+    rightRect.set({ left: x2 - offset, top: 0, width: totalW - x2, height: totalH });
 
 
-      drawRectangleInfoXY(x1, y1);
-      drawRectangleInfoWH(x2 - x1, y2 - y1);
+    drawRectangleInfoXY(x1, y1);
+    drawRectangleInfoWH(x2 - x1, y2 - y1);
 
-      canvas.renderAll();
+    canvas.renderAll();
   });
 
-  canvas.on('mouse:up', function(o){
+  canvas.on('mouse:up', function (o) {
     isDown = false;
     imageCut();
   });
@@ -924,14 +1000,14 @@ function makeCanvas2(id, width, height, offsetX, offsetY, containerDiv){
 
 
 
-function cleanCanvas(){
-  if(canvas){
+function cleanCanvas() {
+  if (canvas) {
     canvas.clear();
     $('.show-upload .canvas-container .upper-canvas').css('background', fillColor);
   }
 }
 
-function cleanCut(){
+function cleanCut() {
   var innerHTML = '<canvas class="cut-image-ct" width="460" height="260" ></canvas>'
   $('#cut-ct').html(innerHTML);
   $('#cut-ct').css('background', '#fff');
@@ -939,17 +1015,17 @@ function cleanCut(){
 }
 
 
-function imageCut(){
+function imageCut() {
   var originalShow = false;
 
   console.log('begin to cut image...');
   var uploadLink = $('#tiff-show img');
-  if(uploadLink === undefined){
+  if (uploadLink === undefined) {
     console.log('no file upload here');
     return;
   }
   var link = uploadLink.attr('src');
-  if(link === undefined){
+  if (link === undefined) {
     console.log('doSignVal no link here');
     return;
   }
@@ -959,32 +1035,32 @@ function imageCut(){
   var sourceY = $('#box-y').val();
   var sourceWidth = $('#box-w').val();
   var sourceHeight = $('#box-h').val();
-  if(sourceX === undefined || sourceX === null || sourceX === ''){
+  if (sourceX === undefined || sourceX === null || sourceX === '') {
     console.log('No area to cut!');
     return;
   }
   cleanCut();
 
   $('#cut-ct').css('background', 'rgb(34, 34, 34)');
-  if(originalShow){
-    $('#cut-result').attr('width','' + sourceWidth);
-    $('#cut-result').attr('height','' + sourceHeight);
+  if (originalShow) {
+    $('#cut-result').attr('width', '' + sourceWidth);
+    $('#cut-result').attr('height', '' + sourceHeight);
   }
 
   // scale = parseFloatH(scale);
   var scale = 1;
 
-  sourceX = parseFloatH(sourceX)/scale;
-  sourceY = parseFloatH(sourceY)/scale;
+  sourceX = parseFloatH(sourceX) / scale;
+  sourceY = parseFloatH(sourceY) / scale;
 
-  sourceWidth = parseFloatH(sourceWidth)/scale;
-  sourceHeight = parseFloatH(sourceHeight)/scale;
+  sourceWidth = parseFloatH(sourceWidth) / scale;
+  sourceHeight = parseFloatH(sourceHeight) / scale;
 
   var cutCanvas = document.getElementById('cut-result');
   var cutContext = cutCanvas.getContext('2d');
   var imageObj = new Image();
 
-  imageObj.onload = function() {
+  imageObj.onload = function () {
     // draw cropped image
 
     var destWidth = sourceWidth;
@@ -998,13 +1074,13 @@ function imageCut(){
     var wScale = 1;
     var hScale = 1;
 
-    if(cutCanvas.width < destWidth){
+    if (cutCanvas.width < destWidth) {
       wScale = cutCanvas.width / destWidth;
     }
-    if(cutCanvas.height < destHeight){
+    if (cutCanvas.height < destHeight) {
       hScale = cutCanvas.height / destHeight;
     }
-    if(!originalShow){
+    if (!originalShow) {
       scale = wScale > hScale ? hScale : wScale;
     }
 
@@ -1020,28 +1096,28 @@ function imageCut(){
 
 }
 
-function parseFloatH(numStr){
-    var defNum = 0;
-    try{
-        if(numStr){
-            var num = parseFloat(numStr);
-            if(num === NaN){
-                return defNum
-            }
-            return num;
-        }
+function parseFloatH(numStr) {
+  var defNum = 0;
+  try {
+    if (numStr) {
+      var num = parseFloat(numStr);
+      if (num === NaN) {
         return defNum
-    }catch(e){
-        return defNum;
+      }
+      return num;
     }
+    return defNum
+  } catch (e) {
+    return defNum;
+  }
 }
 
-function createMarkBox(matchArea){
-  if(matchArea === undefined || matchArea === null || matchArea.length === 0){
+function createMarkBox(matchArea) {
+  if (matchArea === undefined || matchArea === null || matchArea.length === 0) {
     return;
   }
   var scale = getScale();
-  for(var i = 0, len = matchArea.length; i < len; i++){
+  for (var i = 0, len = matchArea.length; i < len; i++) {
     var temp = matchArea[i];
     var w = round(parseFloatH(temp.w) * scale, 2);
     var h = round(parseFloatH(temp.h) * scale, 2);
@@ -1054,33 +1130,33 @@ function createMarkBox(matchArea){
     var innerText = buildNameStr(nameStr);
     var dataSrc = 'width:' + w + 'px;height:' + h + 'px;left:' + x + 'px;top:' + y + 'px;';
     var dataScale = 'width:' + w + 'px; height:' + h + 'px; left:' + x + 'px; top:' + y + 'px; line-height:' + h + 'px; text-align: center;';
-    var box = '<div id="mb-'+i+'" data-x="' + x + '" data-y="'+y+'" data-w="'+w+'" data-h="'+h+'" data-rate="'+rate+'"  onclick="markBoxClick(this)" class="mark-box box-off" style="' + dataScale + '">'+innerText+'</div>';
+    var box = '<div id="mb-' + i + '" data-x="' + x + '" data-y="' + y + '" data-w="' + w + '" data-h="' + h + '" data-rate="' + rate + '"  onclick="markBoxClick(this)" class="mark-box box-off" style="' + dataScale + '">' + innerText + '</div>';
     $('#tiff-show .mark-ct').append(box);
   }
-  setTimeout( function () {
+  setTimeout(function () {
     showTopBox();
   }, 100);
 }
 
-function buildNameStr(nameStr){
+function buildNameStr(nameStr) {
   var innerText = "<input type=hidden value='" + nameStr + "'></input>";
   return innerText;
 }
 
-function getNameStrHtml(id){
-   var nameStr = $('#' + id + ' input').val();
+function getNameStrHtml(id) {
+  var nameStr = $('#' + id + ' input').val();
   return buildNameStr(nameStr);
 }
 
-function round(num, scale){
+function round(num, scale) {
   return parseFloatH(num.toFixed(scale));
 }
 
-function showTopBox(){
+function showTopBox() {
   var topId = '';
   var rate = -1;
   var topInnerHtml = '';
-  $('.mark-ct > .mark-box').each(function (index){
+  $('.mark-ct > .mark-box').each(function (index) {
     var currentId = $(this).attr('id');
     var currentRate = $(this).attr('data-rate');
     currentRate = parseFloatH(currentRate);
@@ -1090,31 +1166,31 @@ function showTopBox(){
 
 
     $(this).html('<i class="fa fa-question-circle" aria-hidden="true"></i>');
-//    $(this).append('<label>'+currentRate+'</label>');
-    $(this).append('<label>'+''+'</label>');
+    //    $(this).append('<label>'+currentRate+'</label>');
+    $(this).append('<label>' + '' + '</label>');
     $(this).append(innerHtml);
-    if(currentRate > rate){
+    if (currentRate > rate) {
       rate = currentRate;
       topId = currentId;
       topInnerHtml = innerHtml;
     }
   });
-  if(topId === ''){
+  if (topId === '') {
     console.log("no top id found");
     return;
   }
   $('#' + topId).removeClass('box-off');
   $('#' + topId).addClass('box-on');
   $('#' + topId).html('<i class="fa fa-check-circle-o" aria-hidden="true"></i>');
-  $('#' + topId).append('<label>'+rate+'</label>');
+  $('#' + topId).append('<label>' + rate + '</label>');
   $('#' + topId).append(topInnerHtml);
   showNameList(topId);
 }
 
-function markBoxClick(e){
+function markBoxClick(e) {
   var id = $(e).attr('id');
   showNameList(id);
-  $('.mark-ct > .mark-box').each(function (index){
+  $('.mark-ct > .mark-box').each(function (index) {
     var tempId = $(this).attr('id');
     var currentRate = $(this).attr('data-rate');
     var innerHtml = getNameStrHtml(tempId);
@@ -1122,19 +1198,19 @@ function markBoxClick(e){
 
     $(this).addClass('box-off');
     $(this).html('<i class="fa fa-question-circle" aria-hidden="true"></i>');
-    $(this).append('<label>'+currentRate+'</label>');
+    $(this).append('<label>' + currentRate + '</label>');
     $(this).append(innerHtml);
-    if(tempId === id){
+    if (tempId === id) {
       $(this).removeClass('box-off');
       $(this).addClass('box-on');
       $(this).html('<i class="fa fa-check-circle-o" aria-hidden="true"></i>');
-      $(this).append('<label>'+currentRate+'</label>');
+      $(this).append('<label>' + currentRate + '</label>');
       $(this).append(innerHtml);
     }
   });
 }
 
-function showNameList(id){
+function showNameList(id) {
   var nameStr = $('#' + id + ' input').val();
   console.log('showNameList', id);
   console.log('showNameList', nameStr);
@@ -1143,36 +1219,36 @@ function showNameList(id){
   $('#cut-ct').html('');
   $('#cut-ct').css('background', 'rgb(34, 34, 34)');
   $('#cut-ct').css('color', '#fff');
-  if(nameList === undefined || nameList === null || nameList.length === 0){
+  if (nameList === undefined || nameList === null || nameList.length === 0) {
     $('#cut-ct').append('No Name matched');
     return;
   }
-  for(var i = 0, len = nameList.length; i < len; i++){
+  for (var i = 0, len = nameList.length; i < len; i++) {
     var name = nameList[i];
     var html = buildName(name, i);
     $('#cut-ct').append(html);
-    if(i === 0){
+    if (i === 0) {
       printName(name);
     }
   }
 }
 
-function buildName(name, i){
+function buildName(name, i) {
   var nameStr = JSON.stringify(name);
   var clz = i === 0 ? 'name-ct name-active' : 'name-ct';
-  var html = "<div class='"+clz+"' data-name='"+nameStr+"' onclick='pickName(this)'>";
-  html = html + '<label class="name">' + (name.full ?  name.full : '') + '</label>';
+  var html = "<div class='" + clz + "' data-name='" + nameStr + "' onclick='pickName(this)'>";
+  html = html + '<label class="name">' + (name.full ? name.full : '') + '</label>';
   html = html + '<label class="email">' + (name.email ? name.email : '') + '</label>';
   html = html + '<label class="flg"><i class="fa fa-check-circle-o" aria-hidden="true"></i></label>';
   html = html + '</div>';
   return html;
 }
 
-function pickName(e){
+function pickName(e) {
   var nameStr = $(e).attr('data-name');
   var name = JSON.parse(nameStr);
   printName(name);
-  $('.name-ct').each(function (index){
+  $('.name-ct').each(function (index) {
     $(this).removeClass('name-active');
   });
 
@@ -1180,7 +1256,7 @@ function pickName(e){
 }
 
 
-function printName(name){
+function printName(name) {
   $('#signature-val-result input#name').val(name.full);
   $('#signature-val-result input#email').val(name.email);
   $('#signature-val-result input#writerId').val(name.id);
@@ -1188,139 +1264,749 @@ function printName(name){
 }
 
 
-function cleanMarkBox(){
+function cleanMarkBox() {
   $('#tiff-show .mark-ct').html('');
 }
 
-function getScale(){
+function getScale() {
   var orgW = $("#image-scale").attr('data-org-w');
   var realW = $("#image-scale").attr('data-real-w');
-  return parseFloatH(orgW)/parseFloatH(realW);
+  return parseFloatH(orgW) / parseFloatH(realW);
 }
 
 
-document.onkeyup  = function(e){
+document.onkeyup = function (e) {
   var e = e || window.event; // for IE to cover IEs window event-object
-  if(e.ctrlKey && e.altKey && e.which == 65) {
+  if (e.ctrlKey && e.altKey && e.which == 65) {
     canvasSwitchClick(e);
     return false;
   }
-  if(e.ctrlKey && e.altKey && e.which == 67) {
+  if (e.ctrlKey && e.altKey && e.which == 67) {
     cleanRectangle();
     return false;
   }
 }
 
-function imagePlus(){
-    var src = $("#stew").val();
-    var degree = parseFloatH(src);
-    degree = degree + 1;
-    if(degree > 360){
-        degree = 0;
-    }else if(degree < -360){
-        degree = 0;
+function imagePlus() {
+  var src = $("#stew").val();
+  var degree = parseFloatH(src);
+  degree = degree + 1;
+  if (degree > 360) {
+    degree = 0;
+  } else if (degree < -360) {
+    degree = 0;
+  }
+  $("#stew").val(degree);
+
+  imageStewApply();
+}
+
+function imageMinus() {
+  var src = $("#stew").val();
+  var degree = parseFloatH(src);
+  degree = degree - 1;
+  if (degree > 360) {
+    degree = 0;
+  } else if (degree < -360) {
+    degree = 0;
+  }
+  $("#stew").val(degree);
+  imageStewApply();
+}
+
+function stewPress() {
+  var src = $("#stew").val();
+  var degree = parseFloatH(src);
+
+  if (degree > 360 || degree < -360) {
+    degree = 0;
+  }
+  $("#stew").val(degree);
+  imageStewApply();
+}
+
+function imageStewApply() {
+  //upload-signature-pre
+  var src = $("#stew").val();
+  var rotate = "rotate(" + src + "deg)"
+
+  $("#upload-signature-pre").css('-ms-transform', rotate);
+  $("#upload-signature-pre").css('-webkit-transform', rotate);
+  $("#upload-signature-pre").css('transform', rotate);
+}
+
+function imageSave() {
+  var src = $("#stew").val();
+  var degree = parseFloatH(src);
+  if (degree % 360 === 0) {
+    showMessage('warning', 'No degree rotate!!!');
+    return;
+  }
+
+  var transparency = $('#transparency').val();
+  //upload-signature-pre
+  var imgObj = $('#upload-signature-pre');
+  var imgPath = imgObj.attr("data-path");
+  var imgName = imgObj.attr("data-sname");
+  var url = '/tiny/ocr/image/rotate.do?imgPath=' + imgPath + '&imgName=' + imgName + '&degree=' + degree + "&transparency=" + transparency;
+
+  showLoading();
+
+  $.ajax({
+    type: "POST",
+    url: url,
+    contentType: "application/json",
+    success: function (resp) {
+      hideLoading();
+
+      if (resp.status) {
+        showMessage('success', resp.message);
+        beforeSignUpload();
+
+        handleUploadRespBefore(resp);
+        handleSinglePageUploadResp(resp);
+
+      } else {
+        showMessage('error', resp.message);
+      }
+
+    },
+    error: function (err) {
+      hideLoading();
+      showMessage('error', 'Save fail!');
+
     }
-    $("#stew").val(degree);
-
-    imageStewApply();
+  });
 }
 
-function imageMinus(){
-    var src = $("#stew").val();
-    var degree = parseFloatH(src);
-    degree = degree - 1;
-    if(degree > 360){
-        degree = 0;
-    }else if(degree < -360){
-        degree = 0;
+
+function optionSwitch(e) {
+  var display = $(".option-ct").css("display");
+  console.log('optionSwitch', display);
+  if (display !== undefined && display === 'none') {
+    $(".option-ct").css("display", "block");
+  } else {
+    $(".option-ct").css("display", "none");
+  }
+}
+
+function onWriterChange(element) {
+  var id = $(element).val();
+  var name = $("#writer-list option:selected").text();
+
+  $('#signature-val-result input#writerId').val(id);
+  $('#signature-val-result input#name').val(name);
+  $('#signature-val-result input#email').val('');
+  $('#signature-val-result input#comments').val('fixed writer id:' + id);
+}
+
+/** ****************************************OCR*************************************************** */
+function doLayoutRecon() {
+  var imgObj = $('#tiff-show-layout img');
+
+  if (imgObj === undefined || imgObj === null) {
+    showMessage('error', 'Please upload an image first!!!');
+    return;
+  }
+  var imgPath = imgObj.attr("data-path");
+  var imgName = imgObj.attr("data-sname");
+
+  if (imgPath === undefined || imgName === undefined) {
+    showMessage('error', 'Please upload an image first!!!');
+    return;
+  }
+
+  var body = { 'imageWebPath': imgPath, 'reconImage': imgName };
+  $('input#layout-type').val('');
+  $('div#type-list').html('<button class="dropdown-item" type="button">No Data</button>');
+  var url = "/tiny/api/layout/recon.do";
+  showLoading();
+  $.ajax({
+    type: "POST",
+    url: url,
+    data: JSON.stringify(body),
+    contentType: "application/json",
+    success: function (resp) {
+      hideLoading();
+
+      if (resp.status) {
+        if (resp.data && resp.data.length > 0) {
+          renderTypeList(resp.data);
+          showMessage('success', resp.message);
+        } else {
+          showMessage('warning', 'Cannot recognition layout of this image');
+        }
+      } else {
+        showMessage('error', resp.message);
+      }
+
+    },
+    error: function (err) {
+      hideLoading();
+      showMessage('error', 'Layout Recongnition fail!');
     }
-    $("#stew").val(degree);
-    imageStewApply();
+  });
 }
 
-function stewPress(){
-    var src = $("#stew").val();
-    var degree = parseFloatH(src);
+function renderTypeList(data){
+    data.sort(function(a, b){
+        var ap = parseFloat(a.probability);
+        var bp = parseFloat(b.probability);
+        return bp - ap;
+    })
+     var html = '';
+     for(var i = 0; i < data.length; i++){
+        var temp = data[i];
+        var prob = parseFloat(parseFloat(temp.probability).toFixed(2));
+        var tag = temp.tag ? temp.tag : 'Unknown';
+        var showMsg = 'Type:' + temp.type + ', tag:' + tag + ', probability:' + prob;
+        if(i == 0){
+            $('input#layout-type').val(showMsg);
+        }
+        html = html + '<button class="dropdown-item" type="button" onclick="applyLayoutRe(this);" data-type="'+temp.type+'" data-tag="'+temp.tag+'" data-probability="'+temp.probability+'" data-comments="'+temp.comments+'">'+showMsg+'</button>';
+     }
+     $('div#type-list').html(html);
+}
 
-    if(degree > 360 || degree < -360){
-        degree = 0;
+
+function applyLayoutRe(element){
+    var type = $(element).attr('data-type');
+    var probability = $(element).attr('data-probability');
+    var tag = $(element).attr('data-tag');
+    tag = tag ? tag : 'Unknown';
+    probability = parseFloat(parseFloat(probability).toFixed(2));
+    var showMsg = 'Type:' + type + ', tag:' + tag + ', probability:' + probability;
+    $('input#layout-type').val(showMsg);
+}
+
+function doContentRecon() {
+  var imgObj = $('#tiff-show-layout img');
+  if (imgObj === undefined || imgObj === null) {
+    showMessage('error', 'Please upload an image first!!!');
+    return;
+  }
+  var imgPath = imgObj.attr("data-path");
+  var imgName = imgObj.attr("data-sname");
+  if (imgPath === undefined || imgName === undefined) {
+    showMessage('error', 'Please upload an image first!!!');
+    return;
+  }
+  var body = { 'imageWebPath': imgPath, 'reconImage': imgName };
+  var url = "/tiny/api/detail/recon.do";
+  showLoading();
+  $.ajax({
+    type: "POST",
+    url: url,
+    data: JSON.stringify(body),
+    contentType: "application/json",
+    success: function (resp) {
+      hideLoading();
+
+      if (resp.status) {
+        if (resp.data && resp.data.result && resp.data.result.type === 'table-ly') {
+          $('input#content-type').val('table-ly');
+          rendomTableResult(resp);
+          showMessage('success', resp.message);
+        } else if (resp.data && resp.data.result && resp.data.result.type === 'grid-ly') {
+          $('input#content-type').val('grid-ly');
+          rendomGridResult(resp);
+          showMessage('success', resp.message);
+        } else {
+          showMessage('warning', 'Unknow result...');
+        }
+
+      } else {
+        showMessage('error', resp.message);
+      }
+
+    },
+    error: function (err) {
+      hideLoading();
+      showMessage('error', 'Content Recongnition fail!');
     }
-    $("#stew").val(degree);
-    imageStewApply();
+  });
 }
 
-function imageStewApply(){
-    //upload-signature-pre
-    var src = $("#stew").val();
-    var rotate = "rotate(" + src + "deg)"
+function rendomTableResult(resp) {
+  var result = resp.data.result;
+  var tableHtml = '<table class="recon-ct">';
+  var isHeader = false;
+  var i = 0, len = result.allList.length;
+  var colSize = 0;
+  var lastRow = false;
+  for (; i < len; i++) {
+    isHeader = i === 0;
+    lastRow = i === len - 1;
 
-    $("#upload-signature-pre").css('-ms-transform', rotate);
-    $("#upload-signature-pre").css('-webkit-transform', rotate);
-    $("#upload-signature-pre").css('transform', rotate);
+    var rowList = result.allList[i];
+    colSize = rowList.length;
+    var rowHtml = rendomRowHtml(i, rowList, isHeader, lastRow);
+    tableHtml = tableHtml + rowHtml;
+  }
+
+
+  var colspan = colSize + 2;
+
+
+  var lastRowHtml = '<tr><td colspan="' + colspan + '" style="text-align: center;">';
+  var submitHtml = '<span data-length="' + len + '" data-col="' + colSize + '" class="opera opera-submit" onclick="reconSubAll(this);">Submit</span>';
+  var resetHtml = '<span data-length="' + len + '" data-col="' + colSize + '" class="opera opera-reset" onclick="reconResetAll(this);">Reset</span>';
+  lastRowHtml = lastRowHtml + submitHtml + resetHtml + '</td></tr>';
+
+  tableHtml = tableHtml + lastRowHtml;
+
+  $('#ocr-result').html('<div class="detail-ct table-ly">' + tableHtml + '</table><div class="end-padding"></div></div>');
+  appendToolbar();
 }
 
-function imageSave(){
-    var src = $("#stew").val();
-    var degree = parseFloatH(src);
-    if(degree%360 === 0){
-        showMessage('warning', 'No degree rotate!!!');
-        return;
+function rendomRowHtml(index, rowList, isHeader, lastRow) {
+  var resultHmtl = '<tr>';
+
+  if (isHeader) {
+    var cellHtml = '<th>#</th>'
+    resultHmtl = resultHmtl + cellHtml;
+  } else {
+    resultHmtl = '<tr class="recon-row" id="rowt-' + index + '">';
+    var cellHtml = '<td id="rowi-' + index + '"><div style="width:100%; height:100%; display: flex;"><i style="padding-right: 5px;" class="fa fa-question-circle" aria-hidden="true"></i>' + index + '</div></td>'
+    resultHmtl = resultHmtl + cellHtml;
+
+  }
+  var i = 0, len = rowList.length;
+  for (; i < len; i++) {
+    var cellObj = rowList[i];
+    var cellHtml = rendomCellHtml(index, i, cellObj, isHeader);
+    resultHmtl = resultHmtl + cellHtml;
+  }
+  if (isHeader) {
+    var cellHtml = '<th>Operation</th>'
+    resultHmtl = resultHmtl + cellHtml;
+  } else {
+    var style = 'display: flex; border-left: 0px solid transparent; border-top: 0px solid transparent;';
+    style = lastRow ? style + 'border-bottom: 0px solid transparent;' : style;
+    var submitHtml = '<span data-row="' + index + '" data-length="' + len + '" class="opera opera-submit" onclick="reconSub(this);">Submit</span>';
+    var resetHtml = '<span data-row="' + index + '" data-length="' + len + '" class="opera opera-reset" onclick="reconReset(this);">Reset</span>';
+    var cellHtml = '<td style="' + style + '">' + submitHtml + resetHtml + '</td>'
+    resultHmtl = resultHmtl + cellHtml;
+  }
+
+  return resultHmtl + '</tr>';
+}
+
+function rendomCellHtml(rowIndex, colIndex, cellObj, isHeader) {
+  var begin = '<td>';
+  var end = '</td>';
+  var value = '';
+  if (isHeader) {
+    begin = '<th>';
+    end = '</th>';
+    value = cellObj.text;
+  } else {
+    var id = 'pos-' + rowIndex + '-' + colIndex;
+    value = '<input id="' + id + '" type="text" value="' + cellObj.text + '" data-src="' + cellObj.text + '" data-row="' + rowIndex + '" data-col="' + colIndex + '">'
+  }
+  return begin + value + end;
+}
+
+
+function rendomGridResult(resp) {
+  var result = resp.data.result;
+  var resultHtml = '';
+  var markHtml = '';
+  var scalePer = 1;
+  var myImg = document.querySelector("#syn-signature-pre");
+  var realWidth = myImg.width;
+  var realHeight = myImg.height;
+  scalePer = realWidth/result.width;
+  
+  for (var i = 0, len = result.allList.length; i < len; i++) {
+    var rectObj = result.allList[i];
+    var rendenResult = rendomRectHtml(rectObj, result, scalePer);
+    resultHtml = resultHtml + rendenResult.show;
+	markHtml = markHtml + rendenResult.mark;
+  }
+  $('#ocr-result').html('<div class="detail-ct grid-ly">' + resultHtml + '</div>');
+  $('#tiff-show-layout .cell .mark-ct').html(markHtml);
+  appendToolbar();
+}
+
+function rendomRectHtml(rectObj, result, scalePer) {
+  var style = '';
+  var innerStyle = '';
+  var paddingLeft = 0;
+  var paddinGTop = 0;
+  var paddingRight = 10;
+  var paddinGBottom = 10;
+  var xOffset = result.beginX - paddingLeft;
+  var yOffset = result.beginY - paddinGTop;
+
+  style = style + 'left:' + (rectObj.xmin - xOffset) + 'px;';
+  style = style + 'top:' + (rectObj.ymin - yOffset) + 'px;';
+  style = style + 'width:' + (rectObj.width + paddingLeft + paddingRight) + 'px;';
+  style = style + 'max-width:' + (rectObj.width + paddingLeft + paddingRight) + 'px;';
+  style = style + 'height:' + (rectObj.height + paddinGTop + paddinGBottom) + 'px;';
+
+  innerStyle = innerStyle + 'width:' + (rectObj.width) + 'px;';
+  innerStyle = innerStyle + 'max-width:' + (rectObj.width) + 'px;';
+  innerStyle = innerStyle + 'height:' + (rectObj.height) + 'px;';
+
+  var srcId = rectObj.id ? rectObj.id : sampleGuid();
+
+  var id = 'rect-' + srcId;
+
+  var srcInfo = ' data-id="' + srcId + '" data-src="' + rectObj.text + '" data-xmin="' + rectObj.xmin + '" data-ymin="' + rectObj.ymin + '" data-width="' + rectObj.width + '" data-height="' + rectObj.height + '" ';
+
+  var value = '<textarea id="' + id + '" value="' + rectObj.text + '" ' + srcInfo + '>' + rectObj.text + '</textarea>';
+
+  var submitHtml = '<span data-id="' + id + '"  class="opera opera-submit" onclick="reconRectSub(this);">Submit</span>';
+  var resetHtml = '<span data-id="' + id + '"  class="opera opera-reset" onclick="reconRectReset(this);">Reset</span>';
+  var msgCtHtml = '<span id="msg-' + id + '"  class="opera opera-readonly"></span>';
+
+  var operaHtml = '<div class="opera-ct">' + submitHtml + resetHtml + msgCtHtml + '</div>';
+  // var value = textFormat(rectObj.text);
+  var html = '<div class="rect-ct" data-id="'+srcId+'" onclick="showMarkCell(this);" style="' + style + '"><div class="rect" style="' + innerStyle + '">' + value + operaHtml + '</div></div>';
+
+  var markRectHtml = rendenMarkRect(srcId, rectObj, result, scalePer);
+  
+  return {'show': html, 'mark': markRectHtml};
+}
+
+function rendenMarkRect(srcId, rectObj, result, scalePer){
+	var id = 'rect-src-' + srcId;
+	var style = 'left:' + rectObj.xmin*scalePer + 'px; top:' + rectObj.ymin*scalePer + 'px; width:' + rectObj.width*scalePer + 'px; height:' + rectObj.height*scalePer + 'px;'
+	var html = '<div id="'+id+'" class="cell-ct cell-hide" style="'+style+'">';
+	var charList = '';
+	for(var i = 0, len = rectObj.charList.length; i < len; i++){
+		var charObj = rectObj.charList[i];
+		charList = charList + renderCharHtml(charObj, scalePer);
+	}
+	html = html + charList + '</div>';
+	return html;
+}
+
+function renderCharHtml(rectObj, scalePer){
+	var style = 'left:' + rectObj.xmin*scalePer + 'px; top:' + rectObj.ymin*scalePer + 'px; width:' + rectObj.width*scalePer + 'px; height:' + rectObj.height*scalePer + 'px;'
+	var html = '<div class="cell-char" style="'+style+'"></div>';
+	return html;
+}
+
+function appendToolbar() {
+  var cloneToolbar = $('#toolbar-template .toolbar-ct').clone();
+  cloneToolbar.attr('id', 'toolbar-form');
+  cloneToolbar.appendTo('#ocr-result');
+}
+
+function textFormat(text) {
+  return text.replace(/\n/g, "<br />");
+}
+
+
+function reconSub(e) {
+  console.log('reconSub', e);
+  var rowIndex = $(e).attr('data-row');
+  var colLen = $(e).attr('data-length');
+  if (colLen && colLen > 0 && rowIndex) {
+    var detailList = [];
+    for (var i = 0; i < colLen; i++) {
+      var id = 'pos-' + rowIndex + '-' + i;
+      var obj = convertInputObj(id);
+      if (obj) {
+        detailList.push(obj);
+      }
     }
+    submitFixRecon(detailList);
+  }
+}
 
-    var transparency = $('#transparency').val();
-    //upload-signature-pre
-    var imgObj = $('#upload-signature-pre');
-    var imgPath = imgObj.attr("data-path");
-    var imgName = imgObj.attr("data-sname");
-    var url = '/tiny/ocr/image/rotate.do?imgPath=' + imgPath + '&imgName=' + imgName + '&degree='+degree + "&transparency=" + transparency;
-
-    showLoading();
-
-    $.ajax({
-           type: "POST",
-           url: url,
-           contentType: "application/json",
-           success: function(resp)
-           {
-              hideLoading();
-
-              if(resp.status){
-                showMessage('success', resp.message);
-                beforeSignUpload();
-
-                handleUploadRespBefore(resp);
-                handleSinglePageUploadResp(resp);
-
-              }else{
-                showMessage('error', resp.message);
-              }
-
-           },
-           error: function(err){
-             hideLoading();
-             showMessage('error', 'Save fail!');
-
-           }
-    });
+function convertInputObj(id) {
+  var inputElement = $('td input#' + id);
+  if (inputElement === undefined) {
+    return false;
+  }
+  var value = inputElement.val();
+  value = value ? value : '';
+  var srcVal = inputElement.attr('data-src');
+  var rowIndex = inputElement.attr('data-row');
+  var colIndex = inputElement.attr('data-col');
+  return { 'id': id, 'fixText': value, 'srcText': srcVal, 'rowIndex': rowIndex, 'colIndex': colIndex };
 }
 
 
-function optionSwitch(e){
-    var display = $(".option-ct").css("display");
-    console.log('optionSwitch', display);
-    if(display !== undefined && display === 'none'){
-        $(".option-ct").css("display", "block");
-    }else{
-        $(".option-ct").css("display", "none");
+function reconReset(e) {
+  console.log('reconSub', e);
+  var rowIndex = $(e).attr('data-row');
+  var colLen = $(e).attr('data-length');
+  if (colLen && colLen > 0 && rowIndex) {
+    for (var i = 0; i < colLen; i++) {
+      var id = 'pos-' + rowIndex + '-' + i;
+      resetTDInput(id);
     }
+  }
 }
 
-function onWriterChange(element){
-    var id = $(element).val();
-    var name = $("#writer-list option:selected").text();
+function reconRectSub(e) {
+  console.log('reconRectSub', e);
+  var detailList = [];
+  var id = $(e).attr('data-id');
+  var obj = convertTextareaObj(id);
+  if (obj) {
+    detailList.push(obj);
+  }
+  console.log('reconRectSub', obj)
+  submitFixRecon(detailList);
+}
 
-    $('#signature-val-result input#writerId').val(id);
-    $('#signature-val-result input#name').val(name);
-    $('#signature-val-result input#email').val('');
-    $('#signature-val-result input#comments').val('fixed writer id:' + id);
+
+
+function convertTextareaObj(id) {
+  console.log('convertTextareaObj', id);
+  var textareaEl = $('textarea#' + id);
+  if (textareaEl === undefined) {
+    return false;
+  }
+  var value = textareaEl.val();
+  value = value ? value : '';
+  var srcVal = textareaEl.attr('data-src');
+  var xmin = textareaEl.attr('data-xmin');
+  var ymin = textareaEl.attr('data-ymin');
+  var width = textareaEl.attr('data-width');
+  var height = textareaEl.attr('data-height');
+  return { 'id': id, 'fixText': value, 'srcText': srcVal, 'xmin': xmin, 'ymin': ymin, 'width': width, 'height': height };
+}
+
+function reconRectReset(e) {
+  var textareaId = $(e).attr('data-id');
+  var dataSrc = $('#' + textareaId).attr('data-src');
+  dataSrc = dataSrc === undefined ? '' : dataSrc;
+  $('#' + textareaId).val(dataSrc);
+}
+
+function reconSubAll(e) {
+  var detailList = [];
+  $('#ocr-result td input').each(function (index) {
+    var id = $(this).attr('id');
+    var obj = convertInputObj(id);
+    if (obj) {
+      detailList.push(obj);
+    }
+  });
+  submitFixRecon(detailList);
+}
+
+function reconResetAll(e) {
+  resetReonTable();
+}
+
+function resetReonTable() {
+  $('#ocr-result td input').each(function (index) {
+    var dataSrc = $(this).attr('data-src');
+    dataSrc = dataSrc === undefined ? '' : dataSrc;
+    $(this).val(dataSrc);
+  });
+}
+
+function resetReonGrid() {
+  $('#ocr-result textarea').each(function (index) {
+    var dataSrc = $(this).attr('data-src');
+    dataSrc = dataSrc === undefined ? '' : dataSrc;
+    $(this).val(dataSrc);
+  });
+}
+
+function reconRectSubAll() {
+  var detailList = [];
+  $('#ocr-result textarea').each(function (index) {
+    var id = $(this).attr('id');
+    var obj = convertTextareaObj(id);
+    if (obj) {
+      detailList.push(obj);
+    }
+  });
+  submitFixRecon(detailList);
+}
+
+function resetTDInput(id) {
+  var inputElement = $('td input#' + id);
+  if (inputElement === undefined) {
+    return;
+  }
+  var dataSrc = inputElement.attr('data-src');
+  dataSrc = dataSrc === undefined ? '' : dataSrc;
+  inputElement.val(dataSrc);
+}
+
+function resetAll() {
+  resetReonTable();
+  resetReonGrid();
+}
+
+function submitAll() {
+  var layoutType = $('input#content-type').val();
+  if (layoutType && layoutType.length > 0) {
+    if (layoutType === 'table-ly') {
+      reconSubAll();
+    } else {
+      reconRectSubAll();
+    }
+  }
+}
+
+function markAsReadonly() {
+  $('#ocr-result td input').each(function (index) {
+    $(this).attr('readonly', 'true');
+    $(this).addClass('input-readonly');
+  });
+
+  $('#ocr-result textarea').each(function (index) {
+    $(this).attr('readonly', 'true');
+    $(this).addClass('textarea-readonly');
+  });
+}
+
+function markAsEdit() {
+  $('#ocr-result td input').each(function (index) {
+    $(this).removeAttr("readonly")
+    $(this).removeClass('input-readonly');
+  });
+
+  $('#ocr-result textarea').each(function (index) {
+    $(this).removeAttr("readonly")
+    $(this).removeClass('textarea-readonly');
+  });
+}
+
+function zoomInRecon(scale) {
+  var result = 'scale(' + scale + ', ' + scale + ')';
+  $('#ocr-result .detail-ct').css("transform", result);
+}
+
+function zoomInApply() {
+  var scale = $('#zoom-in-ops').val();
+  zoomInRecon(scale);
+}
+
+function submitFixRecon(detailList) {
+  var imgObj = $('#tiff-show-layout img');
+  if (imgObj === undefined || imgObj === null) {
+    showMessage('error', 'Please upload an image first!!!');
+    return;
+  }
+  var imgPath = imgObj.attr("data-path");
+  var imgName = imgObj.attr("data-sname");
+  if (imgPath === undefined || imgName === undefined) {
+    showMessage('error', 'Please upload an image first!!!');
+    return;
+  }
+  var layoutType = $('input#content-type').val();
+  var body = { 'imagePath': imgPath, 'imageName': imgName, 'layoutType': layoutType, 'detailList': detailList };
+  var url = "/tiny/api/detail/subRecon.do";
+  showLoading();
+  $.ajax({
+    type: "POST",
+    url: url,
+    data: JSON.stringify(body),
+    contentType: "application/json",
+    success: function (resp) {
+      hideLoading();
+
+      if (resp.status) {
+        showMessage('success', resp.message);
+        markAlreadySubmit(detailList);
+      } else {
+        showMessage('error', resp.message);
+      }
+
+    },
+    error: function (err) {
+      hideLoading();
+      showMessage('error', 'Submit fixed content Recongnition fail!');
+    }
+  });
+}
+
+function markAlreadySubmit(detailList) {
+  var layoutType = $('input#content-type').val();
+  if (layoutType === 'table-ly') {
+    batchMarkTableSubmit(detailList);
+  } else if (layoutType === 'grid-ly') {
+    batchMarkGridSubmit(detailList);
+  } else {
+    showMessage('warning', 'Unknown layout mark!');
+  }
+}
+
+function batchMarkTableSubmit(detailList) {
+  var rowArr = [];
+  for (var i = 0, len = detailList.length; i < len; i++) {
+    var temp = detailList[i];
+    var rowIndex = temp.rowIndex;
+    if (rowArr.indexOf(rowIndex) > -1) {
+      continue;
+    }
+    rowArr.push(rowIndex);
+    markTableSubmit(rowIndex);
+  }
+}
+
+function batchMarkGridSubmit(detailList) {
+  var idArr = [];
+  for (var i = 0, len = detailList.length; i < len; i++) {
+    var temp = detailList[i];
+    var id = temp.id;
+    if (idArr.indexOf(id) > -1) {
+      continue;
+    }
+    idArr.push(id);
+    markGridSubmit(id);
+  }
+}
+
+function markTableSubmit(rowId) {
+  $('td#rowi-' + rowId + ' i').attr('class', 'fa fa-check-circle');
+  $('tr#rowt-' + rowId).attr('class', 'recon-row recon-row-sub');
+  $('td#rowi-' + rowId + ' i').css('color', 'green');
+  $('td#rowi-' + rowId + ' div').attr('flow', 'right');
+  $('td#rowi-' + rowId + ' div').attr('tooltip', getSubmitMsg());
+}
+
+function markGridSubmit(id) {
+  var message = getSubmitMsg();
+  $('textarea#' + id).css('background', 'lightgreen');
+  $('span#msg-' + id).html(message);
+  $('span#msg-' + id).attr('flow', 'down');
+  $('span#msg-' + id).attr('tooltip', message);
+}
+
+function getSubmitMsg() {
+  var message = 'Submit at ' + (new Date()).toLocaleString();
+  return message;
+}
+
+function showMaxRecon() {
+  //console.log('showMaxRecon ... ');
+  var ocrResultHtml = $('#ocr-result');
+  $('#dialog-recon-detail .modal-body').html('');
+  var cloneOcrResult = ocrResultHtml.clone();
+  cloneOcrResult.attr('id', 'ocr-result-clone');
+  cloneOcrResult.css('height', '100%');
+  cloneOcrResult.css('border-radius', '6px');
+  cloneOcrResult.appendTo('#dialog-recon-detail .modal-body');
+}
+
+function showMarkCell(element){
+	hideAllMark();
+	var id = $(element).attr('data-id');
+	$('#rect-src-' + id).removeClass('cell-hide');
+	$('#rect-src-' + id).addClass('cell-show');
+}
+
+function hideAllMark(){
+	$('#tiff-show-layout .cell .mark-ct .cell-ct').each(function (index){
+		$(this).attr('class', 'cell-ct cell-hide');
+	});
+}
+
+function showAllMark(){
+	$('#tiff-show-layout .cell .mark-ct .cell-ct').each(function (index){
+		$(this).attr('class', 'cell-ct cell-show');
+	});
 }

@@ -8,13 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SignatureFactory {
+public class SignatureFactory extends BaseFactory {
 
     @Autowired
-    private SignatureService remoteService;
+    private SignatureService remoteSignatureService;
 
     @Autowired
-    private SignatureService mockService;
+    private SignatureService mockSignatureService;
 
     public SignatureService getService() {
         String modeV = SystemUtils.getSystemProperty(SystemPropertyEnum.SIGNATURE_MODE);
@@ -22,50 +22,21 @@ public class SignatureFactory {
         mode = mode == null ? Mode.DEF : mode;
         switch (mode) {
             case DEF:
-                return mockService;
+                return mockSignatureService;
             case MOCK:
-                return mockService;
+                return mockSignatureService;
             case REMOTE:
-                return remoteService;
+                return remoteSignatureService;
         }
         throw new RuntimeException("No service available!");
 
     }
 
-
-    enum Mode {
-        REMOTE("remote", 1),
-
-        MOCK("mock", 2),
-
-        DEF("def", 0),;
-        private String code;
-
-        private int val;
-
-        Mode(String code, int val) {
-            this.code = code;
-            this.val = val;
-        }
-
-        public static Mode codeOf(String code) {
-            if (StringUtils.isBlank(code)) {
-                return null;
-            }
-            for (Mode temp : values()) {
-                if (StringUtils.equalsIgnoreCase(code, temp.code)) {
-                    return temp;
-                }
-            }
-            return null;
-        }
+    public void setRemoteSignatureService(SignatureService remoteSignatureService) {
+        this.remoteSignatureService = remoteSignatureService;
     }
 
-    public void setRemoteService(SignatureService remoteService) {
-        this.remoteService = remoteService;
-    }
-
-    public void setMockService(SignatureService mockService) {
-        this.mockService = mockService;
+    public void setMockSignatureService(SignatureService mockSignatureService) {
+        this.mockSignatureService = mockSignatureService;
     }
 }

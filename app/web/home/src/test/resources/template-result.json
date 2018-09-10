@@ -1,0 +1,24 @@
+{
+  "classes": [
+    {
+      "class_id": 4,
+      "probability": 0.7417122
+    },
+    {
+      "class_id": 1,
+      "probability": 0.24653177
+    },
+    {
+      "class_id": 9,
+      "probability": 0.008622313
+    },
+    {
+      "class_id": 2,
+      "probability": 0.0030537313
+    },
+    {
+      "class_id": 5,
+      "probability": 3.18329e-05
+    }
+  ]
+}

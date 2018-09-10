@@ -73,4 +73,50 @@ $(function () {
 	});
 });
 
-$('[data-toggle="tooltip"]').tooltip({show: {effect:"none", delay:0}});
+$('[data-toggle="tooltip"]').tooltip({ show: { effect: "none", delay: 0 } });
+
+
+/**
+ *  Join the string togger with the joined str
+ *  @param {array} strArr = ["a", "b", "c"]
+ *  @param {string} joined = "|"
+ *  @return {string} a|b|c
+ *
+ */
+function join(strArr, joined) {
+	if (strArr === undefined || strArr.length === 0) {
+		return '';
+	}
+	if (joined === undefined) {
+		joined = '';
+	}
+	var retStr = strArr.reduce(
+		(total, temp) => {
+			return total.concat(temp).concat(joined);
+		},
+		'',
+	);
+
+	if (joined.length === 0) {
+		return retStr;
+	}
+	var beginIndex = 0;
+	var endIndex = retStr.length - joined.length;
+	// to substring the last joined string
+	retStr = retStr.substring(beginIndex, endIndex);
+	return retStr;
+};
+
+
+function S4() {
+	return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+};
+
+function guid() {
+	const arr = [S4(), S4(), '-', S4(), '-4', S4().substr(0, 3), '-', S4(), '-', S4(), S4(), S4()];
+	return join(arr, '');
+};
+
+function sampleGuid() {
+	return guid().replace(/-/g, '');
+};

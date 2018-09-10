@@ -11,5 +11,5 @@
 </div>
 <div class="tab-wrap tab-wrap-full">
 	<div id="tc-main" class="tab w3-animate-left" style="display: block; height: 100%">#parse("/templates/ocr/demo/main-infor.vm")</div>
-	<div id="tc-template" class="tab w3-animate-left" style="display: none; height: 100%">#parse("/templates/ocr/demo/template.vm")</div>
+	<div id="tc-template" class="tab w3-animate-right" style="display: none; height: 100%">#parse("/templates/ocr/demo/template.vm")</div>
 </div>

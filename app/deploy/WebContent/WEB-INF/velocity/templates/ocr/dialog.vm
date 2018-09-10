@@ -27,3 +27,14 @@
     </div>
   </div>
 </div>
+
+
+<div id="dialog-recon-detail" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-recon-detail" aria-hidden="true">
+  <div class="modal-dialog" role="document" style="width: 100%; height: calc(100% -  60px); padding: 40px;">
+    <div class="modal-content" style="height: 100%; background: #999">
+      <div class="modal-body" style="height: 100%; padding: 0px; overflow: auto;">
+        ...
+      </div>
+    </div>
+  </div>
+</div>

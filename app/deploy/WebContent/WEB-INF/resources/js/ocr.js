@@ -46,8 +46,10 @@ function doUpload() {
         $('#tiff-show').append(
           showHtml
         );
+        var canvasCover = '<canvas id="cover-canvas" width="0" height="0"></canvas>';
+        var image = '<div class="cell on "><img alt="display-upload-file" class="upload-img upload-img-0"  src="'+resp.data.name+'"/>'+canvasCover+'</div>';
+        $('#dialog-image-cover .modal-body').html(image);
       }
-
     },
     error: function (err) {
       console.error('tiff err handle', err);

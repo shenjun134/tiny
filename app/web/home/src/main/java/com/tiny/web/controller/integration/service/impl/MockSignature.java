@@ -47,6 +47,10 @@ public class MockSignature extends AbstractSignatureService {
 
         Assert.notNull(fixedFax.getWidth(), "width is miss");
 
+        Assert.state(fixedFax.getHeight() != 0.0, "height is miss");
+
+        Assert.state(fixedFax.getWidth() != 0.0, "width is miss");
+
         Assert.notNull(fixedFax.getXmin(), "Xmin is miss");
 
         Assert.notNull(fixedFax.getYmin(), "Ymin is miss");

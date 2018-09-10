@@ -1,7 +1,5 @@
 /**
  * PropertyPlaceholderConfigurerSupport.java
- *
- *
  */
 package com.tiny.common.configuration;
 
@@ -16,27 +14,29 @@ import org.springframework.core.io.InputStreamResource;
  */
 public class PropertyPlaceholderConfigurerSupport extends PropertyPlaceholderConfigurer implements InitializingBean {
 
-	/**
-	 * configurationManager
-	 */
-	private ConfigurationManager	configurationManager;
+    /**
+     * configurationManager
+     */
+    private ConfigurationManager configurationManager;
 
-	/**
-	 * 
-	 */
-	public void init() {
-		if (configurationManager != null) {
-			configurationManager.initialize();
-			setLocation(new InputStreamResource(configurationManager.getPropertiesConfiguration().getInputStream()));
-		}
-	}
+    /**
+     *
+     */
+    public void init() {
+        if (configurationManager != null) {
+            configurationManager.initialize();
+            setLocation(new InputStreamResource(configurationManager.getPropertiesConfiguration().getInputStream()));
+        }
+        GridLayoutConfigMng.getInstance().initialize();
 
-	public void setConfigurationManager(ConfigurationManager configurationManager) {
-		this.configurationManager = configurationManager;
-	}
+    }
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-	}
+    public void setConfigurationManager(ConfigurationManager configurationManager) {
+        this.configurationManager = configurationManager;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+    }
 
 }

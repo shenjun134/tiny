@@ -1,0 +1,91 @@
+<div class="ct-out" style="height: calc(100% - 10px);">
+	<div class="ct-block ct-s-block" style="height: 100%;">
+		<span class="title">Layout Recognition</span>
+		<div style="display: flex; height: calc(100% - 0px);">
+			<div class="left" style="width: 540px; overflow-y: auto;">
+                <form id="layoutActionForm" class="form-inline" method="POST" style="display: flex; margin-top: 10px; margin-bottom: 10px; margin-left: 10px;">
+					<button id="layout-recon" type="button" class="btn btn-default btn-info form-group btn-off"
+						style="margin-left: 10px;" onclick="doLayoutRecon()"
+                        tooltip="Layout Recognition" flow="right">
+                        Layout <i class="fa fa-tag" aria-hidden="true"></i>
+                    </button>
+                    <div class="form-group" style="background: #eee; border-radius: 2px; margin-left: 20px;">
+							<input type="text" id="layout-type" name="layout-type" placeholder="layout type" style="max-width: 250px;width: 250px; padding-left:5px; height: 34px;"/>
+                            <input type="hidden" id="content-type" name="content-type" />
+   					</div>
+					<div id="layout-dropdown" class="dropdown" tooltip="Show Layout Type List" flow="left">
+                        <button class="btn dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true"  aria-expanded="false" style="margin-top: 10px; margin-left: 10px;">
+                            Type-List
+                        </button>
+                        <div id="type-list" class="dropdown-menu" aria-labelledby="dropdownMenu2" style="left:-70px">
+                            <button class="dropdown-item" type="button">No Data</button>
+                        </div>
+                    </div>
+                    <span class="page-arrow" tooltip="Back to signature" flow="left">
+                        <i id="detail-back" class="fa fa-arrow-left"aria-hidden="true" onclick="doDetailBack()" ></i>
+                    </span>
+				</form>
+                <form id="contentActionForm" class="form-inline" method="POST" style="margin-top: 10px; padding-bottom: 20px; margin-left: 10px; border-bottom: 1px solid #ddd;">
+					<button id="content-recon" type="button" class="btn btn-default btn-info form-group btn-off"
+						style="margin-left: 10px;" onclick="doContentRecon()"
+                        tooltip="Content Recognition" flow="right">
+                        Content <i class="fa fa-tags" aria-hidden="true"></i>
+                    </button>
+				</form>
+                <div id="ocr-result" class="ocr-result-ct" style="width: 100%;  height: calc(100% - 130px); overflow: auto; background: #222;">
+                    <p class="blank">No data</p>
+                </div>
+            </div>
+            <div style="border-left: 1px solid #ddd; margin-left: 20px; margin-right: 20px" >
+            </div>
+            <div class="right " style='width: calc(100% - 540px); '>
+                <div id="layout-tiff-ct" class="tiff-ct" style='height: calc(100% - 0px); overflow: auto;'>
+                    <div id="tiff-show-layout" class="show-upload" style='position: relative;'><p class="blank">Please upload a signature image</p></div>
+                </div>
+				<div class="syn-option-ct" style="display: none;">
+                    <span class="plus" onclick="showAllMark();" tooltip="Show All Mark" flow="up"><i class="fa fa-plus"  aria-hidden="true"></i></span>
+                    <span class="minus" onclick="hideAllMark();" tooltip="Hide All Mark" flow="up"><i class="fa fa-minus"  aria-hidden="true"></i></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="template-list" style="display: none">
+    <div id="toolbar-template">
+        <div class="toolbar-ct">
+            <span class="opera" tooltip="Reset all" flow="up" onclick="resetAll();"><i class="fa fa-reply-all " aria-hidden="true"></i></span>
+            <span class="opera" tooltip="Submit all" flow="up" onclick="submitAll();"><i class="fa fa-cloud-upload " aria-hidden="true"></i></span>
+            <span class="opera" tooltip="Readonly" flow="up" onclick="markAsReadonly();"><i class="fa fa-lock " aria-hidden="true"></i></span>
+            <span class="opera" tooltip="Edit" flow="up" onclick="markAsEdit();"><i class="fa fa-pencil-square-o " aria-hidden="true"></i></span>
+            <span class="opera" tooltip="Show Max" flow="up" onclick="showMaxRecon();" data-target="#dialog-recon-detail" data-toggle="modal"><i class="fa fa-expand"  aria-hidden="true"></i></span>
+            <span class="opera" tooltip="Back to normal" flow="up" onclick="zoomInRecon(1);">100%</span>
+            <span class="opera" tooltip="Zoom In 1/2" flow="up" onclick="zoomInRecon(1/2);">1/2</span>
+            <span class="opera" tooltip="Zoom In 1/3" flow="up" onclick="zoomInRecon(1/3);">1/3</span>
+            <span class="" style="color: #222;">
+                <select id="zoom-in-ops">
+                    <option value="1">100%</option>
+                    <option value="0.95">95%</option>
+                    <option value="0.9">90%</option>
+                    <option value="0.85">85%</option>
+                    <option value="0.8">80%</option>
+                    <option value="0.75">75%</option>
+                    <option value="0.7">70%</option>
+                    <option value="0.65">65%</option>
+                    <option value="0.6">60%</option>
+                    <option value="0.55">55%</option>
+                    <option value="0.5">50%</option>
+                    <option value="0.45">45%</option>
+                    <option value="0.4">40%</option>
+                    <option value="0.35">35%</option>
+                    <option value="0.3">30%</option>
+                    <option value="0.25">25%</option>
+                    <option value="0.2">20%</option>
+                    <option value="0.15">15%</option>
+                    <option value="0.1">10%</option>
+                </select>
+            </span>
+            <span class="opera" tooltip="Zoom In Apply" flow="up" onclick="zoomInApply(this);"><i class="fa fa-wrench " aria-hidden="true"></i></span>
+
+        </div>
+    </div>
+</div>

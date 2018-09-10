@@ -29,7 +29,7 @@ import org.springframework.util.Assert;
 import java.io.File;
 import java.io.IOException;
 
-@Component("remoteService")
+@Component("remoteSignatureService")
 public class RemoteSignatureService extends AbstractSignatureService {
 
 

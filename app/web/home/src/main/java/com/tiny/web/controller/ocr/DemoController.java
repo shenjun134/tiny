@@ -1,9 +1,6 @@
 package com.tiny.web.controller.ocr;
 
-import com.sun.media.jai.codec.FileSeekableStream;
-import com.sun.media.jai.codec.ImageCodec;
-import com.sun.media.jai.codec.ImageDecoder;
-import com.sun.media.jai.codec.TIFFEncodeParam;
+import com.sun.media.jai.codec.*;
 import com.tiny.common.exception.InitializationException;
 import com.tiny.core.model.FileInfo;
 import com.tiny.core.model.SubFile;
@@ -80,7 +77,13 @@ public class DemoController extends OCRController {
 //    private TesseractService tesseractService;
 
     interface Constant {
+        //        String imageType = "png";
         String imageType = "jpg";
+
+        int top_qulity = 100;
+        int high_qulity = 75;
+        int medium_qulity = 50;
+        int low_qulity = 25;
     }
 
     @PostConstruct
@@ -345,6 +348,7 @@ public class DemoController extends OCRController {
                 dir.mkdirs();
             }
             TIFFEncodeParam param = new TIFFEncodeParam();
+            String opName = "filestore";
             param.setCompression(TIFFEncodeParam.COMPRESSION_GROUP4);
             param.setLittleEndian(false); // Intel
             for (int i = 0; i < count; ++i) {
@@ -353,17 +357,35 @@ public class DemoController extends OCRController {
                 String tempName = dir.getAbsolutePath() + File.separator + tiffSrc + "-" + i + "." + Constant.imageType;
                 String retTempName = tempPath + tiffSrc + "-" + i + "." + Constant.imageType;
                 RenderedImage page = imageDecoder.decodeAsRenderedImage(i);
-                ParameterBlock parameterBlock = new ParameterBlock();
+
+                if (Constant.imageType.equalsIgnoreCase("jpg")) {
+                    FileOutputStream fos = null;
+                    try {
+                        JPEGEncodeParam jpegEncodeParam = new JPEGEncodeParam();
+                        jpegEncodeParam.setQuality(Constant.high_qulity);
+                        fos = new FileOutputStream(tempName);
+                        ImageEncoder en = ImageCodec.createImageEncoder("jpeg", fos, jpegEncodeParam);
+                        en.encode(page);
+                        fos.flush();
+                    } finally {
+                        if (fos != null) {
+                            fos.close();
+                        }
+                    }
+                } else if (Constant.imageType.equalsIgnoreCase("png")) {
+
+                    ParameterBlock parameterBlock = new ParameterBlock();
                 /* add source of page */
-                parameterBlock.addSource(page);
+                    parameterBlock.addSource(page);
                 /* add o/p file path */
-                parameterBlock.add(tempName);
+                    parameterBlock.add(tempName);
                 /* add o/p file type */
-                parameterBlock.add(Constant.imageType);
+                    parameterBlock.add(Constant.imageType);
                  /* create output image using JAI filestore */
-                RenderedOp renderedOp = JAI.create("filestore",
-                        parameterBlock);
-                renderedOp.dispose();
+                    RenderedOp renderedOp = JAI.create(opName,
+                            parameterBlock);
+                    renderedOp.dispose();
+                }
                 SubFile subFile = new SubFile();
                 subFile.setName(retTempName);
                 subFiles.add(subFile);
@@ -456,7 +478,6 @@ public class DemoController extends OCRController {
 //
 //        return result;
 //    }
-
     private TempScanResp ocrTempScan(String fileName, String page, String tempName) {
 
 //        int pageIndex = Integer.parseInt(StringUtils.remove(page, "Page-"));
