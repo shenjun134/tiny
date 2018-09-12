@@ -37,6 +37,10 @@ public class RectVO extends ToString {
 
     private String colIndex;
 
+    private String bizTag;
+
+    private String comments;
+
     public String getName() {
         return name;
     }
@@ -147,5 +151,21 @@ public class RectVO extends ToString {
 
     public void setColIndex(String colIndex) {
         this.colIndex = colIndex;
+    }
+
+    public String getBizTag() {
+        return bizTag;
+    }
+
+    public void setBizTag(String bizTag) {
+        this.bizTag = bizTag;
+    }
+
+    public String getComments() {
+        return comments;
+    }
+
+    public void setComments(String comments) {
+        this.comments = comments;
     }
 }

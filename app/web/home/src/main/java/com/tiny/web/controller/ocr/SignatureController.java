@@ -106,6 +106,8 @@ public class SignatureController extends OCRController {
     public String index(ModelMap model) {
         model.addAttribute("view_path", UrlCenter.OCR.SIGNATURE);
         model.addAttribute("writer-list", RandomUtil.loadNameList());
+        model.addAttribute("biz-tag-list", RandomUtil.loadBizTag());
+        model.addAttribute("layout-list", RandomUtil.loadLayout());
         return View.SIGNATURE;
     }
 
@@ -222,7 +224,7 @@ public class SignatureController extends OCRController {
             if (signatureReq.getFixedArea() != null) {
                 signatureFactory.getService().fix(convert2FixFax(signatureReq));
             }
-            baseJsonResult.markeSuccess("submit succ", true);
+            baseJsonResult.markeSuccess("Signature submit successfully!", true);
         } catch (Exception e) {
             logger.error("submit error -- " + e.getMessage(), e);
             baseJsonResult.marketFail("submit signature fail--" + e.getMessage());

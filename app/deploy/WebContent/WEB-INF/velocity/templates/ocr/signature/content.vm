@@ -1,6 +1,11 @@
 <script src="/tiny/resources/js/signature.js"></script>
 <div class="title cf">
 	<h2 class="fl animate seven"><span>O</span><span style="padding-right: 5px;"></span><span>C</span><span style="padding-right: 5px;"></span><span>R</span><span style="padding-right: 20px;"></span><span>S</span><span>i</span><span>g</span><span >n</span><span >a</span><span >t</span><span >u</span><span >r</span><span >e</span></h2>
+	<div class="breadcrumb flat">
+    	<a id="step-sign">Validate</a>
+    	<a id="step-layout">Layout</a>
+    	<a id="step-content">Content</a>
+    </div>
 	<ul class="title-list fr cf ">
 		<li id="th-main" class="on">Signature</li>
 		<li id="th-detail">Detail</li>

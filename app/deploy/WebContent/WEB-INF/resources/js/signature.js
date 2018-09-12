@@ -148,6 +148,9 @@ function beforeSignUpload() {
   $('.option-ct').css('display', 'none');
   $('.syn-option-ct').css('display', 'none');
   $('#writer-list').addClass('opt-off');
+  $('#step-sign').removeClass('active');
+  $('#step-layout').removeClass('active');
+  $('#step-content').removeClass('active');
   document.getElementById("writer-list").options[0].selected = true;
   resetStew();
   cleanValResult();
@@ -164,7 +167,8 @@ function cleanNextInfo() {
   $('button#layout-recon').addClass('btn-off');
   $('button#content-recon').addClass('btn-off');
 
-  $('input#layout-type').val('');
+  //$('input#layout-type').val('');
+  $('select#layout-type').val('');
   $('input#content-type').val('');
   $('#ocr-result').html('<p class="blank">No data</p>');
 
@@ -557,7 +561,7 @@ function doSignSumbit() {
       hideLoading();
       var type = resp.status ? 'success' : 'error';
       var message = resp.message ? resp.message : 'Submit ' + type + ' !';
-
+      stepSignFinish();
       showMessage(type, message);
     },
     error: function (err) {
@@ -1417,7 +1421,8 @@ function doLayoutRecon() {
   }
 
   var body = { 'imageWebPath': imgPath, 'reconImage': imgName };
-  $('input#layout-type').val('');
+//  $('input#layout-type').val('');
+  $('select#layout-type').val('');
   $('div#type-list').html('<button class="dropdown-item" type="button">No Data</button>');
   var url = "/tiny/api/layout/recon.do";
   showLoading();
@@ -1433,6 +1438,7 @@ function doLayoutRecon() {
         if (resp.data && resp.data.length > 0) {
           renderTypeList(resp.data);
           showMessage('success', resp.message);
+          stepLayoutFinish();
         } else {
           showMessage('warning', 'Cannot recognition layout of this image');
         }
@@ -1457,13 +1463,16 @@ function renderTypeList(data){
      var html = '';
      for(var i = 0; i < data.length; i++){
         var temp = data[i];
-        var prob = parseFloat(parseFloat(temp.probability).toFixed(2));
+        var prob = parseFloat(parseFloat(temp.probability).toFixed(0));
         var tag = temp.tag ? temp.tag : 'Unknown';
-        var showMsg = 'Type:' + temp.type + ', tag:' + tag + ', probability:' + prob;
+        var id = temp.id ? temp.id : 'Unknown';
+//        var showMsg = 'Type:' + temp.type + ', tag:' + tag + ', probability:' + prob;
+        var showMsg = '' + temp.type + '<div class="probability-bar"><div class="current-prob" style="width: '+prob+'%"></div><div class="prob-text">'+prob+'%</div></div>';
         if(i == 0){
-            $('input#layout-type').val(showMsg);
+//            $('input#layout-type').val(showMsg);
+              $('select#layout-type').val(id);
         }
-        html = html + '<button class="dropdown-item" type="button" onclick="applyLayoutRe(this);" data-type="'+temp.type+'" data-tag="'+temp.tag+'" data-probability="'+temp.probability+'" data-comments="'+temp.comments+'">'+showMsg+'</button>';
+        html = html + '<button class="dropdown-item" style="display: flex;" type="button" onclick="applyLayoutRe(this);" data-type="'+temp.type+'" data-tag="'+temp.tag+'" data-id="'+temp.id+'" data-probability="'+temp.probability+'" data-comments="'+temp.comments+'">'+showMsg+'</button>';
      }
      $('div#type-list').html(html);
 }
@@ -1473,10 +1482,13 @@ function applyLayoutRe(element){
     var type = $(element).attr('data-type');
     var probability = $(element).attr('data-probability');
     var tag = $(element).attr('data-tag');
+    var id = $(element).attr('data-id');
     tag = tag ? tag : 'Unknown';
-    probability = parseFloat(parseFloat(probability).toFixed(2));
-    var showMsg = 'Type:' + type + ', tag:' + tag + ', probability:' + probability;
-    $('input#layout-type').val(showMsg);
+    id = id ? id : '';
+    probability = parseFloat(parseFloat(probability).toFixed(0));
+    //var showMsg = 'Type:' + type + ', tag:' + tag + ', probability:' + probability;
+    //$('input#layout-type').val(showMsg);
+    $('select#layout-type').val(id);
 }
 
 function doContentRecon() {
@@ -1503,6 +1515,7 @@ function doContentRecon() {
       hideLoading();
 
       if (resp.status) {
+        stepContentFinish();
         if (resp.data && resp.data.result && resp.data.result.type === 'table-ly') {
           $('input#content-type').val('table-ly');
           rendomTableResult(resp);
@@ -1510,6 +1523,7 @@ function doContentRecon() {
         } else if (resp.data && resp.data.result && resp.data.result.type === 'grid-ly') {
           $('input#content-type').val('grid-ly');
           rendomGridResult(resp);
+          renderReconPos(resp);
           showMessage('success', resp.message);
         } else {
           showMessage('warning', 'Unknow result...');
@@ -1525,6 +1539,17 @@ function doContentRecon() {
       showMessage('error', 'Content Recongnition fail!');
     }
   });
+}
+
+function renderReconPos(resp){
+    var result = resp.data.result;
+    var reconPosElement = $('#temp-recon-position').clone();
+    reconPosElement.attr('id', 'recon-pos-ct');
+    reconPosElement.appendTo('#ocr-result');
+    setTimeout(function(){
+              $('#recon-pos-ct #recon-image-w').val(result.width ? result.width : 0);
+              $('#recon-pos-ct #recon-image-h').val(result.height ? result.height : 0);
+    }, 100);
 }
 
 function rendomTableResult(resp) {
@@ -1659,15 +1684,53 @@ function rendomRectHtml(rectObj, result, scalePer) {
 
   var submitHtml = '<span data-id="' + id + '"  class="opera opera-submit" onclick="reconRectSub(this);">Submit</span>';
   var resetHtml = '<span data-id="' + id + '"  class="opera opera-reset" onclick="reconRectReset(this);">Reset</span>';
+  var bizTagHtml = renderBizTag(rectObj, srcId, id);
   var msgCtHtml = '<span id="msg-' + id + '"  class="opera opera-readonly"></span>';
 
-  var operaHtml = '<div class="opera-ct">' + submitHtml + resetHtml + msgCtHtml + '</div>';
+  var operaHtml = '<div class="opera-ct">' + submitHtml + resetHtml + bizTagHtml + msgCtHtml + '</div>';
   // var value = textFormat(rectObj.text);
-  var html = '<div class="rect-ct" data-id="'+srcId+'" onclick="showMarkCell(this);" style="' + style + '"><div class="rect" style="' + innerStyle + '">' + value + operaHtml + '</div></div>';
+  var html = '<div class="rect-ct" '+srcInfo+'  onclick="showMarkCell(this);" style="' + style + '"><div class="rect" style="' + innerStyle + '">' + value + operaHtml + '</div></div>';
 
   var markRectHtml = rendenMarkRect(srcId, rectObj, result, scalePer);
   
   return {'show': html, 'mark': markRectHtml};
+}
+
+function renderBizTag(rectObj, srcId, id){
+//    var html = '<input id="biz-tag-'+srcId+'" type="hidden" data-id="' + id + '"  value=""></input>';
+    var html = '';
+    var bizTagList = $('#biz-tag-list-temp #biz-tag-list').clone();
+    bizTagList.attr('id', 'biz-tag-'+srcId);
+    html = html + '<select id="biz-tag-'+srcId+'" data-id="' + srcId + '">' + bizTagList.html() + '</select>';
+    return html;
+}
+
+function renderBizTag2(rectObj, srcId, id){
+//    var html = '<input id="biz-tag-'+srcId+'" type="hidden" data-id="' + id + '"  value=""></input>';
+    var html = '';
+    var bizTagList = $('#biz-tag-list-temp #biz-tag-list').clone();
+    bizTagList.attr('id', 'biz-tag-'+srcId);
+    html = html + '<div id="dropdown-'+srcId+'" class="dropup" tooltip="Choose Tag" flow="up" >';
+    html = html + '<button class="dropdown-toggle" data-id="' + srcId + '" type="button" onclick="fixTagDropdown(this);" data-toggle="dropdown" aria-haspopup="true"  aria-expanded="false" style="margin-left: 4px; font-size: 12px; line-height: 14px; border-radius: 4px;">';
+    html = html + '<i class="fa fa-tags" aria-hidden="true"></i>';
+    html = html + '</button>';
+    html = html + '<div class="dropdown-menu" aria-labelledby="dropdownMenu2" style="left:-90px">';
+    html = html + '<select id="biz-tag-'+srcId+'" data-id="' + srcId + '">' + bizTagList.html() + '</select>';
+    html = html + '<br/><span data-id="' + srcId + '" onclick="unfixTagDropdown(this);" style="padding-left: 10px;"><i class="fa fa-wrench" aria-hidden="true"></i></span></div>';
+    html = html + '</div>';
+    return html;
+}
+
+function fixTagDropdown(element){
+    console.log('fixTagDropdown', element);
+    var id = $(element).attr('data-id');
+    $('#dropdown-'+id + ' button.dropdown-toggle').attr('data-toggle', 'collapse');
+}
+
+function unfixTagDropdown(element){
+    console.log('unfixTagDropdown', element);
+    var id = $(element).attr('data-id');
+    $('#'+id + ' button.dropdown-toggle').attr('data-toggle', 'dropdown');
 }
 
 function rendenMarkRect(srcId, rectObj, result, scalePer){
@@ -1995,8 +2058,16 @@ function showMaxRecon() {
 function showMarkCell(element){
 	hideAllMark();
 	var id = $(element).attr('data-id');
+	var width = $(element).attr('data-width');
+	var height = $(element).attr('data-height');
+	var xmin = $(element).attr('data-xmin');
+	var ymin = $(element).attr('data-ymin');
 	$('#rect-src-' + id).removeClass('cell-hide');
 	$('#rect-src-' + id).addClass('cell-show');
+	$('#recon-pos-ct #recon-box-w').val(width ? width : 0);
+	$('#recon-pos-ct #recon-box-h').val(height ? height : 0);
+	$('#recon-pos-ct #recon-box-x').val(xmin ? xmin : 0);
+	$('#recon-pos-ct #recon-box-y').val(ymin ? ymin : 0);
 }
 
 function hideAllMark(){
@@ -2009,4 +2080,16 @@ function showAllMark(){
 	$('#tiff-show-layout .cell .mark-ct .cell-ct').each(function (index){
 		$(this).attr('class', 'cell-ct cell-show');
 	});
+}
+
+function stepSignFinish(){
+    $('#step-sign').addClass('active');
+}
+
+function stepLayoutFinish(){
+    $('#step-layout').addClass('active');
+}
+
+function stepContentFinish(){
+    $('#step-content').addClass('active');
 }

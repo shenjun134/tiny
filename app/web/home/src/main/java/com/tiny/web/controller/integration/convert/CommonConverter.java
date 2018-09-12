@@ -22,8 +22,9 @@ public class CommonConverter {
         String split = "\n";
         Map<String, String> replaceMap = new HashMap<String, String>() {
             {
-                put("{\"\"\"", "{\"\\\"\"");
-                put("{\"\\\"", "{\"\\\\\"");
+                put("\"\"\",", "\"\\\"\",");
+                put("\"\\\",", "\"\\\\\",");
+                put("\\\"\"\\\\\",", "\" \",");
             }
         };
 
@@ -115,6 +116,7 @@ public class CommonConverter {
             layoutResult.setProbability("" + 100 * faxClass.getProbability());
             layoutResult.setType(RandomUtil.fetchType(faxClass.getClass_id()));
             layoutResult.setTag(faxClass.getClass_id());
+            layoutResult.setId(faxClass.getClass_id());
             list.add(layoutResult);
         }
         return list;
@@ -189,7 +191,7 @@ public class CommonConverter {
         return rectangleVO;
     }
 
-    private static CharVO parseChar(JSONObject ocrObj) {
+    private static CharVO parseChar2(JSONObject ocrObj) {
         CharVO charVO = new CharVO();
         Set<String> set = ocrObj.keySet();
         for (String key : set) {
@@ -213,6 +215,24 @@ public class CommonConverter {
         return charVO;
     }
 
+    private static CharVO parseChar(JSONObject ocrObj) {
+        CharVO charVO = new CharVO();
+        double width = ocrObj.getDouble("width");
+        double height = ocrObj.getDouble("height");
+        double xmin = ocrObj.getDouble("xmin");
+        double ymin = ocrObj.getDouble("ymin");
+        String str = ocrObj.getString("char");
+
+        charVO.setHeight(height);
+        charVO.setWidth(width);
+        charVO.setXmin(xmin);
+        charVO.setYmin(ymin);
+        charVO.setXmax(xmin + width);
+        charVO.setYmax(ymin + height);
+        charVO.setStr(str);
+        return charVO;
+    }
+
     public static com.tiny.web.controller.integration.entity.ContentResult mockContentResult(String srcJson) {
         String path = "D:\\data\\code\\github-workspace\\tiny\\app\\web\\home\\src\\test\\resources\\table-result-2.json";
         String jsonStr = null;
@@ -227,7 +247,6 @@ public class CommonConverter {
     public static void main(String[] args) throws IOException {
         String path = "D:\\data\\code\\github-workspace\\tiny\\app\\web\\home\\src\\test\\resources\\table-result-2.json";
         String jsonStr = FileUtils.readFileToString(new File(path));
-
 
         Object obj = parseContentResult(jsonStr);
         System.out.println(obj);

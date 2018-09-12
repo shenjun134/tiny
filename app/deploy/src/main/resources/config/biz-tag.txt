@@ -1,0 +1,17 @@
+Fund Number
+Exchange Rate
+Ex Date
+Settle Date
+Trade Id
+Base Currency
+Trade Currency
+Account Id
+Asset Id
+Comments
+Trade Date
+Base Amount
+Trade Amount
+Report Date
+
+
+

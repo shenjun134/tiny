@@ -1,11 +1,12 @@
 package com.tiny.web.controller.integration.util;
 
+import com.tiny.app.model.entity.NameValue;
 import com.tiny.common.util.CommonUtil;
 import com.tiny.web.controller.http.response.SignatureResp;
 import com.tiny.web.controller.ocr.model.Box;
 import com.tiny.web.controller.ocr.model.NameVO;
-import com.tiny.web.controller.ocr.util.FileUtil;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -23,15 +24,21 @@ public class RandomUtil {
 
     private static Map<Long, NameVO> nameVOMap;
 
-    private static Properties layoutList;
+    private static Properties layoutProps;
+
+    private static List<String> bizTag;
+
+    private static List<NameValue> layoutList;
 
     static {
         String filename = "/config/signature-list.properties";
         String layoutListFN = "/config/layout-list.properties";
+        String bizTagFN = "/config/biz-tag.txt";
         nameVOMap = new HashMap<>();
 
         InputStream inputStream = null;
         InputStream inputStream4Layout = null;
+        InputStream inputStream4BizTag = null;
         try {
             inputStream = CommonUtil.getInputStream(filename);
             Properties properties = CommonUtil.retrieveFileProperties(inputStream);
@@ -45,7 +52,29 @@ public class RandomUtil {
             }
 
             inputStream4Layout = CommonUtil.getInputStream(layoutListFN);
-            layoutList = CommonUtil.retrieveFileProperties(inputStream4Layout);
+            layoutProps = CommonUtil.retrieveFileProperties(inputStream4Layout);
+            layoutList = new ArrayList<>();
+            Enumeration enumeration4Layout = layoutProps.propertyNames();
+            while (enumeration4Layout.hasMoreElements()){
+                Object enumer = enumeration4Layout.nextElement();
+                String src = layoutProps.getProperty(enumer.toString());
+                layoutList.add(new NameValue(enumer.toString(), src));
+            }
+            inputStream4BizTag = CommonUtil.getInputStream(bizTagFN);
+            List<String> tempBizTag = IOUtils.readLines(inputStream4BizTag);
+            bizTag = new ArrayList<>();
+            for(String bt : tempBizTag){
+                if(StringUtils.isBlank(bt)){
+                    continue;
+                }
+                bt = StringUtils.trim(bt);
+                if(bizTag.contains(bt)){
+                    continue;
+                }
+                bizTag.add(bt);
+            }
+            Collections.sort(bizTag);
+
         } catch (Exception e) {
             logger.error("read file error - " + filename, e);
         } finally {
@@ -63,6 +92,13 @@ public class RandomUtil {
                     logger.error("input stream close error", e);
                 }
             }
+            if (inputStream4BizTag != null) {
+                try {
+                    inputStream4BizTag.close();
+                } catch (IOException e) {
+                    logger.error("input stream close error", e);
+                }
+            }
         }
     }
 
@@ -74,11 +110,27 @@ public class RandomUtil {
         if (StringUtils.isBlank(classId)) {
             return null;
         }
-        Object obj = layoutList.getProperty(StringUtils.trim(classId));
+        Object obj = layoutProps.getProperty(StringUtils.trim(classId));
         if (obj == null) {
             return null;
         }
         return obj.toString();
+    }
+
+    /**
+     *
+     * @return
+     */
+    public static List<String> loadBizTag(){
+        return bizTag;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public static List<NameValue> loadLayout(){
+        return layoutList;
     }
 
     /**
