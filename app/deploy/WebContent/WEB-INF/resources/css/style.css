@@ -689,6 +689,11 @@ div#submit-result {
 .preview-mark-ct .cell-ct{
     z-index: 1;
 }
+.cell-ct:active,
+.cell-ct:focus,
+.cell-ct:hover{
+    background: rgba(250, 0, 0, 0.1);
+}
 
 .preview-mark-ct .cell-hide,
 .mark-ct .cell-hide{
@@ -1389,8 +1394,10 @@ table.recon-ct tr.recon-row-sub input{
     padding: 20px;
 }
 
-#dialog-recon-detail .rect textarea:active,
-#dialog-recon-detail .rect textarea:focus{
+.recon-ct input:active,
+.recon-ct input:focus,
+.rect textarea:active,
+.rect textarea:focus{
    background: #aed6f1;
 }
 

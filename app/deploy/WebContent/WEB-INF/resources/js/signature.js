@@ -2090,6 +2090,7 @@ function showPreviewImg(){
 }
 
 function showMarkCell(element){
+    var slow = 10;
 	hideAllMark();
 	hideAllPreviewMark();
 	var id = $(element).attr('data-id');
@@ -2100,8 +2101,17 @@ function showMarkCell(element){
 	$('#rect-src-' + id).removeClass('cell-hide');
 	$('#rect-src-' + id).addClass('cell-show');
 
+    //
+    var cellTop = $('#rect-src-' + id).css('top');
+        cellTop = parseFloat(cellTop.replace('px', ''));
+     $("#layout-tiff-ct").animate({scrollTop: cellTop},slow);
+
+    var previewTop = $('.preview-mark-ct #rect-src-' + id).css('top');
+    previewTop = parseFloat(previewTop.replace('px', ''));
 	$('.preview-mark-ct #rect-src-' + id).removeClass('cell-hide');
     $('.preview-mark-ct #rect-src-' + id).addClass('cell-show');
+
+    $(".preview-ct").animate({scrollTop: previewTop},slow);
 
 	$('#recon-pos-ct #recon-box-w').val(width ? width : 0);
 	$('#recon-pos-ct #recon-box-h').val(height ? height : 0);
