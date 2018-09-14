@@ -85,12 +85,14 @@
                             onclick="cleanRectangle()" tooltip="CTRL + ALT + C" flow="down">
                             <i class="fa fa-eraser" aria-hidden="true"></i>
                         </label>
-                        <label class="action" id="sign-canvas-switch" style="margin-left: 15px; cursor: pointer; display: none; " onclick="canvasSwitchClick(this)"><i class="fa fa-toggle-off"></i></label>
-                            <label class="action" id="sign-image-cut"
-                                style="margin-left: 15px; opacity: 0.6; color: #222; width: 20px; text-align: center; border-radius: 2px; padding-right: 5px;"
-                                onclick="canvasSwitchClick(this)" tooltip="CTRL + ALT + A" flow="down">
-                                <i class="fa fa-scissors" aria-hidden="true"></i>
-                            </label>
+                        <label class="action" id="sign-canvas-switch" style="margin-left: 15px; cursor: pointer; display: none; " onclick="canvasSwitchClick(this)">
+                            <i class="fa fa-toggle-off"></i>
+                        </label>
+                        <label class="action" id="sign-image-cut"
+                            style="margin-left: 15px; opacity: 0.6; color: #222; width: 20px; text-align: center; border-radius: 2px; padding-right: 5px;"
+                            onclick="canvasSwitchClick(this)" tooltip="CTRL + ALT + A" flow="down">
+                            <i class="fa fa-scissors" aria-hidden="true"></i>
+                        </label>
                     </div>
                 </div>
             </div>

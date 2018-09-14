@@ -2090,7 +2090,7 @@ function showPreviewImg(){
 }
 
 function showMarkCell(element){
-    var slow = 10;
+    var slow = 200;
 	hideAllMark();
 	hideAllPreviewMark();
 	var id = $(element).attr('data-id');

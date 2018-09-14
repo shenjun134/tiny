@@ -829,7 +829,7 @@ span.error-tip {
     padding: 5px;
     padding-top: 8px;
     background: #ddd;
-    max-width: 400px;
+    max-width: 500px;
     color: green;
     border-radius: 2px;
 }
