@@ -28,12 +28,48 @@
   </div>
 </div>
 
+<div id="dialog-image-layout" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-image-signature" aria-hidden="true">
+  <div class="modal-dialog" role="document" style="width: 100%; height: calc(100% -  60px); padding: 40px;">
+    <div class="modal-content" style="height: 100%;background: #222">
+      <div class="modal-body" style="height: 100%; padding: 0px; overflow: auto;">
+        <div class="layout-preview">
+            #foreach($temp in $layout-list)
+                <div id="type-${temp.name}" class="layout-view">
+                    <img src="/tiny/resources/images/ocr/layout/type-${temp.name}.jpg" />
+                    <p>${temp.value}</p>
+                </div>
+            #end
+            <div id="type-unknown" class="layout-view">
+                <div class="layout-na">NA</div>
+                <p></p>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <div id="dialog-recon-detail" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-recon-detail" aria-hidden="true">
-  <div class="modal-dialog" role="document" style="width: 100%; height: calc(100% -  60px); padding: 40px;">
-    <div class="modal-content" style="height: 100%; background: #999">
-      <div class="modal-body" style="height: 100%; padding: 0px; overflow: auto;">
-        ...
+  <div class="modal-dialog" role="document" style="width: 100%; height: calc(100% -  60px); padding: 0px;">
+    <div class="modal-content" style="height: 100%; background: #222">
+      <div class="modal-body" style="height: 100%; padding: 0px; overflow: hidden;">
+        <div class="recon-detail">
+        </div>
+        <div class="splitter-horizontal"></div>
+        <div class="recon-image">
+            <div id="preview-recon-position" class="preview-recon-position">
+                <div>
+                    <label style="padding-left: 10px; width: 80px">Fixed-Rect</label>
+                    <span>W:</span><input type="text" id="recon-box-w" name="recon-box-w" disabled/>
+                    <span>H:</span><input type="text" id="recon-box-h" name="recon-box-h" disabled/>
+                    <span>X:</span><input type="text" id="recon-box-x" name="recon-box-x" disabled/>
+                    <span>Y:</span><input type="text" id="recon-box-y" name="recon-box-y" disabled/>
+                </div>
+            </div>
+            <div class="preview-ct">
+            </div>
+        </div>
       </div>
     </div>
   </div>

@@ -15,15 +15,18 @@
 							<input type="hidden" id="content-type" name="content-type" />
    					</div>
 					<div id="layout-dropdown" class="dropdown" tooltip="Show Layout Type List" flow="left">
-                        <button class="btn dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true"  aria-expanded="false" style="margin-top: 10px; margin-left: 10px;">
+                        <button class="btn dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true"  aria-expanded="false" style="margin-top: 10px; margin-left: 10px; ">
                             Layout-Result
                         </button>
                         <div id="type-list" class="dropdown-menu" aria-labelledby="dropdownMenu2" style="left:-70px">
                             <button class="dropdown-item" type="button">No Data</button>
                         </div>
                     </div>
+                    <span class="opera layout-bar" tooltip="Layout Preview" flow="left" data-target="#dialog-image-layout" data-toggle="modal" style="">
+                        <i class="fa fa-bars"  aria-hidden="true"></i>
+                    </span>
                     <span class="page-arrow" tooltip="Back to signature" flow="left">
-                        <i id="detail-back" class="fa fa-arrow-left"aria-hidden="true" onclick="doDetailBack()" ></i>
+                        <i id="detail-back" class="fa fa-arrow-left"aria-hidden="true" onclick="doDetailBack();" ></i>
                     </span>
 				</form>
                 <form id="contentActionForm" class="form-inline" method="POST" style="margin-top: 10px; padding-bottom: 20px; margin-left: 10px; border-bottom: 1px solid #ddd;">
@@ -38,8 +41,22 @@
                         Content <i class="fa fa-tags" aria-hidden="true"></i>
                     </button>
 				</form>
-                <div id="ocr-result" class="ocr-result-ct" style="width: 100%;  height: calc(100% - 130px); overflow: auto; background: #222;">
+                <div id="ocr-result" class="ocr-result-ct" style="width: 100%;  height: calc(100% - 190px); overflow: auto; background: #222;">
                     <p class="blank">No data</p>
+                </div>
+                <div id="recon-pos-ct" class="recon-position">
+                    <div>
+                        <label style="padding-left: 10px; width: 80px">Image</label>
+                        <span>W:</span><input type="text" id="recon-image-w" name="recon-image-w" disabled/>
+                        <span>H:</span><input type="text" id="recon-image-h" name="recon-image-h" disabled/>
+                    </div>
+                    <div>
+                        <label style="padding-left: 10px; width: 80px">Rectangle</label>
+                        <span>W:</span><input type="text" id="recon-box-w" name="recon-box-w" disabled/>
+                        <span>H:</span><input type="text" id="recon-box-h" name="recon-box-h" disabled/>
+                        <span>X:</span><input type="text" id="recon-box-x" name="recon-box-x" disabled/>
+                        <span>Y:</span><input type="text" id="recon-box-y" name="recon-box-y" disabled/>
+                    </div>
                 </div>
             </div>
             <div style="border-left: 1px solid #ddd; margin-left: 20px; margin-right: 20px" >
@@ -64,9 +81,9 @@
             <span class="opera" tooltip="Readonly" flow="up" onclick="markAsReadonly();"><i class="fa fa-lock " aria-hidden="true"></i></span>
             <span class="opera" tooltip="Edit" flow="up" onclick="markAsEdit();"><i class="fa fa-pencil-square-o " aria-hidden="true"></i></span>
             <span class="opera" tooltip="Show Max" flow="up" onclick="showMaxRecon();" data-target="#dialog-recon-detail" data-toggle="modal"><i class="fa fa-expand"  aria-hidden="true"></i></span>
+            <span class="opera" tooltip="Switch Layout" flow="up" onclick="switchLayout();"><i class="fa fa-sliders " aria-hidden="true"></i></span>
             <span class="opera" tooltip="Back to normal" flow="up" onclick="zoomInRecon(1);">100%</span>
             <span class="opera" tooltip="Zoom In 1/2" flow="up" onclick="zoomInRecon(1/2);">1/2</span>
-            <span class="opera" tooltip="Zoom In 1/3" flow="up" onclick="zoomInRecon(1/3);">1/3</span>
             <span class="" style="color: #222;">
                 <select id="zoom-in-ops">
                     <option value="1">100%</option>

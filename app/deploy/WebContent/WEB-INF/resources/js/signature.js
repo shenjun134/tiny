@@ -176,6 +176,7 @@ function cleanNextInfo() {
   $('#layout-tiff-ct').css('background', '#999');
   $('#tiff-show-layout').html('<p class="blank">Please upload a signature image</p>');
   $('div#type-list').html('<button class="dropdown-item" type="button">No Data</button>');
+  cleanMatchedLayout();
 }
 
 function enableNextInfo() {
@@ -445,6 +446,7 @@ function synUploadImage() {
   setTimeout(
     function () {
       hideLoading();
+      showPreviewImg();
     }, 500
   );
 }
@@ -1166,8 +1168,7 @@ function showTopBox() {
     currentRate = parseFloatH(currentRate);
     $(this).addClass('box-off');
     var innerHtml = getNameStrHtml(currentId);
-    console.log('showTopBox innerHtml', innerHtml);
-
+//    console.log('showTopBox innerHtml', innerHtml);
 
     $(this).html('<i class="fa fa-question-circle" aria-hidden="true"></i>');
     //    $(this).append('<label>'+currentRate+'</label>');
@@ -1471,6 +1472,7 @@ function renderTypeList(data){
         if(i == 0){
 //            $('input#layout-type').val(showMsg);
               $('select#layout-type').val(id);
+              markMatchedLayout(id);
         }
         html = html + '<button class="dropdown-item" style="display: flex;" type="button" onclick="applyLayoutRe(this);" data-type="'+temp.type+'" data-tag="'+temp.tag+'" data-id="'+temp.id+'" data-probability="'+temp.probability+'" data-comments="'+temp.comments+'">'+showMsg+'</button>';
      }
@@ -1489,6 +1491,7 @@ function applyLayoutRe(element){
     //var showMsg = 'Type:' + type + ', tag:' + tag + ', probability:' + probability;
     //$('input#layout-type').val(showMsg);
     $('select#layout-type').val(id);
+    markMatchedLayout(id);
 }
 
 function doContentRecon() {
@@ -1519,6 +1522,7 @@ function doContentRecon() {
         if (resp.data && resp.data.result && resp.data.result.type === 'table-ly') {
           $('input#content-type').val('table-ly');
           rendomTableResult(resp);
+          renderReconPos(resp);
           showMessage('success', resp.message);
         } else if (resp.data && resp.data.result && resp.data.result.type === 'grid-ly') {
           $('input#content-type').val('grid-ly');
@@ -1545,6 +1549,7 @@ function renderReconPos(resp){
     var result = resp.data.result;
     var reconPosElement = $('#temp-recon-position').clone();
     reconPosElement.attr('id', 'recon-pos-ct');
+    reconPosElement.css('display', 'none');
     reconPosElement.appendTo('#ocr-result');
     setTimeout(function(){
               $('#recon-pos-ct #recon-image-w').val(result.width ? result.width : 0);
@@ -1569,9 +1574,7 @@ function rendomTableResult(resp) {
     tableHtml = tableHtml + rowHtml;
   }
 
-
   var colspan = colSize + 2;
-
 
   var lastRowHtml = '<tr><td colspan="' + colspan + '" style="text-align: center;">';
   var submitHtml = '<span data-length="' + len + '" data-col="' + colSize + '" class="opera opera-submit" onclick="reconSubAll(this);">Submit</span>';
@@ -1618,16 +1621,18 @@ function rendomRowHtml(index, rowList, isHeader, lastRow) {
 }
 
 function rendomCellHtml(rowIndex, colIndex, cellObj, isHeader) {
-  var begin = '<td>';
+//onclick="showMarkCell(this);
+  var dataInfo = 'data-src="' + cellObj.text + '" data-row="' + rowIndex + '" data-col="' + colIndex + '" data-w="'+cellObj.width+'" data-h="'+cellObj.height+'" data-x="'+cellObj.xmin+'" data-y="'+cellObj.ymin+'"';
+  var begin = '<td onclick="showMarkTableCell(this);" '+dataInfo+'>';
   var end = '</td>';
   var value = '';
   if (isHeader) {
-    begin = '<th>';
+    begin = '<th onclick="showMarkTableCell(this);" '+dataInfo+'>';
     end = '</th>';
     value = cellObj.text;
   } else {
     var id = 'pos-' + rowIndex + '-' + colIndex;
-    value = '<input id="' + id + '" type="text" value="' + cellObj.text + '" data-src="' + cellObj.text + '" data-row="' + rowIndex + '" data-col="' + colIndex + '">'
+    value = '<input id="' + id + '" type="text" value="' + cellObj.text + '" '+dataInfo+'>'
   }
   return begin + value + end;
 }
@@ -1637,24 +1642,33 @@ function rendomGridResult(resp) {
   var result = resp.data.result;
   var resultHtml = '';
   var markHtml = '';
+  var previewMarkHtml = '';
   var scalePer = 1;
   var myImg = document.querySelector("#syn-signature-pre");
   var realWidth = myImg.width;
   var realHeight = myImg.height;
   scalePer = realWidth/result.width;
+
+  var previewImg = document.querySelector("#syn-signature-max");
+  var realPreviewWidth = previewImg.width;
+  var previewScalePer = 1;
+  previewScalePer = realPreviewWidth/result.width;
   
   for (var i = 0, len = result.allList.length; i < len; i++) {
     var rectObj = result.allList[i];
-    var rendenResult = rendomRectHtml(rectObj, result, scalePer);
+    var rendenResult = rendomRectHtml(rectObj, result, scalePer, previewScalePer);
     resultHtml = resultHtml + rendenResult.show;
 	markHtml = markHtml + rendenResult.mark;
+	previewMarkHtml = previewMarkHtml + rendenResult.previewMark;
   }
   $('#ocr-result').html('<div class="detail-ct grid-ly">' + resultHtml + '</div>');
   $('#tiff-show-layout .cell .mark-ct').html(markHtml);
+
+  $('#dialog-recon-detail .preview-ct').append('<div class="preview-mark-ct">' + previewMarkHtml + '</div>');
   appendToolbar();
 }
 
-function rendomRectHtml(rectObj, result, scalePer) {
+function rendomRectHtml(rectObj, result, scalePer, previewScalePer) {
   var style = '';
   var innerStyle = '';
   var paddingLeft = 0;
@@ -1691,9 +1705,9 @@ function rendomRectHtml(rectObj, result, scalePer) {
   // var value = textFormat(rectObj.text);
   var html = '<div class="rect-ct" '+srcInfo+'  onclick="showMarkCell(this);" style="' + style + '"><div class="rect" style="' + innerStyle + '">' + value + operaHtml + '</div></div>';
 
-  var markRectHtml = rendenMarkRect(srcId, rectObj, result, scalePer);
+  var markResult = rendenMarkRect(srcId, rectObj, result, scalePer, previewScalePer);
   
-  return {'show': html, 'mark': markRectHtml};
+  return {'show': html, 'mark': markResult.mark, 'previewMark': markResult.previewMark};
 }
 
 function renderBizTag(rectObj, srcId, id){
@@ -1733,9 +1747,12 @@ function unfixTagDropdown(element){
     $('#'+id + ' button.dropdown-toggle').attr('data-toggle', 'dropdown');
 }
 
-function rendenMarkRect(srcId, rectObj, result, scalePer){
+function rendenMarkRect(srcId, rectObj, result, scalePer, previewScalePer){
 	var id = 'rect-src-' + srcId;
-	var style = 'left:' + rectObj.xmin*scalePer + 'px; top:' + rectObj.ymin*scalePer + 'px; width:' + rectObj.width*scalePer + 'px; height:' + rectObj.height*scalePer + 'px;'
+
+	var style = 'left:' + rectObj.xmin*scalePer + 'px; top:' + rectObj.ymin*scalePer + 'px; width:' + rectObj.width*scalePer + 'px; height:' + rectObj.height*scalePer + 'px;';
+	var previewStyle = 'left:' + rectObj.xmin*previewScalePer + 'px; top:' + rectObj.ymin*previewScalePer + 'px; width:' + rectObj.width*previewScalePer + 'px; height:' + rectObj.height*previewScalePer + 'px;';
+
 	var html = '<div id="'+id+'" class="cell-ct cell-hide" style="'+style+'">';
 	var charList = '';
 	for(var i = 0, len = rectObj.charList.length; i < len; i++){
@@ -1743,7 +1760,9 @@ function rendenMarkRect(srcId, rectObj, result, scalePer){
 		charList = charList + renderCharHtml(charObj, scalePer);
 	}
 	html = html + charList + '</div>';
-	return html;
+
+	var previewHtml = '<div id="'+id+'" class="cell-ct cell-hide" style="'+previewStyle+'"></div>';
+	return {"mark": html, "previewMark": previewHtml};
 }
 
 function renderCharHtml(rectObj, scalePer){
@@ -1841,6 +1860,7 @@ function reconRectReset(e) {
   var dataSrc = $('#' + textareaId).attr('data-src');
   dataSrc = dataSrc === undefined ? '' : dataSrc;
   $('#' + textareaId).val(dataSrc);
+  $('.recon-detail #' + textareaId).val(dataSrc);
 }
 
 function reconSubAll(e) {
@@ -2047,16 +2067,31 @@ function getSubmitMsg() {
 function showMaxRecon() {
   //console.log('showMaxRecon ... ');
   var ocrResultHtml = $('#ocr-result');
-  $('#dialog-recon-detail .modal-body').html('');
+  $('#dialog-recon-detail .recon-detail').html('');
+//  $('#dialog-recon-detail .recon-image').html('');
   var cloneOcrResult = ocrResultHtml.clone();
   cloneOcrResult.attr('id', 'ocr-result-clone');
-  cloneOcrResult.css('height', '100%');
+  cloneOcrResult.css('height', 'calc(100% - 50px)');
   cloneOcrResult.css('border-radius', '6px');
-  cloneOcrResult.appendTo('#dialog-recon-detail .modal-body');
+  cloneOcrResult.css('margin-top', '50px');
+  cloneOcrResult.css('padding-top', '0px');
+  cloneOcrResult.appendTo('#dialog-recon-detail .recon-detail');
+//  showPreviewImg();
+}
+
+function showPreviewImg(){
+    //syn-signature-pre
+    $('#dialog-recon-detail .preview-ct').html('');
+    var img = $('img#syn-signature-pre').clone();
+    img.attr('id', 'syn-signature-max');
+    img.css('margin-bottom', '10px');
+    img.appendTo('#dialog-recon-detail .preview-ct');
+
 }
 
 function showMarkCell(element){
 	hideAllMark();
+	hideAllPreviewMark();
 	var id = $(element).attr('data-id');
 	var width = $(element).attr('data-width');
 	var height = $(element).attr('data-height');
@@ -2064,14 +2099,38 @@ function showMarkCell(element){
 	var ymin = $(element).attr('data-ymin');
 	$('#rect-src-' + id).removeClass('cell-hide');
 	$('#rect-src-' + id).addClass('cell-show');
+
+	$('.preview-mark-ct #rect-src-' + id).removeClass('cell-hide');
+    $('.preview-mark-ct #rect-src-' + id).addClass('cell-show');
+
 	$('#recon-pos-ct #recon-box-w').val(width ? width : 0);
 	$('#recon-pos-ct #recon-box-h').val(height ? height : 0);
 	$('#recon-pos-ct #recon-box-x').val(xmin ? xmin : 0);
 	$('#recon-pos-ct #recon-box-y').val(ymin ? ymin : 0);
 }
 
+function showMarkTableCell(element){
+//	hideAllMark();
+	var id = $(element).attr('data-id');
+	var width = $(element).attr('data-w');
+	var height = $(element).attr('data-h');
+	var xmin = $(element).attr('data-x');
+	var ymin = $(element).attr('data-y');
+//	$('#rect-src-' + id).removeClass('cell-hide');
+//	$('#rect-src-' + id).addClass('cell-show');
+	$('#recon-pos-ct #recon-box-w').val(width ? width : 0);
+	$('#recon-pos-ct #recon-box-h').val(height ? height : 0);
+	$('#recon-pos-ct #recon-box-x').val(xmin ? xmin : 0);
+	$('#recon-pos-ct #recon-box-y').val(ymin ? ymin : 0);
+}
 function hideAllMark(){
 	$('#tiff-show-layout .cell .mark-ct .cell-ct').each(function (index){
+		$(this).attr('class', 'cell-ct cell-hide');
+	});
+}
+
+function hideAllPreviewMark(){
+	$('#dialog-recon-detail .preview-mark-ct .cell-ct').each(function (index){
 		$(this).attr('class', 'cell-ct cell-hide');
 	});
 }
@@ -2092,4 +2151,32 @@ function stepLayoutFinish(){
 
 function stepContentFinish(){
     $('#step-content').addClass('active');
+}
+
+function switchLayout(){
+    $('#ocr-result .rect-ct').each(function(index){
+        var staticDisplay = $(this).hasClass('rect-static');
+        if(staticDisplay){
+            $(this).removeClass('rect-static');
+        }else{
+            $(this).addClass('rect-static');
+        }
+    });
+}
+
+function markMatchedLayout(typeId){
+    cleanMatchedLayout();
+    var item = $('#dialog-image-layout #type-'+typeId);
+    console.log('markMatchedLayout', item)
+    if(item && item.length > 0){
+        item.addClass('ly-match');
+    }else{
+        $('#dialog-image-layout #type-unknown').addClass('ly-match');
+    }
+}
+
+function cleanMatchedLayout(){
+    $('#dialog-image-layout .layout-view').each(function (index){
+        $(this).removeClass('ly-match');
+    });
 }

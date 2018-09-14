@@ -58,7 +58,7 @@ $(function () {
 		$("body").attrchange({
 		trackValues: true, // set to true so that the event object is updated with old & new values
 		callback: function (event) {
-			console.log('body event', event);
+//			console.log('body event', event);
 			if (!$("#shortcut_menu .btn-top").hasClass('return-top-active')) {
 				return;
 			}

@@ -18,7 +18,7 @@ import java.util.*;
 public class CommonConverter {
 
 
-    interface Constant {
+    public interface Constant {
         String split = "\n";
         Map<String, String> replaceMap = new HashMap<String, String>() {
             {
@@ -27,6 +27,9 @@ public class CommonConverter {
                 put("\\\"\"\\\\\",", "\" \",");
             }
         };
+
+        double mockedWidth = 800;
+        double mockedHeight = 2000;
 
     }
 
@@ -37,6 +40,10 @@ public class CommonConverter {
     public static RectangleVO convert2Rect(CellVO cellVO) {
         RectangleVO rectangleVO = new RectangleVO();
         rectangleVO.setText(cellVO.getValue() == null ? "" : cellVO.getValue().toString());
+        rectangleVO.setXmin(RandomUtil.randomInt((int)Constant.mockedWidth, 0));
+        rectangleVO.setYmin(RandomUtil.randomInt((int)Constant.mockedHeight, 0));
+        rectangleVO.setWidth(RandomUtil.randomInt((int)Constant.mockedWidth, 0));
+        rectangleVO.setHeight(RandomUtil.randomInt((int)Constant.mockedHeight, 0));
         return rectangleVO;
     }
 

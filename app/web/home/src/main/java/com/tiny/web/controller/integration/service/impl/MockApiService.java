@@ -88,6 +88,8 @@ public class MockApiService extends AbstractApiService {
         TableLayoutResult tableLayoutResult = TableLayoutResult.newInstance(layoutResult);
         TableVO tableVO = TableUtil.random();
         tableLayoutResult.setAllList(CommonConverter.convert2ListList(tableVO));
+        tableLayoutResult.setWidth(CommonConverter.Constant.mockedWidth);
+        tableLayoutResult.setHeight(CommonConverter.Constant.mockedHeight);
 
         ContentResult contentResult = new ContentResult();
         contentResult.setResult(tableLayoutResult);

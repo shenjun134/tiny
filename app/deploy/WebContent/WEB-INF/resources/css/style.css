@@ -620,12 +620,13 @@ div#submit-result {
 
 .g-message {
     text-align: center;
-    width: 100%;
+    /*width: 100%;*/
     position: absolute;
     z-index: 11;
     top: 40px;
     font-size: 14px;
     font-weight: bold;
+    margin-left: 40%;
 }
 
 .g-message-on {
@@ -679,16 +680,22 @@ div#submit-result {
     border: 1px dashed #999;
 }
 
+.preview-mark-ct .cell-ct,
 .mark-ct .cell-ct{
 	position: absolute;
 	border: 2px solid #f4856f;
 	border-radius: 2px;
 }
+.preview-mark-ct .cell-ct{
+    z-index: 1;
+}
 
+.preview-mark-ct .cell-hide,
 .mark-ct .cell-hide{
 	display: none;
 }
 
+.preview-mark-ct .cell-show,
 .mark-ct .cell-show{
 	display: block;
 }
@@ -801,16 +808,32 @@ span.error-tip {
     /*bottom: 10px;*/
     margin-top: 40px;
 }
+.preview-recon-position,
 .recon-position,
 .position-ct{
     font-size: 12px;
     color: #555;
 }
-
+.preview-recon-position input,
 .recon-position input,
 .position-ct input {
     width: 50px !important;
     padding-left: 5px;
+}
+.preview-recon-position{
+    padding: 5px;
+    padding-top: 8px;
+    background: #ddd;
+    max-width: 400px;
+    color: green;
+    border-radius: 2px;
+}
+
+.preview-ct{
+    margin-top: 10px;
+    height: calc(100% - 50px);
+    overflow: auto;
+    position: relative;
 }
 
 .show-upload .canvas-container {
@@ -1049,6 +1072,14 @@ table.recon-ct tr.recon-row-sub input{
     position: relative;
 }
 
+#ocr-result-clone .recon-position{
+    max-width: 500px;
+    top: 10px;
+    left: 10px;
+    max-height: 50px;
+    color: red;
+}
+
 .ocr-result-ct .table-ly {
     padding-bottom: 20px;
     display: flex;
@@ -1064,6 +1095,8 @@ table.recon-ct tr.recon-row-sub input{
     margin-bottom: 20px;
     width: calc(100% - 20px);
     height: calc(100% - 20px);*/
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .detail-ct .rect-ct {
@@ -1094,6 +1127,7 @@ table.recon-ct tr.recon-row-sub input{
     padding: 5px;
     padding-top: 0px;
     border-radius: 2px;
+    min-height: 30px;
 }
 .detail-ct .rect-ct .rect textarea:hover{
     border-color: #1298EA;
@@ -1209,14 +1243,15 @@ table.recon-ct tr.recon-row-sub input{
 }
 
 .recon-position{
-    position: absolute;
+    padding-top: 10px;
+/*    position: absolute;
     bottom: 20px;
     left: 5px;
     background: #fff;
     opacity: 0.4;
     font-size: 12px;
     padding: 5px;
-    border-radius: 2px;
+    border-radius: 2px;*/
 }
 
 /*********************************carousel********************************************/
@@ -1245,6 +1280,7 @@ table.recon-ct tr.recon-row-sub input{
 	background: #666;
 	background: linear-gradient(#666, #333);
 	position: relative;
+	cursor: pointer;
 }
 /*since the first link does not have a triangle before it we can reduce the left padding to make it look consistent with other links*/
 .breadcrumb a:first-child {
@@ -1274,7 +1310,8 @@ table.recon-ct tr.recon-row-sub input{
 	content: '';
 	position: absolute;
 	top: 0;
-	right: -9px; /*half of square's length*/
+	/*right: -9px;*/
+	/*half of square's length*/
 	/*same dimension as the line-height of .breadcrumb a */
 	width: 16px;
 	height: 16px;
@@ -1333,4 +1370,129 @@ table.recon-ct tr.recon-row-sub input{
 .flat a:hover, .flat a.active,
 .flat a:hover:after, .flat a.active:after{
 	background: #9EEB62;
-}}
+}
+
+.rect-static{
+    position: static !important;
+}
+
+.rect-static .rect,
+.rect-static textarea,
+.rect-static{
+    height: auto !important;
+}
+
+
+#dialog-recon-detail .recon-detail{
+    flex: 0 0 auto;
+    height: 50%;
+    padding: 20px;
+}
+
+#dialog-recon-detail .rect textarea:active,
+#dialog-recon-detail .rect textarea:focus{
+   background: #aed6f1;
+}
+
+#dialog-recon-detail .recon-detail #recon-pos-ct{
+    display: block !important;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #fff;
+    opacity: 0.6;
+    font-size: 12px;
+    padding: 5px;
+    border-radius: 2px;
+}
+
+#dialog-recon-detail .recon-image{
+    flex: 1 1 auto;
+    padding: 20px;
+    height: calc(50% - 8px);
+}
+
+#dialog-recon-detail .splitter-horizontal{
+    flex: 0 0 auto;
+    height: 8px;
+    width: 100%;
+    background: lightgreen;
+    cursor: row-resize;
+}
+
+#dialog-recon-detail .modal-body{
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.layout-preview {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 20px;
+}
+
+.ly-match{
+    background: lightgreen;
+    border-radius: 5px;
+}
+.ly-match p{
+    color: #222 !important;
+}
+
+.layout-preview .layout-view{
+    width: 13%;
+    padding: 10px;
+}
+.layout-preview .ly-match .layout-na,
+.layout-preview .ly-match img{
+    border: 3px solid green !important;
+}
+
+.layout-na,
+.layout-preview .layout-view img{
+    width: 100%;
+    border-radius: 5px;
+    border: 3px solid transparent;
+}
+.layout-na:hover,
+.layout-preview .layout-view img:hover{
+    border: 3px solid #fa5959;
+}
+
+.layout-preview .layout-view p{
+    width: 100%;
+    text-align: center;
+    color: #fff;
+    padding-top: 10px;
+    font-size: 14px;
+    height: 50px;
+}
+
+.layout-bar{
+    display: inline-block;
+    line-height: 34px;
+    margin-left: 20px;
+    margin-top: 10px;
+    cursor: pointer;
+    width: 34px;
+    text-align: center;
+    border-radius: 2px;
+}
+
+.layout-bar:hover{
+    background: #ddd;
+}
+
+.layout-na{
+    font-size: 3vw;
+    text-align: center;
+    width: 100%;
+    height: calc(100% - 55px);
+    background: #fff;
+    padding-top: 30%;
+}
+
+/*
+#ocr-result .opera-ct{
+    display: none;
+}*/

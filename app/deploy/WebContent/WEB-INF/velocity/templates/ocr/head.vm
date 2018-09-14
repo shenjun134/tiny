@@ -19,6 +19,7 @@
 
 	<link type="image/x-icon" href="/tiny/resources/images/stone.ico" rel="icon" />
 	<script src="/tiny/resources/lib/jquery/3.2.1/jquery.min.js"></script>
+	<script src="/tiny/resources/lib/jquery/jquery-resizable.js"></script>
 	<script src="/tiny/resources/lib/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<script src="/tiny/resources/lib/horizon-tab/js/main.js"></script>
 	<script src="/tiny/resources/lib/canvas/js/main.js"></script>

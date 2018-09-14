@@ -2,9 +2,15 @@
 <div class="title cf">
 	<h2 class="fl animate seven"><span>O</span><span style="padding-right: 5px;"></span><span>C</span><span style="padding-right: 5px;"></span><span>R</span><span style="padding-right: 20px;"></span><span>S</span><span>i</span><span>g</span><span >n</span><span >a</span><span >t</span><span >u</span><span >r</span><span >e</span></h2>
 	<div class="breadcrumb flat">
-    	<a id="step-sign">Validate</a>
-    	<a id="step-layout">Layout</a>
-    	<a id="step-content">Content</a>
+    	<a id="step-sign" onclick="doDetailBack();">
+    	    <span tooltip="Validate Signature" flow="right">Validate</span>
+    	</a>
+    	<a id="step-layout" onclick="doSignNext();">
+    	    <span tooltip="Recognise Layout" flow="right">Layout</span>
+    	</a>
+    	<a id="step-content" onclick="doSignNext();">
+    	    <span tooltip="Recognise Content" flow="left">Content</span>
+    	</a>
     </div>
 	<ul class="title-list fr cf ">
 		<li id="th-main" class="on">Signature</li>
