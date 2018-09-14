@@ -1,5 +1,6 @@
 //<p class="no-matched">No signature matched</p>
 var canvas = null;
+var previewCanvas = null;
 var fillColor = 'rgba(0, 0, 0, 0.3)';
 function doSignUpload() {
   console.log('doUpload begin...');
@@ -157,6 +158,7 @@ function beforeSignUpload() {
   cleanImagInfo();
   cleanRectangleInfo();
   canvasOff();
+  preCanvasOff();
   cleanCut();
   canvas = null;
   cleanNextInfo();
@@ -177,6 +179,7 @@ function cleanNextInfo() {
   $('#tiff-show-layout').html('<p class="blank">Please upload a signature image</p>');
   $('div#type-list').html('<button class="dropdown-item" type="button">No Data</button>');
   cleanMatchedLayout();
+  previewCanvas = null;
 }
 
 function enableNextInfo() {
@@ -307,11 +310,27 @@ function canvasSwitchClick(e) {
   }
 }
 
+function preCanvasSwitchClick(e) {
+  var currentClz = $('#sign-canvas-switch-pre i').attr('class');
+  if (currentClz.indexOf('fa-toggle-on') > -1) {
+    preCanvasOff();
+  } else {
+    preCanvasOn();
+  }
+}
+
 function canvasOff() {
   $('#sign-canvas-switch i').removeClass('fa-toggle-on');
   $('#sign-canvas-switch i').addClass('fa-toggle-off');
   displayCanvas(false);
   disableCut()
+}
+
+function preCanvasOff() {
+  $('#sign-canvas-switch-pre i').removeClass('fa-toggle-on');
+  $('#sign-canvas-switch-pre i').addClass('fa-toggle-off');
+  displayPreCanvas(false);
+  disablePreCut()
 }
 
 function canvasOn() {
@@ -324,16 +343,34 @@ function canvasOn() {
   activeCut();
 }
 
+function preCanvasOn() {
+  $('#sign-canvas-switch-pre i').removeClass('fa-toggle-off');
+  $('#sign-canvas-switch-pre i').addClass('fa-toggle-on');
+  displayPreCanvas(true);
+  activePreCut();
+}
+
 
 function displayCanvas(show) {
   var canvasObj = $('#sign-canvas');
   if (canvasObj === undefined || canvasObj === null) {
     return;
   }
-  $('.canvas-container').css('display', show ? 'block' : 'none');
+  $('.cell .canvas-container').css('display', show ? 'block' : 'none');
   $('#sign-canvas').css('display', show ? 'block' : 'none');
-  $('.upper-canvas ').css('display', show ? 'block' : 'none');
+  $('.cell .upper-canvas ').css('display', show ? 'block' : 'none');
 }
+
+function displayPreCanvas(show) {
+  var canvasObj = $('#preview-canvas');
+  if (canvasObj === undefined || canvasObj === null) {
+    return;
+  }
+  $('.preview-ct .canvas-container').css('display', show ? 'block' : 'none');
+  $('#preview-canvas').css('display', show ? 'block' : 'none');
+  $('.preview-ct .upper-canvas ').css('display', show ? 'block' : 'none');
+}
+
 
 
 
@@ -751,6 +788,13 @@ function cleanRectangleInfo() {
   $("#box-y").val('');
 }
 
+function cleanPreviewRectangleInfo() {
+  $("#recon-box-w").val('');
+  $("#recon-box-h").val('');
+  $("#recon-box-x").val('');
+  $("#recon-box-y").val('');
+}
+
 function activeCut() {
   $('#sign-image-cut').css('cursor', 'pointer');
   $('#sign-image-cut').css('opacity', '1');
@@ -765,6 +809,20 @@ function disableCut() {
   $('#sign-image-cut').css('background', '#fff');
 }
 
+function activePreCut() {
+  $('#sign-image-cut-pre').css('cursor', 'pointer');
+  $('#sign-image-cut-pre').css('opacity', '1');
+  $('#sign-image-cut-pre').css('color', '#fff');
+  $('#sign-image-cut-pre').css('background', '#555');
+}
+
+function disablePreCut() {
+  $('#sign-image-cut-pre').css('cursor', 'pointer');
+  $('#sign-image-cut-pre').css('opacity', '0.6');
+  $('#sign-image-cut-pre').css('color', '#000');
+  $('#sign-image-cut-pre').css('background', '#fff');
+}
+
 function drawRectangleInfoXY(x, y) {
   var scale = getScale();
 
@@ -772,11 +830,25 @@ function drawRectangleInfoXY(x, y) {
   $("#box-y").val((y / scale).toFixed(2));
 }
 
+function drawPreviewRectangleInfoXY(x, y) {
+  var scale = getPreviewScale();
+
+  $("#preview-recon-position #recon-box-x").val((x / scale).toFixed(2));
+  $("#preview-recon-position #recon-box-y").val((y / scale).toFixed(2));
+}
+
 function drawRectangleInfoWH(w, h) {
   var scale = getScale();
 
   $("#box-w").val((w / scale).toFixed(2));
   $("#box-h").val((h / scale).toFixed(2));
+}
+
+function drawPreviewRectangleInfoWH(w, h) {
+  var scale = getPreviewScale();
+
+  $("#preview-recon-position #recon-box-w").val((w / scale).toFixed(2));
+  $("#preview-recon-position #recon-box-h").val((h / scale).toFixed(2));
 }
 
 function makeCanvas(id, width, height, offsetX, offsetY, containerDiv) {
@@ -1217,8 +1289,8 @@ function markBoxClick(e) {
 
 function showNameList(id) {
   var nameStr = $('#' + id + ' input').val();
-  console.log('showNameList', id);
-  console.log('showNameList', nameStr);
+//  console.log('showNameList', id);
+//  console.log('showNameList', nameStr);
   var nameList = JSON.parse(nameStr);
   cleanCut();
   $('#cut-ct').html('');
@@ -1278,6 +1350,12 @@ function getScale() {
   var realW = $("#image-scale").attr('data-real-w');
   return parseFloatH(orgW) / parseFloatH(realW);
 }
+function getPreviewScale() {
+  var orgW = $("#recon-pos-ct #recon-image-w").val();
+  var realW = $("#syn-signature-max").width();
+  return parseFloatH(orgW) / realW;
+}
+
 
 
 document.onkeyup = function (e) {
@@ -2077,6 +2155,19 @@ function showMaxRecon() {
   cloneOcrResult.css('padding-top', '0px');
   cloneOcrResult.appendTo('#dialog-recon-detail .recon-detail');
 //  showPreviewImg();
+    setTimeout(function(){
+        var canvasContainer = $('.preview-ct .canvas-container');
+        if(canvasContainer && canvasContainer.length > 0){
+            console.log('showMaxRecon....has canvasContainer', canvasContainer);
+            return;
+        }
+        var id = 'preview-canvas';
+        var width = $('#syn-signature-max').width();
+        var height = $('#syn-signature-max').height();
+        console.log('showPreviewImg', width);
+        console.log('showPreviewImg', height);
+        makePreviewCanvas(id, width, height);
+    }, 1000);
 }
 
 function showPreviewImg(){
@@ -2086,6 +2177,19 @@ function showPreviewImg(){
     img.attr('id', 'syn-signature-max');
     img.css('margin-bottom', '10px');
     img.appendTo('#dialog-recon-detail .preview-ct');
+
+    //append preview canvas
+    var canvasCover = '<canvas id="preview-canvas" width="0" height="0" style="display: none;"></canvas>';
+    $('#dialog-recon-detail .preview-ct').append(canvasCover);
+
+//    setTimeout(function(){
+//            var id = 'preview-canvas';
+//            var width = $('#syn-signature-max').width();
+//            var height = $('#syn-signature-max').height();
+//            console.log('showPreviewImg', width);
+//            console.log('showPreviewImg', height);
+//            makePreviewCanvas(id, width, height);
+//        }, 1000);
 
 }
 
@@ -2189,4 +2293,137 @@ function cleanMatchedLayout(){
     $('#dialog-image-layout .layout-view').each(function (index){
         $(this).removeClass('ly-match');
     });
+}
+
+/*****************************************************preview auto size **************************************************/
+/**
+ * fill oppsite
+ */
+function makePreviewCanvas(id, width, height) {
+  $('#' + id).attr('width', '' + width);
+  $('#' + id).attr('height', '' + height);
+  var offsetTopScroll = 0;
+  var isDown;
+  var origX, origY;
+  var leftCol, rightCol, upCol, downCol;
+  // var fillColor1 = 'rgba(0, 0, 0, 1)';
+  leftCol = fillColor;
+  rightCol = fillColor;
+  upCol = fillColor;
+  downCol = fillColor;
+
+  var totalH, totalW;
+  var leftRect, rightRect, upRect, downRect;
+  var x1, y1, x2, y2;
+  totalW = width;
+  totalH = height;
+
+  previewCanvas = new fabric.Canvas(id, { selection: false });
+
+
+  previewCanvas.on('mouse:down', function (o) {
+    cleanPreviewRectangleInfo();
+
+    previewCanvas.clear();
+    $('.preview-ct .canvas-container .upper-canvas').css('background', fillColor);
+    isDown = true;
+
+    var pointer = previewCanvas.getPointer(o.e);
+    origX = pointer.x;
+    origY = pointer.y;
+
+
+    leftRect = new fabric.Rect({
+      left: 0,
+      top: 0,
+      originX: 'left',
+      originY: 'top',
+      width: 0,
+      height: 0,
+      angle: 0,
+      fill: leftCol,
+      transparentCorners: false
+    });
+
+    upRect = new fabric.Rect({
+      left: 0,
+      top: 0,
+      originX: 'left',
+      originY: 'top',
+      width: 0,
+      height: 0,
+      angle: 0,
+      fill: upCol,
+      transparentCorners: false
+    });
+
+    downRect = new fabric.Rect({
+      left: 0,
+      top: 0,
+      originX: 'left',
+      originY: 'top',
+      width: 0,
+      height: 0,
+      angle: 0,
+      fill: downCol,
+      transparentCorners: false
+    });
+
+    rightRect = new fabric.Rect({
+      left: 0,
+      top: 0,
+      originX: 'left',
+      originY: 'top',
+      width: 0,
+      height: 0,
+      angle: 0,
+      fill: rightCol,
+      transparentCorners: false
+    });
+    previewCanvas.add(leftRect);
+    previewCanvas.add(upRect);
+    previewCanvas.add(downRect);
+    previewCanvas.add(rightRect);
+
+  });
+
+  previewCanvas.on('mouse:move', function (o) {
+    if (!isDown) return;
+    $('.preview-ct .canvas-container .upper-canvas').css('background', 'transparent');
+    var pointer = previewCanvas.getPointer(o.e);
+    var currentX = pointer.x;
+    var currentY = pointer.y;
+
+    if (currentX > origX) {
+      x1 = origX;
+      x2 = currentX;
+    } else {
+      x2 = origX;
+      x1 = currentX;
+    }
+
+    if (currentY > origY) {
+      y1 = origY;
+      y2 = currentY;
+    } else {
+      y2 = origY;
+      y1 = currentY;
+    }
+    var offset = 0.05;
+    leftRect.set({ left: 0, top: 0, width: x1 + offset, height: totalH });
+    upRect.set({ left: x1, top: 0, width: x2 - x1, height: y1 });
+    downRect.set({ left: x1, top: y2, width: x2 - x1, height: totalH - y2 });
+    rightRect.set({ left: x2 - offset, top: 0, width: totalW - x2, height: totalH });
+
+
+    drawPreviewRectangleInfoXY(x1, y1);
+    drawPreviewRectangleInfoWH(x2 - x1, y2 - y1);
+
+    previewCanvas.renderAll();
+  });
+
+  previewCanvas.on('mouse:up', function (o) {
+    isDown = false;
+    //imageCut();
+  });
 }

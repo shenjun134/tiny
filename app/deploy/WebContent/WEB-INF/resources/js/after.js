@@ -9,7 +9,7 @@ $(document).ready(function () {
     $("#dialog-recon-detail .recon-detail").attrchange({
         trackValues: true, // set to true so that the event object is updated with old & new values
         callback: function (event) {
-            console.log('#dialog-recon-detail .recon-detail event', event);
+//            console.log('#dialog-recon-detail .recon-detail event', event);
             var detailHeight = $('#dialog-recon-detail .recon-detail').css('height');
             var splitterHeight = $('#dialog-recon-detail .splitter-horizontal').css('height');
             var bodyHeight = $('#dialog-recon-detail .modal-body').height();
@@ -25,7 +25,7 @@ $(document).ready(function () {
 
     $('select#layout-type').change(function(){
         var selectedOption = $('select#layout-type option:selected');
-        console.log('selectedOptionselectedOptionselectedOption', selectedOption);
+//        console.log('selectedOptionselectedOptionselectedOption', selectedOption);
         markMatchedLayout(selectedOption.attr('value'));
     });
 });

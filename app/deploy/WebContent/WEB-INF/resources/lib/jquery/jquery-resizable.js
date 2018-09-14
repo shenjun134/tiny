@@ -165,7 +165,6 @@ Licensed under MIT License
             }
 
             function getMousePos(e) {
-                console.log('getMousePosgetMousePosgetMousePosgetMousePos', e);
                 var pos = { x: 0, y: 0, width: 0, height: 0 };
                 if (typeof e.clientX === "number") {
                     pos.x = e.clientX;
