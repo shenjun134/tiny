@@ -51,9 +51,10 @@
 
 
 <div id="dialog-recon-detail" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-recon-detail" aria-hidden="true">
-  <div class="modal-dialog" role="document" style="width: 100%; height: calc(100% -  60px); padding: 0px;">
+  <div class="modal-dialog" role="document" style="width: 100%; height: calc(100% -  0px); padding: 0px; margin: 0px;">
     <div class="modal-content" style="height: 100%; background: #222">
       <div class="modal-body" style="height: 100%; padding: 0px; overflow: hidden;">
+        <button type="button" class="close" data-dismiss="modal"  aria-hidden="true" style="color: #fff;">×</button>
         <div class="recon-detail">
         </div>
         <div class="splitter-horizontal"></div>

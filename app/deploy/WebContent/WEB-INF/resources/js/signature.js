@@ -832,6 +832,8 @@ function drawRectangleInfoXY(x, y) {
 
 function drawPreviewRectangleInfoXY(x, y) {
   var scale = getPreviewScale();
+  scale = 1/scale;
+  console.log('drawPreviewRectangleInfoWH', scale);
 
   $("#preview-recon-position #recon-box-x").val((x / scale).toFixed(2));
   $("#preview-recon-position #recon-box-y").val((y / scale).toFixed(2));
@@ -846,6 +848,8 @@ function drawRectangleInfoWH(w, h) {
 
 function drawPreviewRectangleInfoWH(w, h) {
   var scale = getPreviewScale();
+  scale = 1/scale;
+  console.log('drawPreviewRectangleInfoWH', scale);
 
   $("#preview-recon-position #recon-box-w").val((w / scale).toFixed(2));
   $("#preview-recon-position #recon-box-h").val((h / scale).toFixed(2));
@@ -2167,6 +2171,7 @@ function showMaxRecon() {
         console.log('showPreviewImg', width);
         console.log('showPreviewImg', height);
         makePreviewCanvas(id, width, height);
+        autoScalePreviewMark();
     }, 1000);
 }
 
@@ -2176,6 +2181,7 @@ function showPreviewImg(){
     var img = $('img#syn-signature-pre').clone();
     img.attr('id', 'syn-signature-max');
     img.css('margin-bottom', '10px');
+    img.css('width', '100%');
     img.appendTo('#dialog-recon-detail .preview-ct');
 
     //append preview canvas
@@ -2426,4 +2432,22 @@ function makePreviewCanvas(id, width, height) {
     isDown = false;
     //imageCut();
   });
+}
+
+function autoScalePreviewMark(){
+    var scale = getPreviewScale();
+//    console.log('autoScalePreviewMark', scale);
+    $('.preview-mark-ct .cell-ct').each(function (index){
+//        console.log('autoScalePreviewMark loop', index);
+        var width = $(this).css('width').replace('px','');
+        var height = $(this).css('height').replace('px','');
+        var left = $(this).css('left').replace('px','');
+        var top = $(this).css('top').replace('px','');
+
+        $(this).css('width', '' + (parseFloat(width)/scale) + 'px');
+        $(this).css('height', '' + (parseFloat(height)/scale) + 'px');
+        $(this).css('left', '' + (parseFloat(left)/scale) + 'px');
+        $(this).css('top', '' + (parseFloat(top)/scale) + 'px');
+
+    });
 }
