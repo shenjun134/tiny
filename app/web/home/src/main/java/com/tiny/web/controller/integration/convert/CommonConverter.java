@@ -4,18 +4,26 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.tiny.common.entity.*;
 import com.tiny.common.entity.GridLayoutResult;
+import com.tiny.common.util.LogUtil;
 import com.tiny.web.controller.integration.entity.*;
 import com.tiny.web.controller.integration.util.RandomUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
+import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
 public class CommonConverter {
+
+    /**
+     * logger
+     */
+    private static final Logger logger = Logger.getLogger(CommonConverter.class);
 
 
     public interface Constant {
@@ -40,10 +48,10 @@ public class CommonConverter {
     public static RectangleVO convert2Rect(CellVO cellVO) {
         RectangleVO rectangleVO = new RectangleVO();
         rectangleVO.setText(cellVO.getValue() == null ? "" : cellVO.getValue().toString());
-        rectangleVO.setXmin(RandomUtil.randomInt((int)Constant.mockedWidth, 0));
-        rectangleVO.setYmin(RandomUtil.randomInt((int)Constant.mockedHeight, 0));
-        rectangleVO.setWidth(RandomUtil.randomInt((int)Constant.mockedWidth, 0));
-        rectangleVO.setHeight(RandomUtil.randomInt((int)Constant.mockedHeight, 0));
+        rectangleVO.setXmin(RandomUtil.randomInt((int) Constant.mockedWidth, 0));
+        rectangleVO.setYmin(RandomUtil.randomInt((int) Constant.mockedHeight, 0));
+        rectangleVO.setWidth(RandomUtil.randomInt((int) Constant.mockedWidth, 0));
+        rectangleVO.setHeight(RandomUtil.randomInt((int) Constant.mockedHeight, 0));
         return rectangleVO;
     }
 
@@ -155,6 +163,13 @@ public class CommonConverter {
         result.setHeight(faxObj.getDouble("height"));
         result.setId(faxObj.getString("fax_id"));
 
+        Object isTableObj = faxObj.get("is_table");
+        boolean isTable = isTableObj == null ? false : Boolean.parseBoolean(isTableObj.toString());
+        Object rowObj = faxObj.get("row_num");
+        int row = rowObj == null ? 0 : (int) NumberUtils.toDouble(rowObj.toString(), 0);
+        Object columnObj = faxObj.get("col_num");
+        int column = columnObj == null ? 0 : (int) NumberUtils.toDouble(columnObj.toString(), 0);
+
         JSONArray cellsArr = (JSONArray) faxObj.get("cells");
         if (cellsArr == null || cellsArr.size() == 0) {
             return null;
@@ -164,9 +179,73 @@ public class CommonConverter {
             RectangleVO rectangleVO = parseRect(cell);
             result.getAllList().add(rectangleVO);
         }
+        //SORT
+
+//        Collections.sort(result.getAllList(), new Comparator<RectangleVO>() {
+//            @Override
+//            public int compare(RectangleVO o1, RectangleVO o2) {
+//                int result = compareRect(o1, o2);
+//                return result;
+//            }
+//
+//            public int compareRect(RectangleVO o1, RectangleVO o2) {
+//                if(o1 == null && o2 == null ){
+//                    return 0;
+//                }
+//                if(o1 == null){
+//                    return 1;
+//                }
+//                if(o2 == null){
+//                    return -1;
+//                }
+//                if(o1 == o2){
+//                    return 0;
+//                }
+//                int yResult = Double.valueOf(o1.getYmin()).compareTo(Double.valueOf(o2.getYmin()));
+//                if(yResult == 0){
+//                    return Double.valueOf(o1.getXmin()).compareTo(o2.getXmin());
+//                }
+//                return yResult;
+//            }
+//        });
+
+        if (isTable) {
+            TableLayoutResult layoutResult = grid2Table(result, row, column);
+            if (layoutResult != null) {
+                ContentResult contentResult = new ContentResult();
+                contentResult.setResult(layoutResult);
+                return contentResult;
+            }
+        }
+
         ContentResult contentResult = new ContentResult();
         contentResult.setResult(result);
         return contentResult;
+    }
+
+
+    /**
+     * @param gridResult
+     * @param row
+     * @param column
+     * @return if size!=row*column will be null
+     */
+    private static com.tiny.web.controller.integration.entity.TableLayoutResult grid2Table(com.tiny.web.controller.integration.entity.GridLayoutResult gridResult, int row, int column) {
+        if (gridResult.getAllList().size() != row * column) {
+            LogUtil.error(logger, "convert grid2Table fail, size not match, size:{0}, row: {1}, column: {2}", gridResult.getAllList().size(), row, column);
+            return null;
+        }
+        com.tiny.web.controller.integration.entity.TableLayoutResult tableResult = com.tiny.web.controller.integration.entity.TableLayoutResult.newInstance(gridResult);
+        for (int i = 0; i < row; i++) {
+            List<RectangleVO> rowData = new ArrayList<>();
+            int startIndex = i * column;
+            for (int j = 0; j < column; j++) {
+                RectangleVO rectangleVO = gridResult.getAllList().get(startIndex + j);
+                rowData.add(rectangleVO);
+            }
+            tableResult.getAllList().add(rowData);
+        }
+        return tableResult;
     }
 
     private static RectangleVO parseRect(JSONObject cell) {
@@ -252,7 +331,8 @@ public class CommonConverter {
     }
 
     public static void main(String[] args) throws IOException {
-        String path = "D:\\data\\code\\github-workspace\\tiny\\app\\web\\home\\src\\test\\resources\\table-result-2.json";
+//        String path = "D:\\data\\code\\github-workspace\\tiny\\app\\web\\home\\src\\test\\resources\\table-result-2.json";
+        String path = "D:\\data\\code\\github-workspace\\tiny\\app\\web\\home\\src\\test\\resources\\022979.json";
         String jsonStr = FileUtils.readFileToString(new File(path));
 
         Object obj = parseContentResult(jsonStr);

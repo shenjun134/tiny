@@ -10,6 +10,7 @@ public class TableLayoutResult extends LayoutResult {
     public static TableLayoutResult newInstance(LayoutResult layoutResult) {
         TableLayoutResult result = new TableLayoutResult();
         result.copy(layoutResult);
+        result.setType(LayoutEnum.TABLE.getCode());
         return result;
     }
 

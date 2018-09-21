@@ -54,10 +54,12 @@
   <div class="modal-dialog" role="document" style="width: 100%; height: calc(100% -  0px); padding: 0px; margin: 0px;">
     <div class="modal-content" style="height: 100%; background: #222">
       <div class="modal-body" style="height: 100%; padding: 0px; overflow: hidden;">
-        <button type="button" class="close" data-dismiss="modal"  aria-hidden="true" style="color: #fff;">×</button>
+        <button type="button" class="close animated flash infinite" data-dismiss="modal"  aria-hidden="true" style="color: #888; position: absolute; top: 0; left: 50%;">×</button>
         <div class="recon-detail">
         </div>
-        <div class="splitter-horizontal"></div>
+        <div class="splitter-horizontal" >
+            <i class="fa fa-bars" style="font-size: 6px;"></i>
+        </div>
         <div class="recon-image">
             <div id="preview-recon-position" class="preview-recon-position">
                 <div>
@@ -77,7 +79,7 @@
                     <label class="action" id="sign-image-cut-pre"
                         style="margin-left: 15px; opacity: 0.6; color: #222; width: 20px; text-align: center; border-radius: 2px; padding-right: 5px;"
                         onclick="preCanvasSwitchClick(this)" tooltip="Fix Mark Area" flow="up">
-                        <i class="fa fa-scissors" aria-hidden="true"></i>
+                        <i class="fa fa-scissors" aria-hidden="true" style="padding-left: 4px;"></i>
                     </label>
                 </div>
             </div>

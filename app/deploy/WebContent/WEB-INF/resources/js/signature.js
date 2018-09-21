@@ -1603,12 +1603,12 @@ function doContentRecon() {
         stepContentFinish();
         if (resp.data && resp.data.result && resp.data.result.type === 'table-ly') {
           $('input#content-type').val('table-ly');
-          rendomTableResult(resp);
+          renderTableResult(resp);
           renderReconPos(resp);
           showMessage('success', resp.message);
         } else if (resp.data && resp.data.result && resp.data.result.type === 'grid-ly') {
           $('input#content-type').val('grid-ly');
-          rendomGridResult(resp);
+          renderGridResult(resp);
           renderReconPos(resp);
           showMessage('success', resp.message);
         } else {
@@ -1639,21 +1639,39 @@ function renderReconPos(resp){
     }, 100);
 }
 
-function rendomTableResult(resp) {
+function renderTableResult(resp) {
   var result = resp.data.result;
   var tableHtml = '<table class="recon-ct">';
   var isHeader = false;
   var i = 0, len = result.allList.length;
   var colSize = 0;
   var lastRow = false;
+
+    var markHtml = '';
+    var previewMarkHtml = '';
+    var scalePer = 1;
+    var myImg = document.querySelector("#syn-signature-pre");
+    var realWidth = myImg.width;
+    var realHeight = myImg.height;
+    scalePer = realWidth/result.width;
+
+  var previewImg = document.querySelector("#syn-signature-max");
+  var realPreviewWidth = previewImg.width;
+  var previewScalePer = 1;
+  previewScalePer = realPreviewWidth/result.width;
+
+
   for (; i < len; i++) {
-    isHeader = i === 0;
+//    isHeader = i === 0;
     lastRow = i === len - 1;
+
 
     var rowList = result.allList[i];
     colSize = rowList.length;
-    var rowHtml = rendomRowHtml(i, rowList, isHeader, lastRow);
-    tableHtml = tableHtml + rowHtml;
+    var rowHtmlResult = renderRowHtml(i, rowList, isHeader, lastRow, scalePer, previewScalePer, result);
+    tableHtml = tableHtml + rowHtmlResult.show;
+    markHtml = markHtml + rowHtmlResult.mark;
+    previewMarkHtml = previewMarkHtml + rowHtmlResult.previewMark;
   }
 
   var colspan = colSize + 2;
@@ -1664,63 +1682,90 @@ function rendomTableResult(resp) {
   lastRowHtml = lastRowHtml + submitHtml + resetHtml + '</td></tr>';
 
   tableHtml = tableHtml + lastRowHtml;
+    $('#tiff-show-layout .cell .mark-ct').html(markHtml);
 
+    $('#dialog-recon-detail .preview-ct').append('<div class="preview-mark-ct">' + previewMarkHtml + '</div>');
   $('#ocr-result').html('<div class="detail-ct table-ly">' + tableHtml + '</table><div class="end-padding"></div></div>');
   appendToolbar();
 }
 
-function rendomRowHtml(index, rowList, isHeader, lastRow) {
-  var resultHmtl = '<tr>';
-
+function renderRowHtml(index, rowList, isHeader, lastRow, scalePer, previewScalePer, result) {
+  var resultHtml = '';
+  var markHtml = '';
+  var previewMarkHtml = '';
+  if(index == 0){
+    console.log('renderRowHtml');
+    var thHtml = '<tr class="recon-row"><th>#</th>';
+    var colSize = rowList ? rowList.length : 0;
+    for(var i = 0; i < colSize; i++){
+        var srcId = 'biz-tag-' + i;
+        var bizTagHtml = cloneBizTag(srcId, srcId);
+        thHtml = thHtml + '<th>' + bizTagHtml + '</th>';
+    }
+    thHtml = thHtml + '<th>Operation</th></tr>';
+    resultHtml = resultHtml + thHtml;
+    console.log('renderRowHtml', resultHtml);
+  }
+  resultHtml = resultHtml + '<tr>';
   if (isHeader) {
     var cellHtml = '<th>#</th>'
-    resultHmtl = resultHmtl + cellHtml;
+    resultHtml = resultHtml + cellHtml;
   } else {
-    resultHmtl = '<tr class="recon-row" id="rowt-' + index + '">';
+    resultHtml = resultHtml + '<tr class="recon-row" id="rowt-' + index + '">';
     var cellHtml = '<td id="rowi-' + index + '"><div style="width:100%; height:100%; display: flex;"><i style="padding-right: 5px;" class="fa fa-question-circle" aria-hidden="true"></i>' + index + '</div></td>'
-    resultHmtl = resultHmtl + cellHtml;
-
+    resultHtml = resultHtml + cellHtml;
   }
   var i = 0, len = rowList.length;
   for (; i < len; i++) {
     var cellObj = rowList[i];
-    var cellHtml = rendomCellHtml(index, i, cellObj, isHeader);
-    resultHmtl = resultHmtl + cellHtml;
+    var cellHtmlResult = renderCellHtml(index, i, cellObj, isHeader, scalePer, previewScalePer, result);
+    resultHtml = resultHtml + cellHtmlResult.show;
+    markHtml = markHtml + cellHtmlResult.mark;
+    previewMarkHtml = previewMarkHtml + cellHtmlResult.previewMark;
   }
   if (isHeader) {
     var cellHtml = '<th>Operation</th>'
-    resultHmtl = resultHmtl + cellHtml;
+    resultHtml = resultHtml + cellHtml;
   } else {
-    var style = 'display: flex; border-left: 0px solid transparent; border-top: 0px solid transparent;';
+    var style = 'border-left: 0px solid transparent; border-top: 0px solid transparent;';
+    if(index == 0){
+        style = 'border-left: 0px solid transparent;';
+    }
     style = lastRow ? style + 'border-bottom: 0px solid transparent;' : style;
     var submitHtml = '<span data-row="' + index + '" data-length="' + len + '" class="opera opera-submit" onclick="reconSub(this);">Submit</span>';
     var resetHtml = '<span data-row="' + index + '" data-length="' + len + '" class="opera opera-reset" onclick="reconReset(this);">Reset</span>';
     var cellHtml = '<td style="' + style + '">' + submitHtml + resetHtml + '</td>'
-    resultHmtl = resultHmtl + cellHtml;
+    resultHtml = resultHtml + cellHtml;
   }
 
-  return resultHmtl + '</tr>';
+  var showHtml = resultHtml + '</tr>';
+  return {'show': showHtml, 'mark': markHtml, 'previewMark': previewMarkHtml};
 }
 
-function rendomCellHtml(rowIndex, colIndex, cellObj, isHeader) {
+function renderCellHtml(rowIndex, colIndex, cellObj, isHeader, scalePer, previewScalePer, result) {
 //onclick="showMarkCell(this);
-  var dataInfo = 'data-src="' + cellObj.text + '" data-row="' + rowIndex + '" data-col="' + colIndex + '" data-w="'+cellObj.width+'" data-h="'+cellObj.height+'" data-x="'+cellObj.xmin+'" data-y="'+cellObj.ymin+'"';
+  var srcId = '' + rowIndex + '-' + colIndex;
+  var markResult = renderMarkRect(srcId, cellObj, result, scalePer, previewScalePer);
+  var srcText = htmlSpecialChars(cellObj.text);
+  var dataInfo = 'data-src="' + srcText + '" data-row="' + rowIndex + '" data-col="' + colIndex + '" data-w="'+cellObj.width+'" data-h="'+cellObj.height+'" data-x="'+cellObj.xmin+'" data-y="'+cellObj.ymin+'"';
   var begin = '<td onclick="showMarkTableCell(this);" '+dataInfo+'>';
   var end = '</td>';
   var value = '';
   if (isHeader) {
     begin = '<th onclick="showMarkTableCell(this);" '+dataInfo+'>';
     end = '</th>';
-    value = cellObj.text;
+    value = srcText;
   } else {
     var id = 'pos-' + rowIndex + '-' + colIndex;
-    value = '<input id="' + id + '" type="text" value="' + cellObj.text + '" '+dataInfo+'>'
+//    value = '<input id="' + id + '" type="text" value="' + srcText + '" '+dataInfo+'>'
+    value = '<textarea id="' + id + '" type="text" '+dataInfo+'>'+srcText+'</textarea>'
   }
-  return begin + value + end;
+  var html = begin + value + end;
+  return {'show': html, 'mark': markResult.mark, 'previewMark': markResult.previewMark};
 }
 
 
-function rendomGridResult(resp) {
+function renderGridResult(resp) {
   var result = resp.data.result;
   var resultHtml = '';
   var markHtml = '';
@@ -1738,7 +1783,7 @@ function rendomGridResult(resp) {
   
   for (var i = 0, len = result.allList.length; i < len; i++) {
     var rectObj = result.allList[i];
-    var rendenResult = rendomRectHtml(rectObj, result, scalePer, previewScalePer);
+    var rendenResult = renderRectHtml(rectObj, result, scalePer, previewScalePer);
     resultHtml = resultHtml + rendenResult.show;
 	markHtml = markHtml + rendenResult.mark;
 	previewMarkHtml = previewMarkHtml + rendenResult.previewMark;
@@ -1750,7 +1795,7 @@ function rendomGridResult(resp) {
   appendToolbar();
 }
 
-function rendomRectHtml(rectObj, result, scalePer, previewScalePer) {
+function renderRectHtml(rectObj, result, scalePer, previewScalePer) {
   var style = '';
   var innerStyle = '';
   var paddingLeft = 0;
@@ -1773,10 +1818,11 @@ function rendomRectHtml(rectObj, result, scalePer, previewScalePer) {
   var srcId = rectObj.id ? rectObj.id : sampleGuid();
 
   var id = 'rect-' + srcId;
+  var srcText = htmlSpecialChars(rectObj.text);
 
-  var srcInfo = ' data-id="' + srcId + '" data-src="' + rectObj.text + '" data-xmin="' + rectObj.xmin + '" data-ymin="' + rectObj.ymin + '" data-width="' + rectObj.width + '" data-height="' + rectObj.height + '" ';
+  var srcInfo = ' data-id="' + srcId + '" data-src="' + srcText + '" data-xmin="' + rectObj.xmin + '" data-ymin="' + rectObj.ymin + '" data-width="' + rectObj.width + '" data-height="' + rectObj.height + '" ';
 
-  var value = '<textarea id="' + id + '" value="' + rectObj.text + '" ' + srcInfo + '>' + rectObj.text + '</textarea>';
+  var value = '<textarea id="' + id + '" value="' + srcText + '" ' + srcInfo + '>' + srcText + '</textarea>';
 
   var submitHtml = '<span data-id="' + id + '"  class="opera opera-submit" onclick="reconRectSub(this);">Submit</span>';
   var resetHtml = '<span data-id="' + id + '"  class="opera opera-reset" onclick="reconRectReset(this);">Reset</span>';
@@ -1787,12 +1833,21 @@ function rendomRectHtml(rectObj, result, scalePer, previewScalePer) {
   // var value = textFormat(rectObj.text);
   var html = '<div class="rect-ct" '+srcInfo+'  onclick="showMarkCell(this);" style="' + style + '"><div class="rect" style="' + innerStyle + '">' + value + operaHtml + '</div></div>';
 
-  var markResult = rendenMarkRect(srcId, rectObj, result, scalePer, previewScalePer);
+  var markResult = renderMarkRect(srcId, rectObj, result, scalePer, previewScalePer);
   
   return {'show': html, 'mark': markResult.mark, 'previewMark': markResult.previewMark};
 }
 
 function renderBizTag(rectObj, srcId, id){
+//    var html = '<input id="biz-tag-'+srcId+'" type="hidden" data-id="' + id + '"  value=""></input>';
+    var html = '';
+    var bizTagList = $('#biz-tag-list-temp #biz-tag-list').clone();
+    bizTagList.attr('id', 'biz-tag-'+srcId);
+    html = html + '<select id="biz-tag-'+srcId+'" data-id="' + srcId + '">' + bizTagList.html() + '</select>';
+    return html;
+}
+
+function cloneBizTag(srcId, id){
 //    var html = '<input id="biz-tag-'+srcId+'" type="hidden" data-id="' + id + '"  value=""></input>';
     var html = '';
     var bizTagList = $('#biz-tag-list-temp #biz-tag-list').clone();
@@ -1829,9 +1884,8 @@ function unfixTagDropdown(element){
     $('#'+id + ' button.dropdown-toggle').attr('data-toggle', 'dropdown');
 }
 
-function rendenMarkRect(srcId, rectObj, result, scalePer, previewScalePer){
+function renderMarkRect(srcId, rectObj, result, scalePer, previewScalePer){
 	var id = 'rect-src-' + srcId;
-
 	var style = 'left:' + rectObj.xmin*scalePer + 'px; top:' + rectObj.ymin*scalePer + 'px; width:' + rectObj.width*scalePer + 'px; height:' + rectObj.height*scalePer + 'px;';
 	var previewStyle = 'left:' + rectObj.xmin*previewScalePer + 'px; top:' + rectObj.ymin*previewScalePer + 'px; width:' + rectObj.width*previewScalePer + 'px; height:' + rectObj.height*previewScalePer + 'px;';
 
@@ -1882,7 +1936,7 @@ function reconSub(e) {
 }
 
 function convertInputObj(id) {
-  var inputElement = $('td input#' + id);
+  var inputElement = $('td textarea#' + id);
   if (inputElement === undefined) {
     return false;
   }
@@ -1919,8 +1973,6 @@ function reconRectSub(e) {
   submitFixRecon(detailList);
 }
 
-
-
 function convertTextareaObj(id) {
   console.log('convertTextareaObj', id);
   var textareaEl = $('textarea#' + id);
@@ -1947,7 +1999,7 @@ function reconRectReset(e) {
 
 function reconSubAll(e) {
   var detailList = [];
-  $('#ocr-result td input').each(function (index) {
+  $('#ocr-result td textarea').each(function (index) {
     var id = $(this).attr('id');
     var obj = convertInputObj(id);
     if (obj) {
@@ -1962,7 +2014,7 @@ function reconResetAll(e) {
 }
 
 function resetReonTable() {
-  $('#ocr-result td input').each(function (index) {
+  $('#ocr-result td textarea').each(function (index) {
     var dataSrc = $(this).attr('data-src');
     dataSrc = dataSrc === undefined ? '' : dataSrc;
     $(this).val(dataSrc);
@@ -1990,7 +2042,8 @@ function reconRectSubAll() {
 }
 
 function resetTDInput(id) {
-  var inputElement = $('td input#' + id);
+//  var inputElement = $('td input#' + id);
+  var inputElement = $('td textarea#' + id);
   if (inputElement === undefined) {
     return;
   }
@@ -2016,9 +2069,9 @@ function submitAll() {
 }
 
 function markAsReadonly() {
-  $('#ocr-result td input').each(function (index) {
+  $('#ocr-result td textarea').each(function (index) {
     $(this).attr('readonly', 'true');
-    $(this).addClass('input-readonly');
+    $(this).addClass('textarea-readonly');
   });
 
   $('#ocr-result textarea').each(function (index) {
@@ -2028,7 +2081,7 @@ function markAsReadonly() {
 }
 
 function markAsEdit() {
-  $('#ocr-result td input').each(function (index) {
+  $('#ocr-result td textarea').each(function (index) {
     $(this).removeAttr("readonly")
     $(this).removeClass('input-readonly');
   });
@@ -2230,14 +2283,30 @@ function showMarkCell(element){
 }
 
 function showMarkTableCell(element){
-//	hideAllMark();
-	var id = $(element).attr('data-id');
+	var slow = 200;
+    hideAllMark();
+    hideAllPreviewMark();
+	var row = $(element).attr('data-row');
+	var col = $(element).attr('data-col');
 	var width = $(element).attr('data-w');
 	var height = $(element).attr('data-h');
 	var xmin = $(element).attr('data-x');
 	var ymin = $(element).attr('data-y');
-//	$('#rect-src-' + id).removeClass('cell-hide');
-//	$('#rect-src-' + id).addClass('cell-show');
+	var id = "" + row + '-' + col;
+	$('#rect-src-' + id).removeClass('cell-hide');
+	$('#rect-src-' + id).addClass('cell-show');
+
+	var cellTop = $('#rect-src-' + id).css('top');
+    cellTop = parseFloat(cellTop.replace('px', ''));
+    $("#layout-tiff-ct").animate({scrollTop: cellTop},slow);
+
+    var previewTop = $('.preview-mark-ct #rect-src-' + id).css('top');
+    previewTop = parseFloat(previewTop.replace('px', ''));
+    $('.preview-mark-ct #rect-src-' + id).removeClass('cell-hide');
+    $('.preview-mark-ct #rect-src-' + id).addClass('cell-show');
+
+    $(".preview-ct").animate({scrollTop: previewTop},slow);
+
 	$('#recon-pos-ct #recon-box-w').val(width ? width : 0);
 	$('#recon-pos-ct #recon-box-h').val(height ? height : 0);
 	$('#recon-pos-ct #recon-box-x').val(xmin ? xmin : 0);
@@ -2450,4 +2519,14 @@ function autoScalePreviewMark(){
         $(this).css('top', '' + (parseFloat(top)/scale) + 'px');
 
     });
+}
+
+function htmlSpecialChars(str)
+{
+    str = str.replace(/&/g, '&amp;');
+    str = str.replace(/</g, '&lt;');
+    str = str.replace(/>/g, '&gt;');
+    str = str.replace(/"/g, '&quot;');
+    str = str.replace(/'/g, '&#039;');
+    return str;
 }

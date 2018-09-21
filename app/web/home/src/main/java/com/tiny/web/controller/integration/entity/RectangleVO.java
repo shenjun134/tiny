@@ -74,12 +74,12 @@ public class RectangleVO extends ToString {
         return tag;
     }
 
-    public void setTag(TagEnum tag) {
-        this.tag = tag;
-    }
-
     public double getXmin() {
         return xmin;
+    }
+
+    public void setTag(TagEnum tag) {
+        this.tag = tag;
     }
 
     public void setXmin(double xmin) {

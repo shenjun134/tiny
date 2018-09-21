@@ -36,7 +36,10 @@ public class TemplateTest {
         String url = "http://180.76.50.16:5000/table";
 
         String imageName = "000000.jpg";
-        String imagePath = "C:\\Users\\smile\\Pictures\\ocr-signatrue\\" + imageName;
+//        String imagePath = "C:\\Users\\smile\\Pictures\\ocr-signatrue\\" + imageName;
+
+        String imagePath = "D:\\data\\code\\github-workspace\\022979.jpg";
+//        String imagePath = "D:\\data\\code\\github-workspace\\007855.jpg";
 
         CloseableHttpClient httpClient = null;
         try{
@@ -45,7 +48,7 @@ public class TemplateTest {
 
 //            httpPost.setHeader("Content-Type", "image/jpg");
 
-            FileBody fileBody = new FileBody(new File(imagePath), ContentType.create("image/jpg"));
+//            FileBody fileBody = new FileBody(new File(imagePath), ContentType.create("image/jpg"));
             MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
             multipartEntityBuilder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
 

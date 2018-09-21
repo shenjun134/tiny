@@ -704,13 +704,19 @@ div#submit-result {
 .mark-ct .cell-show{
 	display: block;
 }
-
+.mark-ct .cell-ct:active .cell-char,
+.mark-ct .cell-ct:focus .cell-char,
+.mark-ct .cell-ct:hover .cell-char{
+    opacity: 1;
+}
 .mark-ct .cell-ct .cell-char{
 	position: absolute;
 	border: 1px solid #f4856f;
 	border-radius: 2px;
 	margin-top: -2px;
 	margin-left: -2px;
+    opacity: 0;
+    transition: 0.5s;
 }
 
 #tiff-show-next .cell {
@@ -1014,7 +1020,7 @@ table.recon-ct input {
     line-height: 18px !important;
     width: 120px;
 }
-
+.detail-ct .textarea-readonly, table.recon-ct textarea.textarea-readonly,
 .detail-ct .textarea-readonly, table.recon-ct input.input-readonly {
     color: #CB4335 !important;
     background: #ddd !important;
@@ -1052,7 +1058,7 @@ table.recon-ct tr.recon-row:nth-child(even) td,
 table.recon-ct tr.recon-row:nth-child(even){
     background: #eee;
 }
-
+table.recon-ct tr.recon-row-sub textarea,
 table.recon-ct tr.recon-row-sub input{
     background: lightgreen;
 }
@@ -1397,6 +1403,8 @@ table.recon-ct tr.recon-row-sub input{
     padding: 20px;
 }
 
+.recon-ct textarea:active,
+.recon-ct textarea:focus,
 .recon-ct input:active,
 .recon-ct input:focus,
 .rect textarea:active,
@@ -1426,8 +1434,11 @@ table.recon-ct tr.recon-row-sub input{
     flex: 0 0 auto;
     height: 8px;
     width: 100%;
-    background: lightgreen;
+    /*background: lightgreen;*/
+    background: #888;
     cursor: row-resize;
+    text-align: center;
+    line-height: 4px;
 }
 
 #dialog-recon-detail .modal-body{

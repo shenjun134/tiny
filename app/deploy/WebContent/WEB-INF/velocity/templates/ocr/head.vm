@@ -16,6 +16,7 @@
 	<link rel="stylesheet" href="/tiny/resources/lib/font-awesome/4.3.0/css/font-awesome.min.css" type="text/css">
 	<!-- <link rel="stylesheet" href="/tiny/resources/lib/tooltip/css/jquery.toolbar.css" type="text/css"> -->
 	<link rel="stylesheet" href="/tiny/resources/css/word.css" type="text/css">
+	<link rel="stylesheet" href="/tiny/resources/css/animation.min.css" type="text/css">
 
 	<link type="image/x-icon" href="/tiny/resources/images/stone.ico" rel="icon" />
 	<script src="/tiny/resources/lib/jquery/3.2.1/jquery.min.js"></script>

@@ -11,6 +11,7 @@ public class GridLayoutResult extends LayoutResult {
     public static GridLayoutResult newInstance(LayoutResult layoutResult) {
         GridLayoutResult result = new GridLayoutResult();
         result.copy(layoutResult);
+        result.setType(LayoutEnum.GRID.getCode());
         return result;
     }
 

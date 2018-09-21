@@ -81,5 +81,7 @@ public class LayoutResult extends ToString implements Cloneable {
         this.setId(result.getId());
         this.setComments(result.getComments());
         this.setProbability(result.getProbability());
+        this.setHeight(result.getHeight());
+        this.setWidth(result.getWidth());
     }
 }
