@@ -1636,6 +1636,7 @@ function renderReconPos(resp){
     setTimeout(function(){
               $('#recon-pos-ct #recon-image-w').val(result.width ? result.width : 0);
               $('#recon-pos-ct #recon-image-h').val(result.height ? result.height : 0);
+              showAllMark();
     }, 100);
 }
 
@@ -1662,8 +1663,8 @@ function renderTableResult(resp) {
 
 
   for (; i < len; i++) {
-//    isHeader = i === 0;
-    lastRow = i === len - 1;
+    isHeader = i === 0;
+//    lastRow = i === len - 1;
 
 
     var rowList = result.allList[i];
@@ -1693,7 +1694,7 @@ function renderRowHtml(index, rowList, isHeader, lastRow, scalePer, previewScale
   var resultHtml = '';
   var markHtml = '';
   var previewMarkHtml = '';
-  if(index == 0){
+  if(!isHeader && index == 0){
     console.log('renderRowHtml');
     var thHtml = '<tr class="recon-row"><th>#</th>';
     var colSize = rowList ? rowList.length : 0;
@@ -1734,7 +1735,7 @@ function renderRowHtml(index, rowList, isHeader, lastRow, scalePer, previewScale
     style = lastRow ? style + 'border-bottom: 0px solid transparent;' : style;
     var submitHtml = '<span data-row="' + index + '" data-length="' + len + '" class="opera opera-submit" onclick="reconSub(this);">Submit</span>';
     var resetHtml = '<span data-row="' + index + '" data-length="' + len + '" class="opera opera-reset" onclick="reconReset(this);">Reset</span>';
-    var cellHtml = '<td style="' + style + '">' + submitHtml + resetHtml + '</td>'
+    var cellHtml = '<td class="row-opt" style="' + style + '"><div>' + submitHtml + resetHtml + '</div></td>'
     resultHtml = resultHtml + cellHtml;
   }
 
