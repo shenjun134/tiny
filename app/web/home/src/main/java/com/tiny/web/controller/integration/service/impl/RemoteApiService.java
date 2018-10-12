@@ -1,6 +1,7 @@
 package com.tiny.web.controller.integration.service.impl;
 
 import com.tiny.common.enums.SystemPropertyEnum;
+import com.tiny.common.util.CommonUtil;
 import com.tiny.common.util.LogUtil;
 import com.tiny.common.util.SystemUtils;
 import com.tiny.web.controller.http.request.RecognitionReq;
@@ -20,10 +21,14 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.util.Properties;
 
 @Component("remoteApiService")
 public class RemoteApiService extends AbstractApiService {
@@ -32,6 +37,31 @@ public class RemoteApiService extends AbstractApiService {
      * logger
      */
     private static final Logger logger = Logger.getLogger(RemoteApiService.class);
+
+    private Properties layoutContentInterfaceMappingProp;
+
+    @PostConstruct
+    public void init(){
+        String filename = "/config/ocr-layout-content-interface.properties";
+        InputStream inputStream = null;
+        try{
+            inputStream = CommonUtil.getInputStream(filename);
+            layoutContentInterfaceMappingProp = CommonUtil.retrieveFileProperties(inputStream);
+        }catch (Exception e){
+            LogUtil.error(logger, e, "load {0} error", filename);
+            throw new RuntimeException(e);
+        }finally {
+            if(inputStream != null){
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    LogUtil.error(logger, e, "close {0} input stream error", filename);
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+    }
 
 
     @Override
@@ -86,7 +116,8 @@ public class RemoteApiService extends AbstractApiService {
         String imageName = request.getReconImage();
         LogUtil.info(logger, "begin doContentRecon with path: {0}, name: {1}", imagePath, imageName);
         CloseableHttpClient httpClient = null;
-        String url = SystemUtils.getSystemProperty(SystemPropertyEnum.FACADE_OCR_RECON_URL);
+//        String url = SystemUtils.getSystemProperty(SystemPropertyEnum.FACADE_OCR_RECON_URL);
+        String url = getContentAPI(request.getLayoutId());
         try {
             httpClient = HttpClients.custom().build();
             HttpPost httpPost = new HttpPost(url);
@@ -144,6 +175,18 @@ public class RemoteApiService extends AbstractApiService {
     @Override
     protected void afterContent(RecognitionReq request) {
         super.afterContent(request);
+    }
+
+    /**
+     *
+     * @param layoutId
+     * @return
+     */
+    private String getContentAPI(String layoutId){
+        Assert.hasText(layoutId, "layout id is missing");
+        String api = layoutContentInterfaceMappingProp.getProperty(layoutId);
+        Assert.hasText(api, "layout Id cannot find content.api");
+        return api;
     }
 
 }

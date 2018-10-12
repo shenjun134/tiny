@@ -186,7 +186,7 @@ function enableNextInfo() {
   setTimeout(function () {
     $('i#sign-next').removeClass('btn-off');
     $('button#layout-recon').removeClass('btn-off');
-    $('button#content-recon').removeClass('btn-off');
+//    $('button#content-recon').removeClass('btn-off');
     synUploadImage();
   }, 200);
 }
@@ -1506,6 +1506,7 @@ function doLayoutRecon() {
   var body = { 'imageWebPath': imgPath, 'reconImage': imgName };
 //  $('input#layout-type').val('');
   $('select#layout-type').val('');
+  $('button#content-recon').addClass('btn-off');
   $('div#type-list').html('<button class="dropdown-item" type="button">No Data</button>');
   var url = "/tiny/api/layout/recon.do";
   showLoading();
@@ -1588,7 +1589,12 @@ function doContentRecon() {
     showMessage('error', 'Please upload an image first!!!');
     return;
   }
-  var body = { 'imageWebPath': imgPath, 'reconImage': imgName };
+  var layoutId = $('select#layout-type').val();
+  if(layoutId === undefined || layoutId === null || layoutId.trim().length === 0){
+    showMessage('warning', 'Please recognize layout first!!!');
+    return;
+  }
+  var body = { 'imageWebPath': imgPath, 'reconImage': imgName, "layoutId": layoutId };
   var url = "/tiny/api/detail/recon.do";
   showLoading();
   $.ajax({
@@ -2337,6 +2343,7 @@ function stepSignFinish(){
 
 function stepLayoutFinish(){
     $('#step-layout').addClass('active');
+    $('button#content-recon').removeClass('btn-off');
 }
 
 function stepContentFinish(){
