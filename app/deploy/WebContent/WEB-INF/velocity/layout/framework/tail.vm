@@ -1,0 +1,8 @@
+<script>
+    $(function () {
+        applyNiceScroll('html');
+        applyNiceScroll('body');
+        updateNiceScroll();
+    });
+    window.addEventListener("resize", updateNiceScroll);
+</script>

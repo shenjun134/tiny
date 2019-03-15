@@ -39,7 +39,7 @@ public class CommonController extends BaseController {
 
     @RequestMapping(path = {UrlCenter.ROOT, UrlCenter.INDEX, UrlCenter.INDEX + ".html", UrlCenter.INDEX + ".htm",
             UrlCenter.INDEX + ".do", UrlCenter.INDEX + ".jsp"})
-    public String tiny() {
+    public String index() {
         return "redirect:" + getHomePage();
     }
 

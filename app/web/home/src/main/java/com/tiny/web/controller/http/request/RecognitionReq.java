@@ -1,6 +1,10 @@
 package com.tiny.web.controller.http.request;
 
 import com.tiny.common.base.ToString;
+import com.tiny.web.controller.integration.entity.LayoutResult;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RecognitionReq extends ToString {
 
@@ -33,6 +37,9 @@ public class RecognitionReq extends ToString {
     private String layoutId;
 
     private String comments;
+
+
+    private List<LayoutResult> selectedLayout = new ArrayList<>();
 
     public String getReconImage() {
         return reconImage;
@@ -97,4 +104,14 @@ public class RecognitionReq extends ToString {
     public void setImageAbsPath(String imageAbsPath) {
         this.imageAbsPath = imageAbsPath;
     }
+
+    public List<LayoutResult> getSelectedLayout() {
+        return selectedLayout;
+    }
+
+    public void setSelectedLayout(List<LayoutResult> selectedLayout) {
+        this.selectedLayout = selectedLayout;
+    }
+
+
 }

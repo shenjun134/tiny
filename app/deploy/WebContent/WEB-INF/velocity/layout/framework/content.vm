@@ -1,0 +1,12 @@
+<div class="app-main-ct slideInDown animated">
+    $!screen_content
+</div>
+<div id="g-load-ct" class="g-loading" style="display: none;">
+    <div class="loading" id="loading_data">
+        <div class="k-line k-line11-1"></div>
+        <div class="k-line k-line11-2"></div>
+        <div class="k-line k-line11-3"></div>
+        <div class="k-line k-line11-4"></div>
+        <div class="k-line k-line11-5"></div>
+    </div>
+</div>

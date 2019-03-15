@@ -1524,7 +1524,7 @@ function doLayoutRecon() {
           showMessage('success', resp.message);
           stepLayoutFinish();
         } else {
-          showMessage('warning', 'Cannot recognition layout of this image');
+          showMessage('warning', 'Cannot recognition layout for this image');
         }
       } else {
         showMessage('error', resp.message);
@@ -1543,7 +1543,7 @@ function renderTypeList(data){
         var ap = parseFloat(a.probability);
         var bp = parseFloat(b.probability);
         return bp - ap;
-    })
+    });
      var html = '';
      for(var i = 0; i < data.length; i++){
         var temp = data[i];
@@ -1787,7 +1787,7 @@ function renderGridResult(resp) {
   var realPreviewWidth = previewImg.width;
   var previewScalePer = 1;
   previewScalePer = realPreviewWidth/result.width;
-  
+
   for (var i = 0, len = result.allList.length; i < len; i++) {
     var rectObj = result.allList[i];
     var rendenResult = renderRectHtml(rectObj, result, scalePer, previewScalePer);
@@ -1841,7 +1841,7 @@ function renderRectHtml(rectObj, result, scalePer, previewScalePer) {
   var html = '<div class="rect-ct" '+srcInfo+'  onclick="showMarkCell(this);" style="' + style + '"><div class="rect" style="' + innerStyle + '">' + value + operaHtml + '</div></div>';
 
   var markResult = renderMarkRect(srcId, rectObj, result, scalePer, previewScalePer);
-  
+
   return {'show': html, 'mark': markResult.mark, 'previewMark': markResult.previewMark};
 }
 

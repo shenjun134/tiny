@@ -1,0 +1,20 @@
+#set($step1 = {"index" : "1","path": "/templates/fax/validate/recon-signature.vm",
+"initCtClz":"workflow-ct flex-ct", "initStepClz": "step-active","label":"Validate Signature"})
+#set($step2 = {"index" : "2","path": "/templates/fax/etd/validate/recon-layout.vm",
+"initCtClz":"workflow-ct flex-ct ct-hidden", "initStepClz": "","label":"Select a Layout"})
+#set($step3 = {"index" : "3","path": "/templates/fax/etd/validate/recon-data.vm",
+"initCtClz":"workflow-ct ct-hidden", "initStepClz": "","label":"Generate Data"}) #set($pathInfoArr =
+[$step1, $step2, $step3]) #parse("/templates/fax/fax-layout.vm")
+
+<script>
+
+    window.addEventListener("resize", onWindowResize);
+
+    function onWindowResize() {
+        console.log('onWindowResize');
+        change4ReconSign();
+        change4ReconLayout();
+        change4ReconData();
+        updateNiceScroll();
+    }
+</script>

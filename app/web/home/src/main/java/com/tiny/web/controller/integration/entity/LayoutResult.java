@@ -19,6 +19,12 @@ public class LayoutResult extends ToString implements Cloneable {
 
     protected double height;
 
+    protected double x;
+
+    protected double y;
+
+    protected String newArea;
+
     public String getType() {
         return type;
     }
@@ -75,6 +81,22 @@ public class LayoutResult extends ToString implements Cloneable {
         this.height = height;
     }
 
+    public double getX() {
+        return x;
+    }
+
+    public void setX(double x) {
+        this.x = x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public void setY(double y) {
+        this.y = y;
+    }
+
     public void copy(LayoutResult result) {
         this.setType(result.getType());
         this.setTag(result.getTag());
@@ -83,5 +105,15 @@ public class LayoutResult extends ToString implements Cloneable {
         this.setProbability(result.getProbability());
         this.setHeight(result.getHeight());
         this.setWidth(result.getWidth());
+        this.setX(result.getX());
+        this.setY(result.getY());
+    }
+
+    public String getNewArea() {
+        return newArea;
+    }
+
+    public void setNewArea(String newArea) {
+        this.newArea = newArea;
     }
 }

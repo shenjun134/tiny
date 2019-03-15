@@ -1,0 +1,441 @@
+<div id="recon-data-ct" class="fax-validate-top">
+    <div class="preview-ct" style="text-align:center;">
+        <img src="$!{img-path}" data-name="$!{img-name}" data-path="$!{img-path}"/>
+        <div class="area-ct"></div>
+        <input type="hidden" value="" id="content-type"/>
+        <div class="toolbar-ct">
+            <span class="opera" tooltip="Reset all" flow="up" onclick="resetAllRD();">
+                <i class="fa fa-reply-all " aria-hidden="true"></i>
+            </span>
+            <span class="opera" tooltip="Show Area" flow="up" onclick="showAreaRD();">
+                <i class="fa fa-tag " aria-hidden="true"></i>
+            </span>
+            <span class="opera" tooltip="Hide Area" flow="up" onclick="hideAreaRD();">
+                <i class="fa fa-ban " aria-hidden="true"></i>
+            </span>
+            <span class="opera" tooltip="Readonly" flow="up" onclick="markRDAsReadonly();">
+                <i class="fa fa-lock " aria-hidden="true"></i>
+            </span>
+            <span class="opera" tooltip="Edit" flow="up" onclick="markRDAsEdit();">
+                <i class="fa fa-pencil-square-o " aria-hidden="true"></i>
+            </span>
+        </div>
+    </div>
+</div>
+<div class="fax-validate-bottom">
+    <div
+        id="recon-data-result"
+        class="recon-ct scroll-ct"
+        style="height: calc(100% - 60px); overflow: auto;"></div>
+    <div class="bottom-bar">
+        <span class="prev" onclick="go2Step(2);">
+            <i class="fa fa-angle-left"></i>
+            <span>Prev</span>
+        </span>
+        <span class="next btn-active" onclick="reconDataSub();" style="text-align: center;">
+            <span>Submit</span>
+        </span>
+    </div>
+</div>
+
+<div id="recon-data-template" style="display: none;">
+    <div class="area-content-list backup-list"></div>
+</div>
+
+<script>
+
+    var reconDataImgSelector = '#recon-data-ct img';
+
+    function reconDataSub() {
+        console.log('recon data submit');
+        markStepDone(3);
+    }
+
+    function getActiveLayoutId() {
+        var activeLayout = $('#recon-layout-result .layout-preview .layout-active');
+        return activeLayout
+            ? activeLayout.attr('data-type-id')
+            : '';
+    }
+
+    function doReconData() {
+        console.log('doReconData');
+        var layoutId = getActiveLayoutId();
+        if (isBlankStr(layoutId)) {
+            sendNotification('warn', 'Please select a layout first!!!');
+            return;
+        }
+
+        var imgPath = $(reconDataImgSelector).attr('data-path');
+        imgPath = imgPath.substring(0, imgPath.lastIndexOf('/'));
+        var imgName = $(reconDataImgSelector).attr('data-name');
+        var body = {
+            'imageWebPath': imgPath,
+            'reconImage': imgName,
+            "layoutId": layoutId
+        };
+        var url = "${WEB_CONTEXT_PATH}/api/detail/recon.do";
+        showLoading();
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: JSON.stringify(body),
+            contentType: "application/json",
+            success: function (resp) {
+                hideLoading();
+                if (resp.status) {
+                    if (resp.data && resp.data.result && resp.data.result.type === 'table-ly') {
+                        updateContentType('table-ly');
+                        renderTableLayout(resp);
+                        sendNotification('success', resp.message);
+                    } else if (resp.data && resp.data.result && resp.data.result.type === 'grid-ly') {
+                        updateContentType('grid-ly');
+                        renderGridLayout(resp);
+                        sendNotification('success', resp.message);
+                    } else {
+                        sendNotification('warn', 'Unknow result...');
+                    }
+                    updateNiceScroll(200);
+                } else {
+                    sendNotification('error', resp.message);
+                }
+
+            },
+            error: function (err) {
+                hideLoading();
+                sendNotification('error', 'Content Recongnition fail!');
+            }
+        });
+
+    }
+
+    function renderTableLayout(resp) {
+        var result = resp.data.result;
+        var isHeader = false;
+        var i = 0,
+            len = result.allList.length;
+        cleanReconDataResult();
+        renderPositionBox4Table(resp);
+        var theadHtml = '<thead>';
+        var tbodyHtml = '<tbody>';
+        var rowLength = 0;
+        for (; i < len; i++) {
+            var rowList = result.allList[i];
+            isHeader = i === 0;
+            if (isHeader) {
+                rowLength = rowList.length;
+                theadHtml = theadHtml + renderTableHeaderRow(rowList, i);
+            } else {
+                tbodyHtml = tbodyHtml + renderTableBodyRow(rowList, i);
+            }
+        }
+        theadHtml = theadHtml + '</thead>';
+        tbodyHtml = tbodyHtml + '</tbody>';
+        var thIndexWidth = 37;
+        var thUnitWidth = 161;
+        var thRowWidthPadding = 30;
+        var thRowWidth = thIndexWidth + rowLength * thUnitWidth + thRowWidthPadding;
+        var tableHtml = '<table class="with-border">' + theadHtml + '</table><div class="table-ct scroll-ct' +
+                '" style="width: ' + thRowWidth + 'px"><table class="with-border">' + tbodyHtml +
+                '</table></div>';
+
+        $('#recon-data-result').html(tableHtml);
+
+    }
+
+    function renderTableHeaderRow(rowList, i) {
+        var rowHtml = '<tr id="' + i + '"><th style="padding: 0 10px;"><div class="th-index"></th>';
+        for (var index = 0; index < rowList.length; index++) {
+            var cellInfo = rowList[index];
+            var cellHtml = renderTabelTH(cellInfo, i, index);
+            rowHtml = rowHtml + cellHtml;
+        }
+        rowHtml = rowHtml + '</tr>';
+        return rowHtml
+    }
+
+    function renderTableBodyRow(rowList, i) {
+        var rowHtml = '<tr id="' + i + '"><td style="text-align: center; padding: 0 10px;"><div class="td-i' +
+                'ndex">' + i + '</div></td>';
+        for (var index = 0; index < rowList.length; index++) {
+            var cellInfo = rowList[index];
+            var cellHtml = renderTableTD(cellInfo, i, index);
+            rowHtml = rowHtml + cellHtml;
+        }
+        rowHtml = rowHtml + '</tr>';
+        return rowHtml
+    }
+
+    function renderTabelTH(cellInfo, i, j) {
+        var text = cellInfo.text
+            ? cellInfo.text
+            : '';
+        var id = '' + i + '-' + j;
+        var cellHtml = '<th id="' + id + '"><div id="' + id + '" class="th-ct" onmouseenter="onAreaEnter(th' +
+                'is);" onmouseleave="onAreaLeave(this);" onclick="onAreaPick(this);">';
+        cellHtml = cellHtml + text;
+        cellHtml = cellHtml + '</div></th>';
+
+        return cellHtml;
+    }
+
+
+    function renderTableTD(cellInfo, i, j) {
+        var text = cellInfo.text
+            ? cellInfo.text
+            : '';
+        var id = '' + i + '-' + j;
+        var cellHtml = '<td id="' + id + '" onmouseenter="onAreaEnter(this);" onmouseleave="onAreaLeave(thi' +
+                's);" onclick="onAreaPick(this);"><textarea id="' + id + '" class="scroll-ct-hidden-bar" onclick="s' +
+                'electSelf(this);" ondblclick="unselectSelf(this);">';
+        cellHtml = cellHtml + text;
+        cellHtml = cellHtml + '</textarea></td>';
+        return cellHtml;
+    }
+
+    function renderGridLayout(resp) {
+        console.log('renderGridLayout');
+        var result = resp.data.result;
+        var isHeader = false;
+        var i = 0,
+            len = result.allList.length;
+        cleanReconDataResult();
+        renderPositionBox4Grid(resp);
+        var theadHtml = '<thead><tr><th style="padding: 0 10px;"><div class="th-index"></th><th><div class="th-ct">Area Con' +
+                'tent</div></th></tr>';
+        var tbodyHtml = '<tbody>';
+        var rowLength = 1;
+        for (; i < len; i++) {
+            var cellInfo = result.allList[i];
+            var rowList = [cellInfo];
+            tbodyHtml = tbodyHtml + renderTableBodyRow(rowList, i);
+        }
+        theadHtml = theadHtml + '</thead>';
+        tbodyHtml = tbodyHtml + '</tbody>';
+        var thIndexWidth = 37;
+        var thUnitWidth = 311;
+        var thRowWidthPadding = 30;
+        var thRowWidth = thIndexWidth + rowLength * thUnitWidth + thRowWidthPadding;
+        var tableHtml = '<table class="with-border single-cell">' + theadHtml + '</table><div class="table-' +
+                'ct scroll-ct" style="width: ' + thRowWidth + 'px"><table class="with-border single-cell">' +
+                tbodyHtml + '</table></div>';
+
+        $('#recon-data-result').html(tableHtml);
+    }
+
+    function cleanReconDataResult() {
+        $('#recon-data-result').html('');
+        cleanAreaContentList();
+    }
+
+    function cleanPositionBox() {
+        $('#recon-data-ct .preview-ct .area-ct').html('');
+    }
+
+    function cleanAreaContentList() {
+        $('#recon-data-template .area-content-list').html('');
+    }
+
+    function appendAreaContentList(matchArea) {
+        var text = matchArea.text
+            ? matchArea.text
+            : '';
+        var id = matchArea.id;
+        var html = '<div id="' + id + '">' + text + '</div>';
+        $('#recon-data-template .area-content-list').append(html);
+    }
+
+    function getTextArea(id) {
+        var text = $('#recon-data-template .area-content-list #' + id).html();
+        return text;
+    }
+
+    function updateAreaCtStyle4ReconData() {
+        var ctSelector = '#recon-data-ct .preview-ct';
+        var left = getReconDataImgLeft(reconDataImgSelector, ctSelector);
+        $('#recon-data-ct .area-ct').css('left', '' + left + 'px');
+    }
+
+    function updateAreaBox4ReconData(scale) {
+        $('#recon-data-ct .area-ct .area-box').each(function () {
+            var x = $(this).attr('data-x');
+            var y = $(this).attr('data-y');
+            var w = $(this).attr('data-w');
+            var h = $(this).attr('data-h');
+            x = parseFloatRound(x) * scale;
+            y = parseFloatRound(y) * scale;
+            w = parseFloatRound(w) * scale;
+            h = parseFloatRound(h) * scale;
+            $(this).css('left', '' + x + 'px');
+            $(this).css('top', '' + y + 'px');
+            $(this).css('width', '' + w + 'px');
+            $(this).css('height', '' + h + 'px');
+        });
+    }
+
+    function change4ReconData() {
+        var scale = getScale(reconDataImgSelector);
+        updateAreaCtStyle4ReconData();
+        updateAreaBox4ReconData(scale);
+    }
+
+    function renderPositionBox4Table(resp) {
+        updateAreaCtStyle4ReconData();
+        var newArea = false;
+        var scale = getScale(reconDataImgSelector);
+        cleanPositionBox();
+        var allList = resp.data.result.allList;
+        for (var i = 0; i < allList.length; i++) {
+            var row = allList[i];
+            for (var j = 0; j < row.length; j++) {
+                var cellInfo = row[j];
+                var matchArea = convert2MatchArea4Table(cellInfo, i, j);
+                appendPositionBox(scale, matchArea, newArea);
+                appendAreaContentList(matchArea);
+            }
+        }
+    }
+
+    function renderPositionBox4Grid(resp) {
+        updateAreaCtStyle4ReconData();
+        var newArea = false;
+        var scale = getScale(reconDataImgSelector);
+        cleanPositionBox();
+        var allList = resp.data.result.allList;
+        for (var i = 0; i < allList.length; i++) {
+            var cellInfo = allList[i];
+            var matchArea = convert2MatchArea4Table(cellInfo, i, 0);
+            appendPositionBox(scale, matchArea, newArea);
+            appendAreaContentList(matchArea);
+        }
+    }
+
+    function convert2MatchArea4Table(cellInfo, i, j) {
+        return {
+            w: "" + cellInfo.width,
+            h: "" + cellInfo.height,
+            x: "" + cellInfo.xmin,
+            y: "" + cellInfo.ymin,
+            text: cellInfo.text,
+            id: "" + i + '-' + j
+        };
+    }
+
+    //w: "306", h: "149", x: "266", y: "294", text: "xxxxxx", id: "xxx01"
+    function appendPositionBox(scale, matchArea, newArea) {
+        var strGuid = matchArea.id
+            ? matchArea.id
+            : 'default';
+        var text = matchArea.text
+            ? matchArea.text
+            : '';
+        var innerHtml = '<span class="area-content">' + text + '</span>';
+        var style = createBoxStyle(matchArea, scale);
+        var attr = createBoxAtt(matchArea, newArea);
+        var boxHtml = '<div class="area-box" style="' + style + '" id="' + strGuid + '" ' + attr + '>' +
+                innerHtml + '</div>';
+        $('#recon-data-ct .preview-ct .area-ct').append(boxHtml);
+    }
+
+    function updateContentType(type) {
+        $('#recon-data-ct input#content-type').val(type);
+    }
+
+    function resetAllRD() {
+        console.log('resetAllRD');
+        $('#recon-data-result textarea').each(function () {
+            var id = $(this).attr('id');
+            var text = getTextArea(id);
+            $(this).val(text);
+        });
+    }
+
+    function markRDAsReadonly() {
+        console.log('markRDAsReadonly');
+        $('#recon-data-result textarea').each(function () {
+            $(this).attr('readonly', 'true');
+        });
+    }
+
+    function markRDAsEdit() {
+        console.log('markRDAsEdit');
+        $('#recon-data-result textarea').each(function () {
+            $(this).removeAttr("readonly");
+        });
+    }
+
+    function onAreaEnter(e) {
+        //console.log('onAreaEnter');
+        var id = $(e).attr('id');
+        showAreaBox(id);
+        activeAreaBox(id);
+    }
+
+    function onAreaLeave(e) {
+        //console.log('onAreaLeave');
+        var id = $(e).attr('id');
+        hideAreaBox(id);
+        deactiveAreaBox(id);
+    }
+
+    function onAreaPick(e) {
+        //console.log('onAreaPick');
+        var id = $(e).attr('id');
+        markAreaBox(id);
+        markTextArea(id);
+    }
+
+    function selectSelf(e) {
+        var id = $(e).attr('id');
+        markTextArea(id)
+    }
+
+    function unselectSelf(e) {
+        var id = $(e).attr('id');
+        unmarkTextArea(id);
+    }
+
+    function markAreaBox(id) {
+        $('#recon-data-ct .preview-ct .area-ct #' + id).removeClass('area-hide');
+    }
+
+    function markTextArea(id) {
+        $('#recon-data-result textarea#' + id).addClass('selected');
+    }
+
+    function unmarkTextArea(id) {
+        $('#recon-data-result textarea#' + id).removeClass('selected');
+    }
+
+    function showAreaBox(id) {
+        $('#recon-data-ct .preview-ct .area-ct #' + id).css('display', 'block');
+        activeAreaBox(id);
+    }
+
+    function hideAreaBox(id) {
+        $('#recon-data-ct .preview-ct .area-ct #' + id).css('display', '');
+        activeAreaBox(id)
+    }
+
+    function activeAreaBox(id) {
+        $('#recon-data-ct .preview-ct .area-ct #' + id).addClass('area-active');
+    }
+
+    function deactiveAreaBox(id) {
+        $('#recon-data-ct .preview-ct .area-ct #' + id).removeClass('area-active');
+    }
+
+    function showAreaRD() {
+        $('#recon-data-ct .preview-ct .area-ct .area-box').each(function () {
+            var clz = $(this).attr('class');
+            $(this).removeClass('area-hide');
+        });
+    }
+
+    function hideAreaRD() {
+        $('#recon-data-ct .preview-ct .area-ct .area-box').each(function () {
+            var clz = $(this).attr('class');
+            $(this).addClass('area-hide');
+        });
+    }
+</script>

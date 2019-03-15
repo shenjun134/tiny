@@ -35,9 +35,15 @@ public enum SystemPropertyEnum implements EnumBase {
 
     HOME_PAGE("home.page"),
 
+    HOME_ENTRY_PAGE("home.entry.page"),
+
     FACADE_SIGNATURE_URL("facade.signature.url"),
 
+    FACADE_SIGNATURE_URL_V2("facade.signature.url.v2"),
+
     FACADE_SIGN_FIX_URL("facade.sign.fix.url"),
+
+    FACADE_SIGN_FIX_URL_V2("facade.sign.fix.url.v2"),
 
     FACADE_TEMPLATE_RECON_URL("facade.template.recon.url"),
 

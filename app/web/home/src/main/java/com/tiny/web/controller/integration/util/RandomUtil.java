@@ -48,6 +48,7 @@ public class RandomUtil {
                 String src = properties.getProperty(enumer.toString());
                 Long id = NumberUtils.toLong(enumer.toString(), 0);
                 NameVO nameVO = new NameVO(id, src);
+                nameVO.setEmail(src.replace(" ", "").replace(",", "") + "@xxx.com");
                 nameVOMap.put(id, nameVO);
             }
 
@@ -55,7 +56,7 @@ public class RandomUtil {
             layoutProps = CommonUtil.retrieveFileProperties(inputStream4Layout);
             layoutList = new ArrayList<>();
             Enumeration enumeration4Layout = layoutProps.propertyNames();
-            while (enumeration4Layout.hasMoreElements()){
+            while (enumeration4Layout.hasMoreElements()) {
                 Object enumer = enumeration4Layout.nextElement();
                 String src = layoutProps.getProperty(enumer.toString());
                 layoutList.add(new NameValue(enumer.toString(), src));
@@ -63,12 +64,12 @@ public class RandomUtil {
             inputStream4BizTag = CommonUtil.getInputStream(bizTagFN);
             List<String> tempBizTag = IOUtils.readLines(inputStream4BizTag);
             bizTag = new ArrayList<>();
-            for(String bt : tempBizTag){
-                if(StringUtils.isBlank(bt)){
+            for (String bt : tempBizTag) {
+                if (StringUtils.isBlank(bt)) {
                     continue;
                 }
                 bt = StringUtils.trim(bt);
-                if(bizTag.contains(bt)){
+                if (bizTag.contains(bt)) {
                     continue;
                 }
                 bizTag.add(bt);
@@ -77,19 +78,21 @@ public class RandomUtil {
             Collections.sort(layoutList, new Comparator<NameValue>() {
                 @Override
                 public int compare(NameValue o1, NameValue o2) {
-                    if(o1 == null && o2 == null){
+                    if (o1 == null && o2 == null) {
                         return 0;
                     }
-                    if(o1 == null){
+                    if (o1 == null) {
                         return -1;
                     }
-                    if(o2 == null){
+                    if (o2 == null) {
                         return 1;
                     }
-                    if(o1 == o2){
+                    if (o1 == o2) {
                         return 0;
                     }
-                    return o1.getName().compareTo(o2.getName());
+                    Long o1Long = NumberUtils.toLong(o1.getName());
+                    Long o2Long = NumberUtils.toLong(o2.getName());
+                    return o1Long.compareTo(o2Long);
                 }
             });
 
@@ -136,18 +139,16 @@ public class RandomUtil {
     }
 
     /**
-     *
      * @return
      */
-    public static List<String> loadBizTag(){
+    public static List<String> loadBizTag() {
         return bizTag;
     }
 
     /**
-     *
      * @return
      */
-    public static List<NameValue> loadLayout(){
+    public static List<NameValue> loadLayout() {
         return layoutList;
     }
 
@@ -209,7 +210,7 @@ public class RandomUtil {
     /**
      * @return
      */
-    public static Box randomBox() {
+    public static Box randomBox2() {
         double w = Constant.W + Constant.W * random();
         double h = Constant.H + Constant.H * random();
         double x = Constant.X + Constant.X * random();
@@ -229,6 +230,23 @@ public class RandomUtil {
         return new Box("" + w, "" + h, "" + x, "" + y).setRate("" + rate).setNameList(nameList);
     }
 
+    public static Box randomBox() {
+        double w = Constant.W + Constant.W * random();
+        double h = Constant.H + Constant.H * random();
+        double x = Constant.X + Constant.X * random();
+        double y = Constant.Y + Constant.Y * random();
+        double rate = 100 * random() + 20;
+        int sLen = (int) (Math.round(random() * 10) % Constant.nameSize + 1);
+        if (sLen == 0) {
+            sLen = 1;
+        }
+        if (sLen > Constant.nameSize) {
+            sLen = Constant.nameSize;
+        }
+        List<NameVO> nameList = randomNameList(sLen);
+        return new Box("" + w, "" + h, "" + x, "" + y).setRate("" + rate).setNameList(nameList);
+    }
+
     public static double random() {
         double rd = Math.random();
         return Double.valueOf(Constant.twoDeciaml.format(rd));
@@ -242,7 +260,7 @@ public class RandomUtil {
     /**
      * @return
      */
-    public static NameVO randomName() {
+    public static NameVO randomName1() {
         int fLen = (int) (Math.round(random() * 10) % 10 + 4);
         int sLen = (int) (Math.round(random() * 10) % 10 + 4);
         String firstName = RandomStringUtils.random(fLen, true, false).toLowerCase();
@@ -267,6 +285,29 @@ public class RandomUtil {
         name.setRate(randomPerc());
         name.setId(Long.valueOf(randomInt(480, 0)));
         return name;
+    }
+
+    /**
+     * @return
+     */
+    public static NameVO randomName() {
+        List<NameVO> list = loadNameList();
+        int size = list.size();
+        int index = randomInt(size - 1, 0);
+        NameVO name = list.get(index);
+        name.setComments("mocked");
+        name.setRate(randomPerc());
+        return name;
+    }
+
+    public static List<NameVO> randomNameList(int count) {
+        List<NameVO> list = loadNameList();
+        Collections.shuffle(list);
+        List<NameVO> retList = list.subList(0, count);
+        for (NameVO nameVO : retList) {
+            nameVO.setRate(randomPerc());
+        }
+        return retList;
     }
 
     /**

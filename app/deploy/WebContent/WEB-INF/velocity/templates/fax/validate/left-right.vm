@@ -1,0 +1,10 @@
+<div class="fax-validate-left">
+    <div class="preview-ct">
+        <img src="$!{img-path}" data-name="$!{img-name}" data-path="$!{img-path}"/>
+    </div>
+    <div class="tool-ct bottom-bar"></div>
+</div>
+<div class="fax-validate-right">
+    <div class="recon-ct"></div>
+    <div class="bottom-bar"></div>
+</div>

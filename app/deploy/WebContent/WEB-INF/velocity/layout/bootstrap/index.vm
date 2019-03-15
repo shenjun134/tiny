@@ -2,11 +2,11 @@
  <!DOCTYPE html>
  <html lang="en">
   <head>
-     #parse('/layout/bootstrap/header.vm')
+    #parse('/layout/bootstrap/header.vm')
   </head>
   <body>
-	 #parse('/layout/bootstrap/mainframe.vm')
-  	 #parse('/layout/bootstrap/tail.vm')
+    #parse('/layout/bootstrap/mainframe.vm')
+    #parse('/layout/bootstrap/tail.vm')
   </body>
   </html>
 #else

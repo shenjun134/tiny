@@ -29,6 +29,12 @@ public class MockSignature extends AbstractSignatureService {
     }
 
     @Override
+    protected SignatureResp processScan2(String imagePath, String imageName) {
+        logger.info("mock processScan ...");
+        return RandomUtil.matchSignature(imagePath, null);
+    }
+
+    @Override
     protected void scanAfter(String imagePath, String imageName) {
         logger.info("mock scanAfter done.");
     }
@@ -63,6 +69,12 @@ public class MockSignature extends AbstractSignatureService {
 
     @Override
     protected void processFix(FixedFax fixedFax, BaseJsonResult baseJsonResult) {
+        logger.info("mock fix process done");
+        baseJsonResult.markeSuccess("mock fix successfully", true);
+    }
+
+    @Override
+    protected void processFix2(FixedFax fixedFax, BaseJsonResult baseJsonResult) {
         logger.info("mock fix process done");
         baseJsonResult.markeSuccess("mock fix successfully", true);
     }

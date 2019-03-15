@@ -1,0 +1,707 @@
+<div id="recon-layout-ct" class="fax-validate-left">
+    <div class="preview-ct">
+        <img src="$!{img-path}" data-name="$!{img-name}" data-path="$!{img-path}"/>
+        <div class="area-ct"></div>
+    </div>
+    <div class="tool-ct bottom-bar flex-ct">
+        <div class="flex-ct" style="width: 200px; padding-top: 20px; padding-left: 20px;">
+            <span class="btn-icon" style="margin-top: -1px;">
+                <i class="fa fa-picture-o fa-little"></i>
+            </span>
+            <input type="range" id="img-scale" min="1" max="100" step="1" value="15"/>
+            <span class="btn-icon" style="margin-top: 1px;">
+                <i class="fa fa-picture-o fa-large"></i>
+            </span>
+        </div>
+        <div class="flex-end-ct" style="width: calc(100% - 200px); padding-bottom: 16px;">
+            <span class="btn-text" onclick="rollbackLayoutRecon();">Reset</span>
+            <span class="btn-icon">
+                <i class="fa fa-reply-all "></i>
+            </span>
+            <span class="btn-icon">
+                <i class="fa fa-share"></i>
+            </span>
+            <span class="btn-icon">
+                <i class="fa fa-reply"></i>
+            </span>
+        </div>
+
+    </div>
+</div>
+<div class="fax-validate-right">
+    <div id="recon-layout-result" class="recon-ct">
+        <div class="status-bar">
+            <span>Best Matches (</span><span id="match-count">?</span><span>)</span>
+            <input id="recon-layout-id" type="hidden" value=""/>
+        </div>
+        <table style="margin-top: 20px;">
+            <thead>
+                <tr>
+                    <th style="width: 10%; text-align:center;">Area No.</th>
+                    <th style="width: 50%;">Matched Info</th>
+                    <th style="width: 20%;">Override
+                        <i class="fa fa-question-circle" style="padding-left: 5px;"></i>
+                    </th>
+                    <th style="width: 20%;">Disgard
+                        <i class="fa fa-question-circle" style="padding-left: 5px;"></i>
+                    </th>
+                </tr>
+            </thead>
+        </table>
+        <div class="scroll-ct" style="width: 100%; height: calc(100% - 102px); margin-top: 0px;">
+            <table>
+                <tbody id="area-record"></tbody>
+            </table>
+        </div>
+    </div>
+    <div class="bottom-bar">
+        <span class="prev" onclick="go2Step(1);">
+            <i class="fa fa-angle-left"></i>
+            <span>Prev</span>
+        </span>
+        <span class="next btn-active" onclick="layoutSub();">
+            <span>Next</span>
+            <i class="fa fa-angle-right"></i>
+        </span>
+    </div>
+</div>
+
+<div id="layout-template" style="display: none;">
+    <div class="layout-preview-area" onclick="fireLayout(this);">
+        <div class="layout-status">
+            <i class="fa fa-check"></i>
+        </div>
+    </div>
+    <div class="toolbar">
+        <span class="left-label">?</span>
+        <span class="right-label">0%</span>
+    </div>
+    <table>
+        <tr class="temp-show-layout" onclick="areaRowClick4Layout(this);">
+            <td class="area-index" style="width: 10%; text-align:center;"></td>
+            <td class="recon-area-ct" style="width: 50%;">
+                <div class="area-label"></div>
+                <div class="area-sub-label"></div>
+            </td>
+            <td style="width: 20%;">
+                <span
+                    id="override-action"
+                    class="area-action"
+                    data-index=""
+                    data-layout-type=""
+                    onclick="override4Layout(this);">Override</span></td>
+            <td style="width: 20%;">
+                <span id="disgard-action" class="area-action" data-index="" onclick="disgard4Layout(this);">Disgard</span></td>
+        </tr>
+
+        <tr class="temp-add-layout">
+            <td class="add-area-ct" colspan="4">
+                <div
+                    class="area-action"
+                    style="width: 100%; text-align: center;"
+                    data-target="#dialog-image-draw-layout"
+                    data-toggle="modal"
+                    onclick="drawLayoutCanvas();">+ Add Another Layout-Area
+                </div>
+                <div class="area-sub-label" style="width: 100%; text-align: center;">Capsture layout area manually</div>
+            </td>
+        </tr>
+    </table>
+    <div class="layout-type-ct" style="height: 200px">
+        <select name='standard' class='custom-select' onchange='onLayoutTypeChange(this);'>
+            <option value=''>None - Please Select</option>
+            <option value='grid-ly'>gird layout</option>
+            <option value='table-ly'>table layout</option>
+        </select>
+    </div>
+    <div
+        id="dialog-image-draw-layout"
+        class="modal fade"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="dialog-image-draw-layout"
+        aria-hidden="true">
+        <div
+            class="modal-dialog"
+            role="document"
+            style="width: 80%; height: calc(100% - 160px); margin: 80px auto;">
+            <div class="modal-content" style="height: 100%;background: #10151e;">
+                <div class="modal-body" style="height: 100%; padding: 0px;">
+                    <div
+                        style="width: 100%; height: 60px; line-height: 60px; font-size: 24px; text-align: center; color: #bdc5d1;">Select an area</div>
+
+                    <div
+                        style="position:absolute;right: 30px; top: 30px;color: #bdc5d1; font-size: 20px; cursor: pointer;"
+                        class="hvs-pulse"
+                        data-dismiss="modal"
+                        onclick="rollbackSelect();">
+                        <i class="fa fa-times"></i>
+                    </div>
+                    <div
+                        class="draw-ct"
+                        style="height: calc(100% - 168px); padding: 0; margin-left: 48px; overflow: auto;">
+                        <img src="$!{img-path}" data-name="$!{img-name}" data-path="$!{img-path}"/>
+                        <div class="area-ct"></div>
+                        <canvas id="canvas" width="800" height="500"></canvas>
+                    </div>
+                    <div class="draw-output" style="width: 100%; height: 40px;">
+                        <span>Begin X:</span><input id="begin-x" value="" disabled="disabled"/>
+                        <span>Begin Y:</span><input id="begin-y" value="" disabled="disabled"/>
+                        <span>End X:</span><input id="fin-x" value="" disabled="disabled"/>
+                        <span>End Y:</span><input id="fin-y" value="" disabled="disabled"/>
+                        <span>Current-X:</span><input id="current-x" value="" disabled="disabled"/>
+                        <span>Current-Y:</span><input id="current-y" value="" disabled="disabled"/>
+                    </div>
+                    <div
+                        class="modal-sub-btn"
+                        style="width: 100%; height: 48px; line-height: 48px;
+                    font-size: 24px; text-align: center; position: absolute; bottom: 0px; left: 0; "
+                        onclick="confirmDrawLayout();"
+                        data-dismiss="modal">
+                        CONFIRM
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        var imageDialog = $('#dialog-image-draw-layout');
+        imageDialog.insertAfter($('.app-main-ct'));
+        cleanLayoutPreview();
+        appendLayoutAdd();
+    });
+
+    function cleanLayoutPreview() {
+        $('#recon-layout-result #area-record').html('');
+        $('#recon-layout-ct .area-ct').html('');
+    }
+
+    function updateLayoutMatchCount(matchedCount) {
+        $('#recon-layout-result #match-count').html(matchedCount);
+    }
+
+    function updateReconLayoutId(layoutId) {
+        $('#recon-layout-result input#recon-layout-id').val(layoutId);
+    }
+
+    function drawLayoutCanvas() {
+        console.log('drawLayoutCanvas ... TODO');
+        var canvasSelector = '#dialog-image-draw-layout .draw-ct #canvas';
+        var imgSelector = '#dialog-image-draw-layout .draw-ct img';
+        var outputSelectorCt = '#dialog-image-draw-layout .draw-output';
+        var lineColor = '#FF0000';
+        $('#dialog-image-draw-layout .draw-ct .area-ct').html('');
+        showLoading()
+        setTimeout(function () {
+            drawCanvas(canvasSelector, outputSelectorCt, imgSelector, lineColor);
+            copyAreaBox2Dialog();
+            hideLoading()
+        }, 500)
+    }
+
+    function copyAreaBox2Dialog() {
+        var imageSelector = '#dialog-image-draw-layout img';
+        var scale = getScale(imageSelector);
+        $('#recon-layout-ct .preview-ct .area-ct .area-box').each(function () {
+            var cloneBox = $(this).clone();
+            var x = cloneBox.attr('data-x');
+            var y = cloneBox.attr('data-y');
+            var w = cloneBox.attr('data-w');
+            var h = cloneBox.attr('data-h');
+            x = parseFloatRound(x) * scale;
+            y = parseFloatRound(y) * scale;
+            w = parseFloatRound(w) * scale;
+            h = parseFloatRound(h) * scale;
+            var style = 'top:' + y + 'px; left:' + x + 'px; width:' + w + 'px; height:' + h + 'px;';
+            cloneBox.attr('style', style);
+            $('#dialog-image-draw-layout .draw-ct .area-ct').append(cloneBox)
+        });
+    }
+
+    function confirmDrawLayout() {
+        var beginX = $('#dialog-image-draw-layout input#begin-x').val();
+        var beginY = $('#dialog-image-draw-layout input#begin-y').val();
+        if (isBlankStr(beginX) || isBlankStr(beginY)) {
+            sendNotification('warn', 'No area selected!');
+            return;
+        }
+        var endX = $('#dialog-image-draw-layout input#fin-x').val();
+        var endY = $('#dialog-image-draw-layout input#fin-y').val();
+
+        beginX = parseFloatRound(beginX);
+        beginY = parseFloatRound(beginY);
+        endX = parseFloatRound(endX);
+        endY = parseFloatRound(endY);
+
+        var x = beginX < endX
+            ? beginX
+            : endX;
+        var y = beginY < endY
+            ? beginY
+            : endY;
+        var w = Math.abs(beginX - endX);
+        var h = Math.abs(beginY - endY);
+
+        var img = $('#dialog-image-draw-layout .draw-ct img')
+        var clientWidth = img.attr('data-client-width')
+        var clientHeight = img.attr('data-client-height')
+        var srcWidth = img.attr('data-src-width')
+        var srcHeight = img.attr('data-src-height')
+
+        var scaleW = parseFloatRound(clientWidth) / parseFloatRound(srcWidth)
+        var scaleH = parseFloatRound(clientHeight) / parseFloatRound(srcHeight)
+        var scale = selectWidthScale
+            ? scaleW
+            : scaleH;
+        var imgSelector = '#recon-layout-ct .preview-ct img';
+        var myImg = document.querySelector(imgSelector);
+        var currentClientWidth = myImg.clientWidth;
+        var currentClientHeight = myImg.clientHeight;
+
+        var realScale = selectWidthScale
+            ? currentClientWidth / srcWidth / scale
+            : currentClientHeight / srcHeight / scale;
+
+        x = x / scale;
+        y = y / scale;
+        w = w / scale;
+        h = h / scale;
+
+        // console.log('confirmDrawSign scaleW:' + scaleW + ', scaleH:' + scaleH)
+        var createAreaInfo = {
+            'width': '' + w,
+            'height': '' + h,
+            'x': '' + x,
+            'y': '' + y,
+            'id': 'mock-id',
+            'tag': 'grid layout',
+            'type': 'grid-ly'
+        }
+        addMatchArea4Layout(createAreaInfo)
+    }
+
+    function areaRowClick4Layout(e) {
+        var strGuid = $(e).attr('id');
+        disableAllLayoutRow();
+        $(e).addClass('area-row-active');
+        activeAreaBox4Layout(strGuid);
+    }
+
+    function disableAllLayoutRow() {
+        $('#recon-layout-result .temp-show-layout').each(function () {
+            $(this).removeClass('area-row-active');
+        });
+    }
+
+    function activeAreaBox4Layout(strGuid) {
+        $('#recon-layout-ct .preview-ct .area-ct .area-box').each(function () {
+            var id = $(this).attr('id');
+            if (id === strGuid) {
+                $(this).addClass('area-active');
+            } else {
+                $(this).removeClass('area-active');
+            }
+        });
+    }
+
+    function onLayoutTypeChange(e) {
+        var strGuid = $(e).attr('data-index');
+        var type = $(e).val();
+        var tag = e
+            .options[e.selectedIndex]
+            .text;
+        updateLayoutType(strGuid, type, tag);
+    }
+
+    function updateLayoutType(strGuid, type, tag) {
+        var row = $('#recon-layout-result #area-record #' + strGuid);
+        row
+            .find('.recon-area-ct  .area-label')
+            .each(function () {
+                $(this).html(tag);
+                $(this).attr('data-layout-type', type);
+            });
+        row
+            .find('.area-action')
+            .each(function () {
+                $(this).attr('data-layout-type', type);
+            });
+    }
+
+    function override4Layout(e) {
+        var strGuid = $(e).attr('data-index');
+        var layoutType = $(e).attr('data-layout-type');
+        var newArea = $(e).attr('data-new');
+        if (newArea !== 'true') {
+            sendNotification('warn', 'Recongnised Area Cannot Override!');
+            return;
+        }
+
+        var cloneTypeSelect = $('#layout-template .layout-type-ct').clone();
+        cloneTypeSelect
+            .find('select')
+            .each(function () {
+                $(this).attr('data-index', strGuid);
+                $(this).val(layoutType);
+            });;
+        cloneTypeSelect.val(layoutType);
+
+        $.confirm({
+            theme: 'black',
+            animation: 'rotateY',
+            closeAnimation: 'rotateY',
+            title: 'Select a Type!',
+            backgroundDismiss: true,
+            content: cloneTypeSelect,
+            buttons: false
+        });
+        setTimeout(function () {
+            $(".jconfirm-box-container .custom-select").customselect();
+        }, 100);
+    }
+
+    function disgard4Layout(e) {
+        var strGuid = $(e).attr('data-index');
+        showDisgrad4layoutConfirm(strGuid);
+    }
+
+    function showDisgrad4layoutConfirm(strGuid) {
+        $.confirm({
+            theme: 'black',
+            title: false,
+            content: '<div style="margin: 20px 0px; font-size: 16px; text-align: center;">Disgard the match?</div>',
+            buttons: {
+                Cancel: function () {
+                    console.log('Cancel disgard')
+                },
+                Yes: {
+                    text: 'Yes',
+                    btnClass: 'btn-danger',
+                    action: function () {
+                        doDisgrad4Layout(strGuid)
+                    }
+                }
+            }
+        })
+    }
+
+    function doDisgrad4Layout(strGuid) {
+        var selector = '#recon-layout-result #area-record #' + strGuid;
+        var trElement = $(selector);
+        if (trElement) {
+            trElement.css('display', 'none');
+        }
+        disgradAreaBox4Layout(strGuid);
+        refreshMatchLayoutIndex()
+    }
+
+    function disgradAreaBox4Layout(strGuid) {
+        $('#recon-layout-ct .preview-ct .area-ct #' + strGuid).addClass('area-disgard');
+    }
+
+    function renderLayoutPreview(layoutInfo) {
+        var matchedCount = layoutInfo && layoutInfo.layoutList
+            ? layoutInfo.layoutList.length
+            : 0;
+        updateLayoutMatchCount(matchedCount);
+        updateReconLayoutId(layoutInfo.id);
+        if (matchedCount === 0) {
+            sendNotification('warn', 'No matched layout!!!');
+            return;
+        }
+        var matchAreaList = layoutInfo.layoutList;
+        for (var i = 0; i < matchAreaList.length; i++) {
+            var matchArea = matchAreaList[i];
+            appendMatchLayout(matchArea, i + 1);
+        }
+        appendLayoutAdd();
+        refreshMatchLayoutIndex();
+    }
+
+    function addMatchArea4Layout(matchArea) {
+        console.log('addMatchArea4Layout', matchArea)
+        appendMatchLayout(matchArea, 0, true);
+        refreshMatchLayoutIndex();
+    }
+
+    function refreshMatchLayoutIndex() {
+        var index = 1;
+        $('#recon-layout-result .temp-show-layout').each(function () {
+            var displayStr = $(this).css('display')
+            if (displayStr === 'none') {
+                return
+            }
+            var strGuid = $(this).attr('id');
+            $(this)
+                .find('.area-index')
+                .each(function () {
+                    $(this).html(index)
+                    synAreaBoxIndex4Layout(strGuid, index);
+                })
+            index = index + 1
+        });
+        $('#recon-layout-result .scroll-ct').css('overflow', 'auto');
+        setTimeout(function () {
+            applyOverflowScroll4Layout();
+        }, 50);
+    }
+
+    function synAreaBoxIndex4Layout(strGuid, index) {
+        $('#recon-layout-ct .preview-ct .area-ct #' + strGuid + ' span.area-index').html(index);
+    }
+
+    function applyOverflowScroll4Layout() {
+        var scrollWidth = $('#recon-layout-result .scroll-ct').prop('scrollWidth');
+        var width = $('#recon-layout-result .scroll-ct').width();
+        $('#recon-layout-result .scroll-ct').css('overflow', 'hidden');
+        // console.log('applyOverflowScroll4Layout scrollWidth:' + scrollWidth + ', width:' + width);
+        if (parseFloat('' + scrollWidth) > parseFloat('' + width)) {
+            console.log('applyOverflowScroll4Layout apply');
+            updateNiceScroll();
+        }
+    }
+
+    function appendMatchLayout(matchArea, index, newArea) {
+        var strGuid = sampleGuid();
+        var layoutShowElement = $('#layout-template .temp-show-layout').clone();
+        layoutShowElement.attr('id', strGuid);
+        layoutShowElement.attr('data-layout-id', matchArea.id);
+        layoutShowElement.attr('data-layout-w', matchArea.width);
+        layoutShowElement.attr('data-layout-h', matchArea.height);
+        layoutShowElement.attr('data-layout-x', matchArea.x);
+        layoutShowElement.attr('data-layout-y', matchArea.y);
+        layoutShowElement.attr('data-layout-type', matchArea.type);
+        layoutShowElement.attr('data-layout-tag', matchArea.tag);
+        layoutShowElement.attr(
+            'data-new',
+            newArea
+                ? 'true'
+                : 'false'
+        );
+        layoutShowElement
+            .find('.area-index')
+            .each(function () {
+                $(this).html(index);
+            });
+        layoutShowElement
+            .find('.recon-area-ct .area-label')
+            .each(function () {
+                $(this).html(matchArea.tag);
+                $(this).attr('data-layout-type', matchArea.type);
+            });
+        layoutShowElement
+            .find('.recon-area-ct .area-sub-label')
+            .each(function () {
+                $(this).html(matchArea.comments);
+            });
+        layoutShowElement
+            .find('.area-action')
+            .each(function () {
+                $(this).attr('data-index', strGuid);
+                $(this).attr(
+                    'data-new',
+                    newArea
+                        ? 'true'
+                        : 'false'
+                );
+                $(this).attr('data-layout-type', matchArea.type);
+            });
+        if (newArea) {
+            layoutShowElement.insertBefore($('#recon-layout-result .temp-add-layout'));
+        } else {
+            layoutShowElement.appendTo('#recon-layout-result #area-record');
+        }
+
+        var imageSelector = '#recon-layout-ct .preview-ct img';
+        var scale = getScale(imageSelector);
+        appendAreaBox4Layout(convertLayout2MatchArea(matchArea), strGuid, scale, newArea, index);
+    }
+
+    function appendAreaBox4Layout(matchArea, strGuid, scale, newArea, index) {
+        var style = createBoxStyle(matchArea, scale);
+        var innerHtml = '<span class="area-label">No.</span><span class="area-index">' + index +
+                '</span>';
+        var attr = createBoxAtt(matchArea, newArea);
+        var boxHtml = '<div class="area-box" style="' + style + '" id="' + strGuid + '" ' + attr + ' onclic' +
+                'k="selectLayout(this);">' + innerHtml + '</div>';
+        $('#recon-layout-ct .preview-ct .area-ct').append(boxHtml);
+    }
+
+    function convertLayout2MatchArea(matchArea) {
+        var newArea = {};
+        newArea.w = '' + matchArea.width;
+        newArea.h = '' + matchArea.height;
+        newArea.x = '' + matchArea.x;
+        newArea.y = '' + matchArea.y;
+        return newArea;
+    }
+
+    function appendLayoutAdd() {
+        var layoutAddElement = $('#layout-template .temp-add-layout').clone();
+        layoutAddElement.appendTo('#recon-layout-result #area-record');
+    }
+
+    function updateLayoutMatchCount(matchedCount) {
+        $('#recon-layout-result #match-count').html(matchedCount);
+    }
+
+    function rollbackLayoutRecon() {
+        $('#recon-layout-result .temp-show-layout').each(function () {
+            var newAdd = $(this).attr('data-new');
+            if (newAdd === 'true') {
+                $(this).remove();
+                return
+            }
+            var strGuid = $(this).attr('id');
+            var layoutTag = $(this).attr('data-layout-tag');
+            var layoutType = $(this).attr('data-layout-type');
+            $(this).css('display', '');
+            $(this)
+                .find('.recon-area-ct .area-label')
+                .each(function () {
+                    $(this).html(layoutTag);
+                });
+            $(this)
+                .find('.area-action')
+                .each(function () {
+                    $(this).attr('data-layout-type', layoutType);
+                });
+        });
+        rollbackAreaBox4Layout();
+        refreshMatchLayoutIndex();
+    }
+
+    function rollbackAreaBox4Layout() {
+        $('#recon-layout-ct .preview-ct .area-ct .area-box').each(function () {
+            var newArea = $(this).attr('data-new');
+            if (newArea === 'true') {
+                $(this).remove();
+            } else {
+                $(this).removeClass('area-disgard');
+            }
+        });
+    }
+
+    function doLayoutRecon() {
+        var imgObj = $('#recon-layout-ct img');
+
+        if (imgObj === undefined || imgObj === null) {
+            sendNotification('error', 'Please upload an image first!!!');
+            return;
+        }
+        var imgPath = imgObj.attr("data-path");
+        var imgName = imgObj.attr("data-name");
+
+        if (imgPath === undefined || imgName === undefined) {
+            sendNotification('error', 'Please upload an image first!!!');
+            return;
+        }
+        imgPath = imgPath.substring(0, imgPath.lastIndexOf('/'));
+
+        var body = {
+            'imageWebPath': imgPath,
+            'reconImage': imgName
+        };
+        var url = '${WEB_CONTEXT_PATH}/api/layout/recon2.do'
+        showLoading();
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: JSON.stringify(body),
+            contentType: "application/json",
+            success: function (resp) {
+                hideLoading();
+                if (resp.status) {
+                    if (resp.data) {
+                        cleanLayoutPreview();
+                        renderLayoutPreview(resp.data);
+                        sendNotification('success', resp.message);
+                    } else {
+                        sendNotification('warn', 'Cannot recognition layout for this image');
+                    }
+                } else {
+                    sendNotification('error', resp.message);
+                }
+
+            },
+            error: function (err) {
+                hideLoading();
+                sendNotification('error', 'Layout Recongnition fail!');
+            }
+        });
+    }
+
+    function layoutSub() {
+        markStepDone(2);
+        go2Step(3);
+        doReconData();
+    }
+
+    function buildContentPostBody() {
+        var layoutList = [];
+        $('#recon-layout-result .temp-show-layout').each(function () {
+            var displayStr = $(this).css('display')
+            if (displayStr === 'none') {
+                return;
+            }
+            var id = $(this).attr('data-layout-id');
+            var newArea = $(this).attr('data-new');
+            var type = '';
+            var tag = ''
+            var width = $(this).attr('data-layout-w');
+            var height = $(this).attr('data-layout-h');
+            var x = $(this).attr('data-layout-x');
+            var y = $(this).attr('data-layout-y');
+            $(this)
+                .find('.recon-area-ct .area-label')
+                .each(function () {
+                    type = $(this).attr('data-layout-type');
+                    tag = $(this).html();
+                });
+            var layoutItem = {};
+            layoutItem.id = id;
+            layoutItem.type = type;
+            layoutItem.tag = tag;
+            layoutItem.width = width;
+            layoutItem.height = height;
+            layoutItem.x = x;
+            layoutItem.y = y;
+            layoutItem.xmin = x;
+            layoutItem.ymin = y;
+            layoutItem.newArea = newArea;
+            layoutList.push(layoutItem);
+        });
+        var layoutId = $('#recon-layout-result input#recon-layout-id').val();
+        var postBody = {};
+        postBody.layoutId = layoutId;
+        postBody.selectedLayout = layoutList;
+        return postBody;
+    }
+
+    function change4ReconLayout() {
+        var imageSelector = '#recon-layout-ct .preview-ct img';
+        var scale = getScale(imageSelector);
+        $('#recon-layout-ct .area-ct .area-box').each(function () {
+            var x = $(this).attr('data-x');
+            var y = $(this).attr('data-y');
+            var w = $(this).attr('data-w');
+            var h = $(this).attr('data-h');
+            x = parseFloatRound(x) * scale;
+            y = parseFloatRound(y) * scale;
+            w = parseFloatRound(w) * scale;
+            h = parseFloatRound(h) * scale;
+            $(this).css('left', '' + x + 'px');
+            $(this).css('top', '' + y + 'px');
+            $(this).css('width', '' + w + 'px');
+            $(this).css('height', '' + h + 'px');
+        });
+    }
+
+    function selectLayout(e) {
+        var strGuid = $(e).attr('id');
+        $('#recon-layout-result tr#' + strGuid).click();
+    }
+</script>

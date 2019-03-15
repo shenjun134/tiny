@@ -3,7 +3,7 @@
 		<span class="title">Fax Cover Information</span>
 		<div style="display: flex; height: calc(100% - 0px);">
 			<div class="left" style="width: 500px">
-				<form id="mainUploadForm" class="form-inline" action="/tiny/ocr/multiUpload.do" method="POST" style="margin-top: 20px; margin-bottom: 20px; margin-left: 10px;">
+				<form id="mainUploadForm" class="form-inline" action="${WEB_CONTEXT_PATH}/ocr/multiUpload.do" method="POST" style="margin-top: 20px; margin-bottom: 20px; margin-left: 10px;">
 					<div class="form-group" style="background: #eee; border-radius: 2px;">
 							<input type="file" accept=".tiff,.tif,.png,.jpg,.bmp,.ico" name="file" style="overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 250px;width: 250px; height: 34px;"/>
 					</div>
@@ -25,7 +25,7 @@
 						#end
 					</tbody>
 				</table>
-				<form id="mainActionForm" class="form-inline" action="/tiny/ocr/multiUpload.do" method="POST" style="margin-bottom: 20px; margin-left: 10px;">
+				<form id="mainActionForm" class="form-inline" action="${WEB_CONTEXT_PATH}/ocr/multiUpload.do" method="POST" style="margin-bottom: 20px; margin-left: 10px;">
 					<div class="form-group" style="bacground: #eee; border-radius: 2px;">
 							<label style="margin-bottom: 0 !important;">Please select template</label>
 							<select name="templateName" id="templateName" onchange="onTempChange(this)" style="height: 34px;">

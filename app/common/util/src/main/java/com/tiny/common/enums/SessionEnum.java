@@ -19,7 +19,6 @@ public enum SessionEnum implements EnumBase {
 
 	IS_LOGIN("K_IS_LOGIN"),
 	
-	
 	URL_CACHE_KEY("URL_CACHE_KEY"),
 
 	;

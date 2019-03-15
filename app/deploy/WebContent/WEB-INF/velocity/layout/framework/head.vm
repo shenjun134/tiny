@@ -1,0 +1,65 @@
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE"/>
+    <title>Fax-OCR</title>
+
+    <!-- style import begin -->
+    <link rel="stylesheet" href="${WEB_CONTEXT_PATH}/resources/lib/w3c/css/w3.css" type="text/css">
+    <link
+        rel="stylesheet"
+        href="${WEB_CONTEXT_PATH}/resources/lib/font-awesome/4.3.0/css/font-awesome.min.css"
+        type="text/css">
+    <link rel="stylesheet" href="${WEB_CONTEXT_PATH}/resources/css/animation.min.css" type="text/css">
+    <link rel="stylesheet" href="${WEB_CONTEXT_PATH}/resources/css/hover-min.css" type="text/css">
+
+    <link
+        rel="stylesheet"
+        href="${WEB_CONTEXT_PATH}/resources/lib/zero-modal/css/zeroModal.css"
+        type="text/css">
+    <link
+        rel="stylesheet"
+        href="${WEB_CONTEXT_PATH}/resources/lib/loading/css/style.css"
+        type="text/css">
+    <link
+        rel="stylesheet"
+        href="${WEB_CONTEXT_PATH}/resources/lib/datetime-picker/jquery.datetimepicker.css">
+    <link
+        rel="stylesheet"
+        href="${WEB_CONTEXT_PATH}/resources/lib/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link
+        rel="stylesheet"
+        href="${WEB_CONTEXT_PATH}/resources/lib/page/css/simplePagination.css"
+        type="text/css">
+    <link
+        rel="stylesheet"
+        href="${WEB_CONTEXT_PATH}/resources/lib/jquery-confirm/jquery-confirm.min.css"
+        type="text/css">
+    <link
+        rel="stylesheet"
+        href="${WEB_CONTEXT_PATH}/resources/lib/jcustom-select/jquery-customselect.css"
+        type="text/css">
+    <link rel="stylesheet" href="${WEB_CONTEXT_PATH}/resources/css/logo.css" type="text/css">
+    <link rel="stylesheet" href="${WEB_CONTEXT_PATH}/resources/css/fax-layout.css" type="text/css">
+    <link rel="stylesheet" href="${WEB_CONTEXT_PATH}/resources/css/loading.css" type="text/css">
+    <link rel="stylesheet" href="${WEB_CONTEXT_PATH}/resources/css/jstree.css" type="text/css">
+    <link rel="stylesheet" href="${WEB_CONTEXT_PATH}/resources/css/notify.css" type="text/css">
+    <link rel="stylesheet" href="${WEB_CONTEXT_PATH}/resources/css/fax.css" type="text/css">
+    <link type="image/x-icon" href="${WEB_CONTEXT_PATH}/resources/images/stone.ico" rel="icon"/>
+    <!-- style import end -->
+
+    <!-- script import begin -->
+    <script src="${WEB_CONTEXT_PATH}/resources/lib/jquery/3.2.1/jquery.min.js"></script>
+    <script src="${WEB_CONTEXT_PATH}/resources/lib/jquery/jquery-resizable.js"></script>
+    <script src="${WEB_CONTEXT_PATH}/resources/lib/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="${WEB_CONTEXT_PATH}/resources/lib/datetime-picker/jquery.datetimepicker.js"></script>
+    <script src="${WEB_CONTEXT_PATH}/resources/lib/page/js/jquery.simplePagination.js"></script>
+    <script src="${WEB_CONTEXT_PATH}/resources/lib/jquery-confirm/jquery-confirm.min.js"></script>
+    <script src="${WEB_CONTEXT_PATH}/resources/lib/jcustom-select/jquery-customselect.js"></script>
+    <script src="${WEB_CONTEXT_PATH}/resources/lib/jquery.nicescroll-3.7.5/dist/jquery.nicescroll.min.js"></script>
+    <script src="${WEB_CONTEXT_PATH}/resources/lib/zero-modal/js/zeroModal.js"></script>
+    <script src="${WEB_CONTEXT_PATH}/resources/lib/notify/notify.min.js"></script>
+    <script src="${WEB_CONTEXT_PATH}/resources/js/common.js"></script>
+    <script src="${WEB_CONTEXT_PATH}/resources/js/fax-common.js"></script>
+    <script src="${WEB_CONTEXT_PATH}/resources/js/attrchange.js"></script>
+    <!-- script import end -->
+</head>

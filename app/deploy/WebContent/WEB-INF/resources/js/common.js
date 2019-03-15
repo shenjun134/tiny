@@ -58,7 +58,7 @@ $(function () {
 		$("body").attrchange({
 		trackValues: true, // set to true so that the event object is updated with old & new values
 		callback: function (event) {
-//			console.log('body event', event);
+			//			console.log('body event', event);
 			if (!$("#shortcut_menu .btn-top").hasClass('return-top-active')) {
 				return;
 			}
@@ -90,20 +90,7 @@ function join(strArr, joined) {
 	if (joined === undefined) {
 		joined = '';
 	}
-	var retStr = strArr.reduce(
-		(total, temp) => {
-			return total.concat(temp).concat(joined);
-		},
-		'',
-	);
-
-	if (joined.length === 0) {
-		return retStr;
-	}
-	var beginIndex = 0;
-	var endIndex = retStr.length - joined.length;
-	// to substring the last joined string
-	retStr = retStr.substring(beginIndex, endIndex);
+	var retStr = strArr.join(joined);
 	return retStr;
 };
 
@@ -120,3 +107,13 @@ function guid() {
 function sampleGuid() {
 	return guid().replace(/-/g, '');
 };
+
+function parseFloatRound(numStr, scale) {
+	var num = parseFloat(numStr);
+	var tempScale = scale ? scale : 2;
+	return round(num, tempScale);
+}
+
+function round(num, scale) {
+	return parseFloat(num.toFixed(2));
+}

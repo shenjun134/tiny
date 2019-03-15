@@ -38,10 +38,6 @@ public class RemoteSignatureService extends AbstractSignatureService {
      */
     private static Logger logger = Logger.getLogger(RemoteSignatureService.class);
 
-    private static final String APPLICATION_JSON = "application/json";
-
-    private static final String CONTENT_TYPE_TEXT_JSON = "text/json";
-
     @Override
     protected void scanBefore(String imagePath, String imageName) {
         logger.info("remote scanBefore check ...");
@@ -61,9 +57,62 @@ public class RemoteSignatureService extends AbstractSignatureService {
 
     @Override
     protected SignatureResp processScan(String imagePath, String imageName) {
+        String url = SystemUtils.getSystemProperty(SystemPropertyEnum.FACADE_SIGNATURE_URL);
+        return processScan(imagePath, imageName, url);
+    }
+
+    @Override
+    protected SignatureResp processScan2(String imagePath, String imageName) {
+        String url = SystemUtils.getSystemProperty(SystemPropertyEnum.FACADE_SIGNATURE_URL_V2);
+        return processScan(imagePath, imageName, url);
+    }
+
+    @Override
+    protected void scanAfter(String imagePath, String imageName) {
+        logger.info("remote scanAfter done.");
+    }
+
+    @Override
+    protected void fixBefore(FixedFax fixedFax) {
+        Assert.notNull(fixedFax, "null fixedFax");
+
+        Assert.hasText(fixedFax.getFixedImageId(), "fix image id is blank");
+
+        Assert.notNull(fixedFax.getWriterId(), "writer id is miss");
+
+        Assert.hasText(fixedFax.getWriterName(), "writer name is miss");
+
+        Assert.notNull(fixedFax.getHeight(), "height is miss");
+
+        Assert.notNull(fixedFax.getWidth(), "width is miss");
+
+        Assert.notNull(fixedFax.getXmin(), "Xmin is miss");
+
+        Assert.notNull(fixedFax.getYmin(), "Ymin is miss");
+    }
+
+    @Override
+    protected void processFix(FixedFax fixedFax, BaseJsonResult baseJsonResult) {
+        String url = SystemUtils.getSystemProperty(SystemPropertyEnum.FACADE_SIGN_FIX_URL);
+        processFix(fixedFax, baseJsonResult, url);
+    }
+
+    @Override
+    protected void processFix2(FixedFax fixedFax, BaseJsonResult baseJsonResult) {
+        String url = SystemUtils.getSystemProperty(SystemPropertyEnum.FACADE_SIGN_FIX_URL_V2);
+        processFix(fixedFax, baseJsonResult, url);
+    }
+
+    @Override
+    protected void fixAfter(FixedFax fixedFax) {
+        logger.info("remote fix after done");
+    }
+
+
+    private SignatureResp processScan(String imagePath, String imageName, String url) {
+
         LogUtil.info(logger, "begin processScan with path: {0}, name: {1}", imagePath, imageName);
         CloseableHttpClient httpClient = null;
-        String url = SystemUtils.getSystemProperty(SystemPropertyEnum.FACADE_SIGNATURE_URL);
         try {
             httpClient = HttpClients.custom().build();
             HttpPost httpPost = new HttpPost(url);
@@ -103,35 +152,10 @@ public class RemoteSignatureService extends AbstractSignatureService {
         }
     }
 
-    @Override
-    protected void scanAfter(String imagePath, String imageName) {
-        logger.info("remote scanAfter done.");
-    }
-
-    @Override
-    protected void fixBefore(FixedFax fixedFax) {
-        Assert.notNull(fixedFax, "null fixedFax");
-
-        Assert.hasText(fixedFax.getFixedImageId(), "fix image id is blank");
-
-        Assert.notNull(fixedFax.getWriterId(), "writer id is miss");
-
-        Assert.hasText(fixedFax.getWriterName(), "writer name is miss");
-
-        Assert.notNull(fixedFax.getHeight(), "height is miss");
-
-        Assert.notNull(fixedFax.getWidth(), "width is miss");
-
-        Assert.notNull(fixedFax.getXmin(), "Xmin is miss");
-
-        Assert.notNull(fixedFax.getYmin(), "Ymin is miss");
-    }
-
-    @Override
-    protected void processFix(FixedFax fixedFax, BaseJsonResult baseJsonResult) {
+    private void processFix(FixedFax fixedFax, BaseJsonResult baseJsonResult, String url) {
         LogUtil.info(logger, "begin processFix with path: {0}", fixedFax);
         CloseableHttpClient httpClient = null;
-        String url = SystemUtils.getSystemProperty(SystemPropertyEnum.FACADE_SIGN_FIX_URL);
+
         try {
             httpClient = HttpClients.custom().build();
             HttpPost httpPost = new HttpPost(url);
@@ -172,10 +196,5 @@ public class RemoteSignatureService extends AbstractSignatureService {
                 }
             }
         }
-    }
-
-    @Override
-    protected void fixAfter(FixedFax fixedFax) {
-        logger.info("remote fix after done");
     }
 }

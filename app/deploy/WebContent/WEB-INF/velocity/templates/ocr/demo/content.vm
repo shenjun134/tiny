@@ -1,4 +1,4 @@
-<script src="/tiny/resources/js/ocr.js"></script>
+<script src="${WEB_CONTEXT_PATH}/resources/js/ocr.js"></script>
 <div class="title cf">
 	<h2 class="fl animate seven"><span>O</span><span style="padding-right: 5px;"></span><span>C</span><span style="padding-right: 5px;"></span><span>R</span><span style="padding-right: 20px;"></span><span>D</span><span>e</span><span>m</span><span >o</span></h2>
 	<ul class="title-list fr cf ">

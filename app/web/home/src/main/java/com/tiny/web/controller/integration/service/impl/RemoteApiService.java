@@ -1,5 +1,7 @@
 package com.tiny.web.controller.integration.service.impl;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.tiny.common.enums.SystemPropertyEnum;
 import com.tiny.common.util.CommonUtil;
 import com.tiny.common.util.LogUtil;
@@ -9,15 +11,20 @@ import com.tiny.web.controller.integration.convert.CommonConverter;
 import com.tiny.web.controller.integration.convert.FaxResultConverter;
 import com.tiny.web.controller.integration.entity.ContentResult;
 import com.tiny.web.controller.integration.entity.LayoutResult;
+import com.tiny.web.controller.integration.entity.LayoutWrapper;
+import com.tiny.web.controller.integration.entity.RectangleVO;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
@@ -27,8 +34,8 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
-import java.util.Properties;
+import java.io.UnsupportedEncodingException;
+import java.util.*;
 
 @Component("remoteApiService")
 public class RemoteApiService extends AbstractApiService {
@@ -41,17 +48,17 @@ public class RemoteApiService extends AbstractApiService {
     private Properties layoutContentInterfaceMappingProp;
 
     @PostConstruct
-    public void init(){
+    public void init() {
         String filename = "/config/ocr-layout-content-interface.properties";
         InputStream inputStream = null;
-        try{
+        try {
             inputStream = CommonUtil.getInputStream(filename);
             layoutContentInterfaceMappingProp = CommonUtil.retrieveFileProperties(inputStream);
-        }catch (Exception e){
+        } catch (Exception e) {
             LogUtil.error(logger, e, "load {0} error", filename);
             throw new RuntimeException(e);
-        }finally {
-            if(inputStream != null){
+        } finally {
+            if (inputStream != null) {
                 try {
                     inputStream.close();
                 } catch (IOException e) {
@@ -111,6 +118,12 @@ public class RemoteApiService extends AbstractApiService {
     }
 
     @Override
+    protected LayoutWrapper doLayoutRecon2(RecognitionReq request) {
+        //TODO
+        return null;
+    }
+
+    @Override
     protected ContentResult doContentRecon(RecognitionReq request) {
         String imagePath = request.getImageAbsPath();
         String imageName = request.getReconImage();
@@ -158,6 +171,71 @@ public class RemoteApiService extends AbstractApiService {
     }
 
     @Override
+    protected List<ContentResult> doContentRecon2(RecognitionReq request) {
+        List<Map<String, Object>> reconLayoutList = new ArrayList<>();
+        List<Map<String, Object>> newLayoutList = new ArrayList<>();
+        for (LayoutResult layout : request.getSelectedLayout()) {
+            boolean isNew = Boolean.valueOf(layout.getNewArea());
+            Map<String, Object> resultMap = convert(layout);
+            if (isNew) {
+                resultMap.put("id", "");
+                newLayoutList.add(resultMap);
+            } else {
+                newLayoutList.add(resultMap);
+            }
+        }
+
+        Map<String, Object> postBody = new HashMap<>();
+        postBody.put("layoutList", reconLayoutList);
+        postBody.put("addList", newLayoutList);
+        postBody.put("validateId", request.getLayoutId());
+
+        LogUtil.info(logger, "doContentRecon2 build post body - {0}", postBody);
+
+        CloseableHttpClient httpClient = null;
+        String url = "??????????????????????";
+        try {
+            httpClient = HttpClients.custom().build();
+            HttpPost httpPost = new HttpPost(url);
+            Gson gson = new GsonBuilder().create();
+
+            String encoderJson = gson.toJson(postBody);
+            StringEntity stringEntity = new StringEntity(encoderJson);
+            stringEntity.setContentType(CONTENT_TYPE_TEXT_JSON);
+            stringEntity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON));
+            httpPost.setEntity(stringEntity);
+
+            HttpResponse response = httpClient.execute(httpPost);
+
+            String jsonResult = EntityUtils.toString(response.getEntity(), "UTF-8");
+
+            logger.info("post fix json response:" + jsonResult);
+
+            StatusLine statusLine = response.getStatusLine();
+            LogUtil.info(logger, "doContentRecon2 result: {0}", statusLine);
+
+            boolean sendSucc = statusLine != null && statusLine.getStatusCode() == 200;
+            if (!sendSucc) {
+                throw new RuntimeException("doContentRecon2 fail!");
+            }
+            //TODO
+
+        } catch (Exception e) {
+            LogUtil.error(logger, e, "doContentRecon2 error - request:{0}", request);
+            throw new RuntimeException("doContentRecon2 error", e);
+        } finally {
+            if (httpClient != null) {
+                try {
+                    httpClient.close();
+                } catch (IOException e) {
+                    logger.error("httpClient close error", e);
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
     protected void beforeLayout(RecognitionReq request) {
         commonAssert(request);
     }
@@ -178,15 +256,24 @@ public class RemoteApiService extends AbstractApiService {
     }
 
     /**
-     *
      * @param layoutId
      * @return
      */
-    private String getContentAPI(String layoutId){
+    private String getContentAPI(String layoutId) {
         Assert.hasText(layoutId, "layout id is missing");
         String api = layoutContentInterfaceMappingProp.getProperty(layoutId);
         Assert.hasText(api, "layout Id cannot find content.api");
         return api;
+    }
+
+    private Map<String, Object> convert(LayoutResult layout) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", layout.getId());
+        map.put("width", layout.getWidth());
+        map.put("height", layout.getHeight());
+        map.put("xmin", layout.getX());
+        map.put("ymin", layout.getY());
+        return map;
     }
 
 }

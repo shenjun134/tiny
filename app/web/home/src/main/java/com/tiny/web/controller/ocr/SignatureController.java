@@ -8,6 +8,7 @@ import com.tiny.common.exception.InitializationException;
 import com.tiny.core.model.FileInfo;
 import com.tiny.core.model.SubFile;
 import com.tiny.web.controller.BaseJsonResult;
+import com.tiny.web.controller.http.request.BatchSignReq;
 import com.tiny.web.controller.http.request.SignatureReq;
 import com.tiny.web.controller.integration.entity.FixedFax;
 import com.tiny.web.controller.integration.factory.SignatureFactory;
@@ -40,9 +41,10 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.io.*;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.TreeMap;
 
 @Controller
 public class SignatureController extends OCRController {
@@ -215,6 +217,32 @@ public class SignatureController extends OCRController {
         return baseJsonResult;
     }
 
+    @RequestMapping(path = {UrlCenter.OCR.SIGNATURE_VALIDATE_2}, method = RequestMethod.POST)
+    @ResponseBody
+    public Object validate2(@RequestParam("imgPath") String imgPath, @RequestParam("imgName") String imgName, @RequestParam("fileName") String fileName, @RequestParam("page") String page) {
+        BaseJsonResult baseJsonResult = new BaseJsonResult();
+        if (StringUtils.isBlank(imgPath)) {
+            logger.error("Cannot find your file path");
+            return baseJsonResult.marketFail("Validate signature fail.");
+        }
+        if (StringUtils.isBlank(imgName)) {
+            logger.error("Cannot find your file name ");
+            return baseJsonResult.marketFail("Validate signature fail.");
+        }
+        try {
+            String realPath = imgPath;
+            String contextPath = context.getContextPath();
+            if (StringUtils.startsWith(imgPath, contextPath)) {
+                realPath = imgPath.substring(contextPath.length(), imgPath.length());
+            }
+            return signatureFactory.getService().scan2(webInfAbsolutePath + realPath, imgName);
+        } catch (Exception e) {
+            logger.error("validate error -- " + e.getMessage(), e);
+            baseJsonResult.marketFail("Validate signature fail--" + e.getMessage());
+        }
+        return baseJsonResult;
+    }
+
     @RequestMapping(path = {UrlCenter.OCR.SIGNATURE_SUBMIT}, method = RequestMethod.POST)
     @ResponseBody
     public Object submit(@RequestBody SignatureReq signatureReq) {
@@ -228,6 +256,87 @@ public class SignatureController extends OCRController {
         } catch (Exception e) {
             logger.error("submit error -- " + e.getMessage(), e);
             baseJsonResult.marketFail("submit signature fail--" + e.getMessage());
+        }
+        return baseJsonResult;
+    }
+
+    @RequestMapping(path = {UrlCenter.OCR.BATCH_SIGNATURE_SUBMIT}, method = RequestMethod.POST)
+    @ResponseBody
+    public Object batchSubmit(@RequestBody BatchSignReq batchSignReq) {
+        logger.info("batchSubmit batchSignReq:" + batchSignReq);
+        BaseJsonResult baseJsonResult = new BaseJsonResult();
+        try {
+            if (CollectionUtils.isEmpty(batchSignReq.getBatchReq())) {
+                return baseJsonResult.marketFail("no request received here...");
+            }
+            for (SignatureReq signatureReq : batchSignReq.getBatchReq()) {
+                if (signatureReq.getFixedArea() != null) {
+                    signatureFactory.getService().fix(convert2FixFax(signatureReq));
+                }
+            }
+            baseJsonResult.markeSuccess("Signature submit successfully!", true);
+        } catch (Exception e) {
+            logger.error("batchSubmit error -- " + e.getMessage(), e);
+            baseJsonResult.marketFail("batchSubmit signature fail--" + e.getMessage());
+        }
+        return baseJsonResult;
+    }
+
+    @RequestMapping(path = {UrlCenter.OCR.BATCH_SIGNATURE_SUBMIT_2}, method = RequestMethod.POST)
+    @ResponseBody
+    public Object batchSubmit2(@RequestBody BatchSignReq batchSignReq) {
+        logger.info("batchSubmit batchSignReq:" + batchSignReq);
+        BaseJsonResult baseJsonResult = new BaseJsonResult();
+        try {
+            if (CollectionUtils.isEmpty(batchSignReq.getBatchReq())) {
+                return baseJsonResult.marketFail("no request received here...");
+            }
+            for (SignatureReq signatureReq : batchSignReq.getBatchReq()) {
+                if (signatureReq.getFixedArea() != null) {
+                    signatureFactory.getService().fix2(convert2FixFax(signatureReq));
+                }
+            }
+            baseJsonResult.markeSuccess("Signature submit successfully!", true);
+        } catch (Exception e) {
+            logger.error("batchSubmit error -- " + e.getMessage(), e);
+            baseJsonResult.marketFail("batchSubmit signature fail--" + e.getMessage());
+        }
+        return baseJsonResult;
+    }
+
+    @RequestMapping(path = {UrlCenter.OCR.SIGNATURE_LOAD}, method = RequestMethod.POST)
+    @ResponseBody
+    public Object getPicList(@RequestBody SignatureReq signatureReq) {
+        logger.info("getPicList signatureReq:" + signatureReq);
+        BaseJsonResult baseJsonResult = new BaseJsonResult();
+        try {
+            if (CollectionUtils.isEmpty(signatureReq.getFolderPath())) {
+                return baseJsonResult.marketFail("No path find!");
+            }
+            File picStoreDir = new File(storePath);
+            if (!picStoreDir.exists()) {
+                picStoreDir.mkdirs();
+            }
+            File[] files = picStoreDir.listFiles();
+            List<FileInfo> fileInfos = new ArrayList<>();
+            TreeMap<Long, FileInfo> treeMap = new TreeMap<>();
+            if (files != null) {
+                for (File file : files) {
+                    FileInfo fileInfo = new FileInfo(resourceBasePath + file.getName(), file.length());
+                    fileInfo.setPath(resourceBasePath);
+                    fileInfo.setShortName(file.getName());
+                    fileInfo.setType(StringUtils.substringAfterLast(file.getName(), "."));
+                    Long lastModified = file.lastModified();
+                    treeMap.put(lastModified, fileInfo);
+                }
+                fileInfos.addAll(treeMap.values());
+                Collections.reverse(fileInfos);
+            }
+
+            baseJsonResult.markeSuccess("Load picture successfully!", fileInfos);
+        } catch (Exception e) {
+            logger.error("Load Picture error -- " + e.getMessage(), e);
+            baseJsonResult.marketFail("Load Picture error--" + e.getMessage());
         }
         return baseJsonResult;
     }

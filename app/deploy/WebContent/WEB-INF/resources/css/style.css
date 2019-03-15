@@ -1324,7 +1324,7 @@ table.recon-ct tr.recon-row-sub input{
 	content: '';
 	position: absolute;
 	top: 0;
-	/*right: -9px;*/
+	right: -9px;
 	/*half of square's length*/
 	/*same dimension as the line-height of .breadcrumb a */
 	width: 16px;

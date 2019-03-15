@@ -1,0 +1,383 @@
+<div id="recon-layout-ct" class="fax-validate-left">
+    <div class="preview-ct">
+        <img src="$!{img-path}" data-name="$!{img-name}" data-path="$!{img-path}"/>
+    </div>
+    <div class="tool-ct bottom-bar flex-ct">
+        <div class="flex-ct" style="width: 200px; padding-top: 20px; padding-left: 20px;">
+            <span class="btn-icon" style="margin-top: -1px;">
+                <i class="fa fa-picture-o fa-little"></i>
+            </span>
+            <input type="range" id="img-scale" min="1" max="100" step="1" value="15"/>
+            <span class="btn-icon" style="margin-top: 1px;">
+                <i class="fa fa-picture-o fa-large"></i>
+            </span>
+        </div>
+        <div class="flex-end-ct" style="width: calc(100% - 200px); padding-bottom: 16px;">
+            <span class="btn-text">Reset</span>
+            <span class="btn-icon">
+                <i class="fa fa-reply-all "></i>
+            </span>
+            <span class="btn-icon">
+                <i class="fa fa-share"></i>
+            </span>
+            <span class="btn-icon">
+                <i class="fa fa-reply"></i>
+            </span>
+        </div>
+
+    </div>
+</div>
+<div class="fax-validate-right">
+    <div id="recon-layout-result" class="recon-ct">
+        <div class="status-bar">
+            <span>Best Matches (</span><span id="match-count">?</span><span>)</span>
+        </div>
+        <div class="layout-preview scroll-ct"></div>
+        <div class="status-bar" style="padding-top: 10px;">
+            <span>No matched layout result.</span>
+            <span
+                class="action"
+                data-target="#dialog-image-layout"
+                data-toggle="modal"
+                onclick="showLayoutOption(this);">Select a layout ></span>
+        </div>
+    </div>
+    <div class="bottom-bar">
+        <span class="prev" onclick="go2Step(1);">
+            <i class="fa fa-angle-left"></i>
+            <span>Prev</span>
+        </span>
+        <span class="next btn-active" onclick="layoutSub();">
+            <span>Next</span>
+            <i class="fa fa-angle-right"></i>
+        </span>
+    </div>
+</div>
+
+<div id="layout-template" style="display: none;">
+    <div class="layout-preview-area" onclick="fireLayout(this);">
+        <div class="layout-status">
+            <i class="fa fa-check"></i>
+        </div>
+    </div>
+    <div class="toolbar">
+        <span class="left-label">?</span>
+        <span class="right-label">0%</span>
+    </div>
+    <div class="layout-tag-list">
+        #foreach($temp in $layout-list)
+            <div class="layout-tag-ct" id='type-${temp.name}'>
+                <span class="img-path">${WEB_CONTEXT_PATH}/resources/images/ocr/layout/type-${temp.name}.jpg</span>
+                <span class="layout-name">${temp.value}</span>
+            </div>
+        #end
+    </div>
+</div>
+
+<div
+    id="dialog-image-layout"
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="dialog-image-layout"
+    aria-hidden="true">
+    <div
+        class="modal-dialog"
+        role="document"
+        style="width: 80%; height: calc(100% -  160px); margin: 80px auto;">
+        <div class="modal-content" style="height: 100%;background: #10151e;">
+            <div class="modal-body" style="height: 100%; padding: 0px;">
+                <div
+                    style="width: 100%; height: 60px; line-height: 60px; font-size: 20px; text-align: center; color: #bdc5d1;">Select a layout</div>
+                <div
+                    style="width: 100%; height: 20px; font-weight: bold; font-size: 16px; line-height: 10px; padding-left: 48px;color: #bdc5d1;">Table (${layout-list.size()})</div>
+                <div
+                    style="position:absolute;right: 30px; top: 30px;color: #bdc5d1; font-size: 20px; cursor: pointer;"
+                    class="hvs-pulse"
+                    data-dismiss="modal"
+                    onclick="rollbackSelect();">
+                    <i class="fa fa-times"></i>
+                </div>
+                <div
+                    class="layout-preview scroll-ct-hidden-bar"
+                    style="height: calc(100% - 140px); padding: 0 48px; overflow: auto;">
+                    #foreach($temp in $layout-list)
+                        <div
+                            class="layout-preview-area"
+                            onclick="selectLayout(this);"
+                            id='type-${temp.name}'
+                            data-type-id='${temp.name}'>
+                            <div class="layout-status">
+                                <i class="fa fa-check"></i>
+                            </div>
+                            <img src='${WEB_CONTEXT_PATH}/resources/images/ocr/layout/type-${temp.name}.jpg'>
+                            <div class="toolbar">
+                                <span class="left-label">${temp.value}</span>
+                                <span class="right-label"></span>
+                            </div>
+                        </div>
+                    #end
+                </div>
+                <div
+                    class="modal-sub-btn"
+                    style="width: 100%; height: 48px; line-height: 48px;
+                    font-size: 24px; text-align: center; position: absolute; bottom: 0px; left: 0; "
+                    onclick="confirmLayoutDialog();"
+                    data-dismiss="modal">
+                    CONFIRM
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        var imageDialog = $('#dialog-image-layout');
+        imageDialog.insertAfter($('.app-main-ct'));
+    });
+    function fireLayout(e) {
+        deactiveAllLayout()
+        $(e).addClass('layout-active');
+        var layoutId = $(e).attr('data-type-id')
+        syncDialogLayout(layoutId);
+    }
+
+    function syncDialogLayout(layoutId) {
+        deactiveDialogLayout();
+        fireDialogLayout(layoutId);
+    }
+
+    function selectLayout(e) {
+        console.log('selectLayout e', e);
+        var layoutId = $(e).attr('data-type-id')
+        syncDialogLayout(layoutId);
+    }
+
+    function deactiveAllLayout() {
+        $('#recon-layout-result .layout-preview-area').each(function () {
+            $(this).removeClass('layout-active');
+        });
+    }
+
+    function fireDialogLayout(layoutId) {
+        $('#dialog-image-layout #type-' + layoutId).addClass('layout-active');
+    }
+
+    function deactiveDialogLayout() {
+        $('#dialog-image-layout .layout-preview-area').each(function () {
+            $(this).removeClass('layout-active');
+        });
+    }
+
+    function cleanLayoutPreview() {
+        $('#recon-layout-result .layout-preview').html();
+    }
+
+    function getLayoutDetail(layoutInfo) {
+        var layoutItem = $('#layout-template .layout-tag-list #type-' + layoutInfo.tag);
+        var imgPath = "";
+        var layoutName = "";
+        if (layoutItem) {
+            imgPath = layoutItem
+                .find('.img-path')
+                .html();
+            layoutName = layoutItem
+                .find('.layout-name')
+                .html();
+        }
+        return {'imgPath': imgPath, 'layoutName': layoutName};
+    }
+
+    function showLayoutOption(e) {
+        $('#dialog-image-layout .scroll-ct-hidden-bar').css('overflow', 'auto');
+        //updateNiceScroll();
+        setTimeout(function () {
+            applyNiceScrollHiddenBar('#dialog-image-layout .scroll-ct-hidden-bar');
+            setTimeout(function () {
+                $('#dialog-image-layout .scroll-ct-hidden-bar').css('overflow', 'hidden');
+            }, 100);
+        }, 500);
+
+    }
+
+    function appendLayoutPreview(active, layoutInfo) {
+        // console.log('appendLayoutPreview layoutInfo:' + layoutInfo + ' active:' + active);
+        var layoutTempElement = $('#layout-template .layout-preview-area').clone();
+        if (active) {
+            layoutTempElement.addClass('layout-active');
+            syncDialogLayout(layoutInfo.tag);
+        }
+        layoutTempElement.attr('data-type-id', layoutInfo.tag);
+        var layoutDetail = getLayoutDetail(layoutInfo);
+        var path = layoutDetail.imgPath;
+        var imgElement = '<img src="' + path + '" data-layout-type="' + layoutInfo.type + '"/>';
+        layoutTempElement.append(imgElement);
+
+        var toolbarElement = $('#layout-template .toolbar').clone();
+        toolbarElement
+            .find('.left-label')
+            .each(function () {
+                $(this).html(layoutDetail.layoutName);
+            });
+        toolbarElement
+            .find('.right-label')
+            .each(function () {
+                $(this).html('' + parseInt(layoutInfo.probability) + '%');
+            });
+        layoutTempElement.append(toolbarElement);
+        layoutTempElement.appendTo('#recon-layout-result .layout-preview');
+
+        $('#recon-layout-result .layout-preview').css('overflow', 'auto');
+        setTimeout(function () {
+            applyOverflowScroll4Layout();
+        }, 50);
+    }
+
+    function applyOverflowScroll4Layout() {
+        var scrollWidth = $('#recon-layout-result .layout-preview').prop('scrollWidth');
+        var width = $('#recon-layout-result .layout-preview').width();
+        $('#recon-layout-result .layout-preview').css('overflow', 'hidden');
+        if (parseFloat('' + scrollWidth) > parseFloat('' + width)) {
+            console.log('applyOverflowScroll4Layout apply');
+            updateNiceScroll();
+        }
+    }
+
+    function updateLayoutMatchCount(matchedCount) {
+        $('#recon-layout-result #match-count').html(matchedCount);
+    }
+
+    function cleanLayoutPreview() {
+        $('#recon-layout-result .layout-preview').html('');
+    }
+
+    function renderLayoutPreview(matchedLayoutList) {
+        var matchedCount = matchedLayoutList
+            ? matchedLayoutList.length
+            : 0;
+        updateLayoutMatchCount(matchedCount);
+        cleanLayoutPreview();
+        if (matchedCount === 0) {
+            return;
+        }
+        matchedLayoutList.sort(function (a, b) {
+            var ap = parseFloat(a.probability);
+            var bp = parseFloat(b.probability);
+            return bp - ap;
+        });
+        for (var i = 0; i < matchedLayoutList.length; i++) {
+            var layoutInfo = matchedLayoutList[i];
+            appendLayoutPreview(i === 0, layoutInfo);
+        }
+    }
+
+    function renderDefaultLayout() {
+        var matchedLayoutList = [
+            {
+                "type": "table-ly",
+                "tag": "20",
+                "id": "897",
+                "probability": "65.96"
+            }, {
+                "type": "table-ly",
+                "tag": "11",
+                "id": "362",
+                "probability": "92.96"
+            }, {
+                "type": "table-ly",
+                "tag": "1",
+                "id": "620",
+                "probability": "28.57"
+            }
+        ];
+        cleanLayoutPreview();
+        renderLayoutPreview(matchedLayoutList);
+    }
+
+    function rollbackSelect() {
+        $('#recon-layout-result .layout-active').each(function () {
+            var tempLayoutId = $(this).attr('data-type-id');
+            syncDialogLayout(tempLayoutId);
+        });
+    }
+
+    function confirmLayoutDialog() {
+        $('#dialog-image-layout .layout-active').each(function () {
+            var layoutId = $(this).attr('data-type-id');
+            deactiveAllLayout();
+            var find = false;
+            $('#recon-layout-result .layout-preview-area').each(function () {
+                var tempLayoutId = $(this).attr('data-type-id');
+                if (tempLayoutId === layoutId) {
+                    $(this).addClass('layout-active');
+                    find = true;
+                }
+            });
+            var layoutInfo = {
+                'tag': layoutId,
+                'probability': '0',
+                'type': 'temp'
+            };
+            if (!find) {
+                appendLayoutPreview(true, layoutInfo);
+                //TODO should better append first of all
+            }
+        });
+    }
+
+    function doLayoutRecon() {
+        var imgObj = $('#recon-layout-ct img');
+
+        if (imgObj === undefined || imgObj === null) {
+            sendNotification('error', 'Please upload an image first!!!');
+            return;
+        }
+        var imgPath = imgObj.attr("data-path");
+        var imgName = imgObj.attr("data-name");
+
+        if (imgPath === undefined || imgName === undefined) {
+            sendNotification('error', 'Please upload an image first!!!');
+            return;
+        }
+        imgPath = imgPath.substring(0, imgPath.lastIndexOf('/'));
+
+        var body = {
+            'imageWebPath': imgPath,
+            'reconImage': imgName
+        };
+        var url = '${WEB_CONTEXT_PATH}/api/layout/recon.do'
+        showLoading();
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: JSON.stringify(body),
+            contentType: "application/json",
+            success: function (resp) {
+                hideLoading();
+                if (resp.status) {
+                    if (resp.data && resp.data.length > 0) {
+                        cleanLayoutPreview();
+                        renderLayoutPreview(resp.data);
+                        sendNotification('success', resp.message);
+                    } else {
+                        sendNotification('warn', 'Cannot recognition layout for this image');
+                    }
+                } else {
+                    sendNotification('error', resp.message);
+                }
+
+            },
+            error: function (err) {
+                hideLoading();
+                sendNotification('error', 'Layout Recongnition fail!');
+            }
+        });
+    }
+
+    function layoutSub() {
+        markStepDone(2);
+        go2Step(3);
+        doReconData();
+    }
+</script>

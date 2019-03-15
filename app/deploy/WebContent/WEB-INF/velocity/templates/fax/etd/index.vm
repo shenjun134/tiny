@@ -1,0 +1,1 @@
+#parse("/templates/fax/index.vm")

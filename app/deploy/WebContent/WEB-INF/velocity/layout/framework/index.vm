@@ -1,0 +1,13 @@
+#if($!{IS_WEB_HOME_PAGE} == true)
+   $!screen_content
+#else
+	<!DOCTYPE HTML >
+  <html>
+  #parse("/layout/framework/head.vm")
+  <body>
+  #parse("/layout/framework/nav.vm")
+  #parse("/layout/framework/content.vm")
+  #parse("/layout/framework/tail.vm")
+  </body>
+  </html>
+#end

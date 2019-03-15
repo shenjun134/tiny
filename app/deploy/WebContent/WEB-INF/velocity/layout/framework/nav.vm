@@ -1,0 +1,125 @@
+<nav class="horizontal-nav ">
+    <a href="#" id="nav-toggle-btn" class="hvr-wobble-skew logo-ct">
+        <span>LOGO</span>
+    </a>
+    <ul class="right-nav-ct">
+        <a href="#" class="">
+            <span class="nav-bell">
+                <i class="fa fa-bell" aria-hidden="true"></i></span></a>
+        <a href="#" class="">
+            <span class="nav-user">
+                <i class="fa fa-user" aria-hidden="true"></i></span></a>
+    </ul>
+</nav>
+
+<div id="sidenav">
+    <a href="javascript:void(0)" class="closebtn hvr-wobble-top">&times;</a>
+    <ul class="side-nav-items"></ul>
+</div>
+<script type="text/javascript">
+    var contextPath = '${WEB_CONTEXT_PATH}';
+    function removeScrollBarPushing() {
+        const offsetY = document.documentElement.scrollTop;
+        let i = 0;
+        const time = setInterval(function () {
+            if (i++ < 2) {
+                clearInterval(time);
+            }
+            document.documentElement.scrollTop = offsetY;
+        }, 1);
+    }
+
+    var mockedSideMenuInfo = [
+        {
+            'label': 'Home',
+            'url': '/home'
+        }, {
+            'label': 'Fax-OCR',
+            'url': '#',
+            'children': [
+                {
+                    'label': 'Index',
+                    'url': '/fax/index'
+                }, {
+                    'label': 'ETD-Index',
+                    'url': '/fax/etd'
+                }, {
+                    'label': 'Category',
+                    'url': '/fax/category'
+                }, {
+                    'label': 'Layout',
+                    'url': '/fax/layout'
+                }, {
+                    'label': 'Signature',
+                    'url': '/fax/signature'
+                }
+            ]
+        }, {
+            'label': 'Contact',
+            'url': '#'
+        }, {
+            'label': 'About',
+            'url': '#'
+        }
+    ];
+
+    function renderSideMenu(sideMenuInfo) {
+        var html = '';
+        for (var i = 0; i < sideMenuInfo.length; i++) {
+            var menuInfo = sideMenuInfo[i];
+            if (menuInfo.children && menuInfo.children.length > 0) {
+                html = html + renderDropdownMenuItem(menuInfo);
+            } else {
+                html = html + renderMenuItem(menuInfo);
+            }
+        }
+        $('#sidenav .side-nav-items').html(html);
+    }
+
+    function renderMenuItem(menuInfo) {
+        var html = '<li class="side-item">';
+        html = html + '<a href="' + contextPath + menuInfo.url + '">' + menuInfo.label + '</a>';
+        html = html + '</li>';
+        return html;
+    }
+
+    function renderDropdownMenuItem(menuInfo) {
+        var html = '<li class="side-item dropdown">';
+        html = html + '<a href="#">' + menuInfo.label + '</a>';
+        html = html + '<ul class="dropdown-items">';
+        for (var i = 0; i < menuInfo.children.length; i++) {
+            var item = menuInfo.children[i];
+            html = html + '<li class="dropdown-item">';
+            html = html + '<a href="' + contextPath + item.url + '">' + item.label + '</a>';
+            html = html + '</li>';
+        }
+
+        html = html + '</ul>';
+        html = html + '</li>';
+        return html;
+    }
+
+    // open sidenav
+    document
+        .getElementById('nav-toggle-btn')
+        .addEventListener('click', function () {
+            document
+                .getElementById('sidenav')
+                .classList
+                .add('show');
+            removeScrollBarPushing();
+        });
+    // close sidenav
+    document
+        .querySelector('#sidenav .closebtn')
+        .addEventListener('click', function () {
+            document
+                .getElementById('sidenav')
+                .classList
+                .remove('show');
+        });
+
+    $(function () {
+        renderSideMenu(mockedSideMenuInfo);
+    });
+</script>

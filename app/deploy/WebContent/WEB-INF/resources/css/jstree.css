@@ -1,0 +1,16 @@
+/********************************************jstree-begin**************************/
+
+/**http://hex2rgba.devoth.com/  **/
+
+li.jstree-node:active>a:first-child.jstree-anchor, li.jstree-node:focus>a:first-child.jstree-anchor, li.jstree-node:hover>a:first-child.jstree-anchor {
+  /*background: #212636 !important;*/
+  background: rgba(33, 38, 54, 0.8) !important;
+  border-radius: 0px !important;
+  box-shadow: none !important;
+}
+
+.fax-ct .jstree-default-dark {
+  background: transparent !important;
+}
+
+/********************************************jstree-end****************************/

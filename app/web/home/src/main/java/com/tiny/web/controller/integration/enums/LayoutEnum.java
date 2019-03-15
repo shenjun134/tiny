@@ -6,7 +6,7 @@ public enum LayoutEnum {
 
     GRID("grid-ly", "gird layout"),
 
-    TABLE("table-ly", "flow layout"),;
+    TABLE("table-ly", "table layout"),;
 
     private String code;
 

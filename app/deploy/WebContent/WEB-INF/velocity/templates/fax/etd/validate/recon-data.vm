@@ -1,0 +1,691 @@
+<div id="recon-data-ct" class="fax-validate-top">
+    <div class="preview-ct" style="text-align:center;">
+        <img src="$!{img-path}" data-name="$!{img-name}" data-path="$!{img-path}"/>
+        <div class="area-ct"></div>
+        <input type="hidden" value="" id="content-type"/>
+        <div class="toolbar-ct">
+            <span class="opera" tooltip="Reset all" flow="up" onclick="resetAllRD();">
+                <i class="fa fa-reply-all " aria-hidden="true"></i>
+            </span>
+            <span class="opera" tooltip="Show Area" flow="up" onclick="showAreaRD();">
+                <i class="fa fa-tag " aria-hidden="true"></i>
+            </span>
+            <span class="opera" tooltip="Hide Area" flow="up" onclick="hideAreaRD();">
+                <i class="fa fa-ban " aria-hidden="true"></i>
+            </span>
+            <span class="opera" tooltip="Readonly" flow="up" onclick="markRDAsReadonly();">
+                <i class="fa fa-lock " aria-hidden="true"></i>
+            </span>
+            <span class="opera" tooltip="Edit" flow="up" onclick="markRDAsEdit();">
+                <i class="fa fa-pencil-square-o " aria-hidden="true"></i>
+            </span>
+        </div>
+    </div>
+</div>
+<div class="fax-validate-bottom">
+    <div
+        id="recon-data-result"
+        class="recon-ct flex-ct"
+        style="height: calc(100% - 60px); overflow: auto;"></div>
+    <div class="bottom-bar">
+        <span class="prev" onclick="go2Step(2);">
+            <i class="fa fa-angle-left"></i>
+            <span>Prev</span>
+        </span>
+        <span class="next btn-active" onclick="reconDataSub();" style="text-align: center;">
+            <span>Submit</span>
+        </span>
+    </div>
+</div>
+
+<div id="recon-data-template" style="display: none;">
+    <div class="area-content-list backup-list"></div>
+    <div class="area-content-inner"></div>
+    <div class="content-result-list"></div>
+</div>
+
+<script>
+    var reconDataImgSelector = '#recon-data-ct img';
+
+    function synTextarea(event) {
+        console.log('synTextarea', event);
+        var value = $(event).val();
+        $(event).text(value);
+    }
+
+    function reconDataSub() {
+        console.log('recon data submit');
+        markStepDone(3);
+    }
+
+    function doReconData() {
+        console.log('doReconData');
+        var body = buildContentPostBody();
+        if (body.selectedLayout.length === 0) {
+            sendNotification('warn', 'No selected layout area');
+            return;
+        }
+        var imgPath = $(reconDataImgSelector).attr('data-path');
+        imgPath = imgPath.substring(0, imgPath.lastIndexOf('/'));
+        var imgName = $(reconDataImgSelector).attr('data-name');
+        body.imageWebPath = imgPath;
+        body.reconImage = imgName;
+
+        var url = "${WEB_CONTEXT_PATH}/api/detail/recon2.do";
+        showLoading();
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: JSON.stringify(body),
+            contentType: "application/json",
+            success: function (resp) {
+                hideLoading();
+                if (resp.status) {
+                    renderContentResult(resp);
+                    updateNiceScroll(200);
+                } else {
+                    sendNotification('error', resp.message);
+                }
+
+            },
+            error: function (err) {
+                hideLoading();
+                sendNotification('error', 'Content Recongnition fail!');
+            }
+        });
+    }
+
+    function cleanReconDataResult() {
+        $('#recon-data-result').html('');
+        $('#recon-data-template .content-result-list').html('');
+        cleanAreaContentList();
+    }
+
+    function cleanPositionBox() {
+        $('#recon-data-ct .preview-ct .area-ct').html('');
+    }
+
+    function cleanAreaContentList() {
+        $('#recon-data-template .area-content-list').html('');
+        $('#recon-data-template .area-content-inner').html('');
+    }
+
+    function updateAreaCtStyle4ReconData() {
+        var ctSelector = '#recon-data-ct .preview-ct';
+        var left = getReconDataImgLeft(reconDataImgSelector, ctSelector);
+        $('#recon-data-ct .area-ct').css('left', '' + left + 'px');
+    }
+
+    function appendPositionBox(scale, matchArea, newArea, contentBox) {
+        var strGuid = matchArea.id
+            ? matchArea.id
+            : 'default';
+        var text = matchArea.text
+            ? matchArea.text
+            : '';
+        var innerHtml = '<span class="area-content">' + text + '</span>';
+        var style = createBoxStyle(matchArea, scale);
+        var attr = createBoxAtt(matchArea, newArea);
+        attr = attr + (
+            contentBox
+                ? 'data-content-box="true"'
+                : ''
+        );
+        var boxHtml = '<div class="area-box" onclick="areaBoxSelect(this);" style="' + style + '" id="' +
+                strGuid + '" ' + attr + '>' + innerHtml + '</div>';
+        if (contentBox) {
+            $('#recon-data-ct .preview-ct .area-ct').append(boxHtml);
+        } else {
+            $('#recon-data-ct .preview-ct .area-ct .area-temp-list').append(boxHtml);
+        }
+    }
+
+    function appendAreaContentResult(content, contentId) {
+        var type = content.result.type;
+        var allList = content.result.allList;
+        if (allList === null || allList === undefined) {
+            return;
+        }
+        var html = '<div id="' + contentId + '">';
+        var backupHtml = html;
+        if (type === 'grid-ly') {
+            for (var i = 0; i < allList.length; i++) {
+                var item = allList[i];
+                var id = '' + i + '-0';
+                var buildResult = builderAreaHtml(item, id);
+                html = html + buildResult.itemHtml;
+                backupHtml = backupHtml + buildResult.backupHtml;
+            }
+        } else if (type === 'table-ly') {
+            for (var i = 0; i < allList.length; i++) {
+                var rowList = allList[i];
+                for (var j = 0; j < rowList.length; j++) {
+                    var item = rowList[j];
+                    var id = '' + i + '-' + j;
+                    var buildResult = builderAreaHtml(item, id);
+                    html = html + buildResult.itemHtml;
+                    backupHtml = backupHtml + buildResult.backupHtml;
+                }
+            }
+        } else {
+            sendNotification('warn', 'Unknown type for content result');
+            return;
+        }
+        html = html + '</div>';
+        backupHtml = backupHtml + '</div>';
+        $('#recon-data-template .area-content-inner').append(html);
+        $('#recon-data-template .area-content-list').append(backupHtml);
+    }
+
+    function builderAreaHtml(item, id) {
+        var matchArea = {};
+        matchArea.id = id;
+        matchArea.x = item.xmin;
+        matchArea.y = item.ymin;
+        matchArea.w = item.width;
+        matchArea.h = item.height;
+        matchArea.text = item.text;
+        var itemHtml = renderAreaBackup(matchArea);
+        var backupHtml = '<div id="' + id + '" class="backup">' + item.text + '</div>';
+        return {'itemHtml': itemHtml, 'backupHtml': backupHtml};
+    }
+
+    function renderAreaBackup(matchArea) {
+        var text = matchArea.text
+            ? matchArea.text
+            : '';
+        var id = matchArea.id;
+        var attr = createBoxAtt(matchArea);
+        var html = '<div id="' + id + '" ' + attr + ' class="area-box">' + text + '</div>';
+        return html;
+    }
+
+    function renderPositionBox4Content(resp) {
+        updateAreaCtStyle4ReconData();
+        cleanPositionBox();
+        var newArea = false;
+        var scale = getScale(reconDataImgSelector);
+        var contentList = resp.data;
+        for (var i = 0; i < contentList.length; i++) {
+            var contentId = buildContentId(i);
+            var content = contentList[i];
+            var matchArea = {};
+            matchArea.x = content.result.x;
+            matchArea.y = content.result.y;
+            matchArea.w = content.result.width;
+            matchArea.h = content.result.height;
+            matchArea.id = contentId;
+            matchArea.text = '';
+            appendPositionBox(scale, matchArea, newArea, true);
+            appendAreaContentResult(content, contentId);
+        }
+        $('#recon-data-ct .preview-ct .area-ct').append('<div class="area-temp-list"></div>');
+    }
+
+    function appendContentResult4Temp(content, contentId) {
+        var type = content.result.type;
+        if (type === 'table-ly') {
+            renderTableLayout(content, contentId);
+        } else if (type === 'grid-ly') {
+            renderGridLayout(content, contentId);
+        } else {
+            sendNotification('warn', 'Unknown type for content result');
+            return;
+        }
+    }
+
+    function renderGridLayout(content, contentId) {
+        console.log('renderGridLayout');
+        var result = content.result;
+        var isHeader = false;
+        var i = 0,
+            len = result.allList.length;
+        var theadHtml = '<thead><tr><th style="padding: 0 10px;"><div class="th-index"></th><th><div class="th-ct">Area Con' +
+                'tent</div></th></tr>';
+        var tbodyHtml = '<tbody>';
+        var rowLength = 1;
+        for (; i < len; i++) {
+            var cellInfo = result.allList[i];
+            var rowList = [cellInfo];
+            tbodyHtml = tbodyHtml + renderTableBodyRow(rowList, i, contentId);
+        }
+        if (len === 0) {
+            theadHtml = '<thead>';
+            tbodyHtml = '<td colspan="2"><div class="gd-no-data">No Data Found</div></td>'
+        }
+        theadHtml = theadHtml + '</thead>';
+        tbodyHtml = tbodyHtml + '</tbody>';
+        var thIndexWidth = 37;
+        var thUnitWidth = 311;
+        var thRowWidthPadding = 30;
+        var thRowWidth = thIndexWidth + rowLength * thUnitWidth + thRowWidthPadding;
+        var tableHtml = '<div id="' + contentId + '"><table class="with-border single-cell">' +
+                theadHtml + '</table><div class="table-ct scroll-ct" style="width: ' + thRowWidth + 'px"><table cla' +
+                'ss="with-border single-cell">' + tbodyHtml + '</table></div></div>';
+
+        $('#recon-data-template .content-result-list').append(tableHtml);
+    }
+
+    function renderTableLayout(content, contentId) {
+        var result = content.result;
+        var isHeader = false;
+        var i = 0,
+            len = result.allList.length;
+        var theadHtml = '<thead>';
+        var tbodyHtml = '<tbody>';
+        var rowLength = 1;
+        for (; i < len; i++) {
+            var rowList = result.allList[i];
+            isHeader = i === 0;
+            if (isHeader) {
+                rowLength = rowList.length;
+                theadHtml = theadHtml + renderTableHeaderRow(rowList, i);
+            } else {
+                tbodyHtml = tbodyHtml + renderTableBodyRow(rowList, i, contentId);
+            }
+        }
+        if (len === 0) {
+            tbodyHtml = '<td colspan="2"><div class="gd-no-data">No Data Found</div></td>';
+        }
+        theadHtml = theadHtml + '</thead>';
+        tbodyHtml = tbodyHtml + '</tbody>';
+        var thIndexWidth = 37;
+        var thUnitWidth = 161;
+        var thRowWidthPadding = 30;
+        var thRowWidth = thIndexWidth + rowLength * thUnitWidth + thRowWidthPadding;
+        var tableHtml = '<div id="' + contentId + '"><table class="with-border">' + theadHtml + '</table><d' +
+                'iv class="table-ct scroll-ct" style="width: ' + thRowWidth + 'px"><table class="with-border">' +
+                tbodyHtml + '</table></div></div>';
+
+        $('#recon-data-template .content-result-list').append(tableHtml);
+    }
+
+    function buildContentId(index) {
+        return 'c-' + index;
+    }
+
+    function renderTableHeaderRow(rowList, i) {
+        var rowHtml = '<tr id="' + i + '"><th style="padding: 0 10px;"><div class="th-index"></th>';
+        for (var index = 0; index < rowList.length; index++) {
+            var cellInfo = rowList[index];
+            var cellHtml = renderTabelTH(cellInfo, i, index);
+            rowHtml = rowHtml + cellHtml;
+        }
+        rowHtml = rowHtml + '</tr>';
+        return rowHtml
+    }
+
+    function renderTableBodyRow(rowList, id, contentId, contentTD) {
+        var finalId = contentId
+            ? contentId
+            : id;
+        var rowHtml = '<tr id="' + finalId + '"><td style="text-align: center; padding: 0 10px;"><div class' +
+                '="td-index">' + id + '</div></td>';
+        for (var index = 0; index < rowList.length; index++) {
+            var cellInfo = rowList[index];
+            var cellHtml = renderTableTD(cellInfo, id, index, contentId, contentTD);
+            rowHtml = rowHtml + cellHtml;
+        }
+        rowHtml = rowHtml + '</tr>';
+        return rowHtml
+    }
+
+    function renderTabelTH(cellInfo, i, j) {
+        var text = cellInfo.text
+            ? cellInfo.text
+            : '';
+        var id = '' + i + '-' + j;
+        var cellHtml = '<th id="' + id + '"><div id="' + id + '" class="th-ct" onmouseenter="onAreaEnter(th' +
+                'is);" onmouseleave="onAreaLeave(this);" onclick="onAreaPick(this);">';
+        cellHtml = cellHtml + text;
+        cellHtml = cellHtml + '</div></th>';
+
+        return cellHtml;
+    }
+
+    function renderTableTD(cellInfo, i, j, contentId, contentTD) {
+        var text = cellInfo.text
+            ? cellInfo.text
+            : '';
+        var id = '' + i + '-' + j;
+        var cellHtml = '<td id="' + id + '" data-content-id="' + contentId + '" data-content-td="' +
+                contentTD + '" onmouseenter="onAreaEnter(this);" onmouseleave="onAreaLeave(this);" onclick="onAreaP' +
+                'ick(this);"><textarea id="' + id + '" class="scroll-ct-hidden-bar" data-content-id="' +
+                contentId + '" data-content-td="' + contentTD + '" onclick="selectSelf(this);" ondblclick="unselect' +
+                'Self(this);" onchange="synTextarea(this);">';
+        cellHtml = cellHtml + text;
+        cellHtml = cellHtml + '</textarea></td>';
+        return cellHtml;
+    }
+
+    function renderContentResult(resp) {
+        //console.log('renderContentResult');
+        var contentList = resp.data;
+        var isHeader = false;
+        var i = 0,
+            len = contentList.length;
+        cleanReconDataResult();
+        renderPositionBox4Content(resp);
+        var theadHtml = '<thead><tr><th style="padding: 0 10px;"><div class="th-index"></th><th><div class="th-ct">Area Inf' +
+                'ormation</div></th></tr>';
+        var tbodyHtml = '<tbody>';
+        var rowLength = 1;
+        for (; i < len; i++) {
+            var content = contentList[i];
+            var cellInfo = {};
+            cellInfo.text = content.result.tag;
+            //TODO
+            var rowList = [cellInfo];
+            var contentId = buildContentId(i);
+            tbodyHtml = tbodyHtml + renderTableBodyRow(rowList, i + 1, contentId, true);
+            appendContentResult4Temp(content, contentId);
+        }
+        theadHtml = theadHtml + '</thead>';
+        tbodyHtml = tbodyHtml + '</tbody>';
+        var thIndexWidth = 37;
+        var thUnitWidth = 311;
+        var thRowWidthPadding = 30;
+        var thRowWidth = thIndexWidth + rowLength * thUnitWidth + thRowWidthPadding;
+        var thead = '<table class="with-border single-cell">' + theadHtml + '</table>';
+        var tbody = '<div class="table-ct scroll-ct area-list" style="width: ' + thRowWidth + 'px"><table c' +
+                'lass="with-border single-cell">' + tbodyHtml + '</table></div>';
+        var contentList = '<div class="content-list">' + thead + tbody + '</div>';
+        var toolbar = '<div class="toolbar"><span class="opera" onclick="resetSelect();"><i class="fa fa-reply"></i></spa' +
+                'n><h2></h2></div>';
+        var resultHtml = contentList + toolbar + '<div class="select-result scroll-ct">';
+
+        $('#recon-data-result').html(resultHtml);
+        triggleAreaInfo();
+    }
+
+    function triggleAreaInfo() {
+        setTimeout(function () {
+            var firstAreaInfo = $('.content-list  tr#c-0 td#1-0');
+            console.log('triggleAreaInfo...', firstAreaInfo);
+            firstAreaInfo.click();
+        }, 1000);
+
+    }
+
+    /***************event*****************************/
+    function onAreaEnter(e) {
+        //console.log('onAreaEnter');
+        var contentId = $(e).attr('data-content-id');
+        var contentTD = $(e).attr('data-content-td');
+        if (contentTD === 'true') {
+            showAreaBox(contentId);
+        } else {
+            showAreaBox($(e).attr('id'));
+        }
+
+    }
+
+    function onAreaLeave(e) {
+        //console.log('onAreaLeave');
+        var contentId = $(e).attr('data-content-id');
+        var contentTD = $(e).attr('data-content-td');
+        if (contentTD === 'true') {
+            hideAreaBox(contentId);
+        } else {
+            hideAreaBox($(e).attr('id'));
+        }
+    }
+
+    function onAreaPick(e) {
+        //console.log('onAreaPick');
+        var contentId = $(e).attr('data-content-id');
+        var contentTD = $(e).attr('data-content-td');
+        var id = $(e).attr('id');
+        if (contentTD === 'true') {
+            markAreaBox(contentId);
+            var selectContentId = $('#recon-data-result .select-result').attr('data-content-id');
+            if (selectContentId === contentId) {
+                return;
+            }
+            showLoading();
+            synSelectedContent()
+            copyContentResult(contentId);
+            copyContentArea(contentId);
+            deactiveAreaSelf(contentId);
+            setTimeout(function () {
+                updateNiceScroll();
+                hideLoading();
+            }, 500);
+
+        } else {
+            markAreaBox(id);
+        }
+        markTextArea(id);
+    }
+
+    function deactiveAreaSelf(contentId) {
+        $('#recon-data-ct .preview-ct .area-ct .area-box').each(function () {
+            var id = $(this).attr('id');
+            if (id === contentId) {
+                $(this).addClass('area-hide');
+            } else {
+                $(this).removeClass('area-hide');
+            }
+        });
+    }
+
+    function copyContentResult(contentId) {
+        var clonedResult = $('#recon-data-template .content-result-list #' + contentId).clone();
+        clonedResult
+            .find('.scroll-ct')
+            .each(function () {
+                //$(this).css('overflow', 'auto');
+            });
+        //$('#recon-data-result .select-result').css('overflow', 'auto');
+        $('#recon-data-result .select-result').attr('data-content-id', contentId);
+        var index = contentId.substring(2);
+        index = parseInt(index) + 1;
+        var header = 'Area-' + index + '';
+        $('#recon-data-result h2').html(header);
+        $('#recon-data-result .select-result').html(clonedResult.html());
+    }
+
+    function synSelectedContent() {
+        var selectResultElement = $('#recon-data-result .select-result').clone();
+        var contentId = selectResultElement.attr('data-content-id');
+        var target = $('#recon-data-template .content-result-list #' + contentId);
+        target.html(selectResultElement.html());
+    }
+
+    function resetContent(contentId) {
+        var selectedContentId = $('#recon-data-result .select-result').attr('data-content-id');
+        var needResetSelected = selectedContentId === contentId;
+        $('#recon-data-template .area-content-list #' + contentId + ' .backup').each(function () {
+            var text = $(this).html();
+            var id = $(this).attr('id');
+            $('#recon-data-template .content-result-list #' + contentId + ' textarea#' + id).val(text);
+            if (needResetSelected) {
+                $('#recon-data-result .select-result textarea#' + id).val(text);
+            }
+        });
+    }
+
+    function copyContentArea(contentId) {
+        var newArea = false;
+        var scale = getScale(reconDataImgSelector);
+        $('#recon-data-ct .preview-ct .area-ct .area-temp-list').html('');
+        var clonedResult = $('#recon-data-template .area-content-inner #' + contentId)
+            .find('.area-box')
+            .each(function () {
+                var id = $(this).attr('id');
+                var x = $(this).attr('data-x');
+                var y = $(this).attr('data-y');
+                var w = $(this).attr('data-w');
+                var h = $(this).attr('data-h');
+                var text = $(this).html();
+                var matchArea = {};
+                matchArea.id = id;
+                matchArea.x = x;
+                matchArea.y = y;
+                matchArea.w = w;
+                matchArea.h = h;
+                matchArea.text = text;
+                appendPositionBox(scale, matchArea, newArea, false);
+            });
+    }
+
+    function resetSelect() {
+        showLoading();
+        var contentId = $('#recon-data-result .select-result').attr('data-content-id');
+        resetContent(contentId);
+        setTimeout(function () {
+            hideLoading();
+        }, 500);
+    }
+
+    function selectSelf(e) {
+        var id = $(e).attr('id');
+        var contentTD = $(e).attr('data-content-td');
+        if (contentTD === 'true') {
+            markTextArea4Content(id);
+        } else {
+            markTextArea(id);
+        }
+    }
+
+    function unselectSelf(e) {
+        var id = $(e).attr('id');
+        var contentTD = $(e).attr('data-content-td');
+        if (contentTD === 'true') {
+            unmarkTextArea4Content(id);
+        } else {
+            unmarkTextArea(id);
+        }
+    }
+
+    function areaBoxSelect(e) {
+        var contentId = $(e).attr('id');
+        var contentBox = $(e).attr('data-content-box');
+        if (contentBox === 'true') {
+            $('#recon-data-result .content-list textarea').each(function () {
+                var id = $(this).attr('data-content-id');
+                if (id === contentId) {
+                    $(this).addClass('selected');
+                    $(this).focus();
+                } else {
+                    $(this).removeClass('selected');
+                }
+            });
+
+            $('#recon-data-ct .preview-ct .area-ct > .area-box').each(function () {
+                var id = $(this).attr('id');
+                if (id === contentId) {
+                    $(this).addClass('area-active');
+                } else {
+                    $(this).removeClass('area-active');
+                }
+            });
+        }
+    }
+
+    function markAreaBox(id) {
+        $('#recon-data-ct .preview-ct .area-ct #' + id).removeClass('area-hide');
+    }
+
+    function markTextArea(id) {
+        $('#recon-data-result .select-result  textarea#' + id).addClass('selected');
+    }
+
+    function unmarkTextArea(id) {
+        $('#recon-data-result .select-result  textarea#' + id).removeClass('selected');
+    }
+
+    function markTextArea4Content(id) {
+        $('#recon-data-result .content-list  textarea#' + id).addClass('selected');
+    }
+
+    function unmarkTextArea4Content(id) {
+        $('#recon-data-result .content-list  textarea#' + id).removeClass('selected');
+    }
+
+    function showAreaBox(id) {
+        $('#recon-data-ct .preview-ct .area-ct #' + id).css('display', 'block');
+        activeAreaBox(id);
+    }
+
+    function hideAreaBox(id) {
+        $('#recon-data-ct .preview-ct .area-ct #' + id).css('display', '');
+        deactiveAreaBox(id)
+    }
+
+    function activeAreaBox(id) {
+        $('#recon-data-ct .preview-ct .area-ct #' + id).addClass('area-active');
+    }
+
+    function deactiveAreaBox(id) {
+        $('#recon-data-ct .preview-ct .area-ct #' + id).removeClass('area-active');
+    }
+
+    function getTextArea(id) {
+        var textElement = $('#recon-data-template .area-content-list #' + id);
+        if (textElement) {
+            return textElement.text;
+        }
+        return '';
+    }
+
+    function resetAllRD() {
+        showLoading();
+        $('.content-list .area-list tr').each(function () {
+            var contentId = $(this).attr('id');
+            resetContent(contentId);
+        });
+        hideLoading();
+    }
+
+    function markRDAsReadonly() {
+        console.log('markRDAsReadonly');
+        $('#recon-data-result textarea').each(function () {
+            $(this).attr('readonly', 'true');
+        });
+    }
+
+    function markRDAsEdit() {
+        console.log('markRDAsEdit');
+        $('#recon-data-result textarea').each(function () {
+            $(this).removeAttr("readonly");
+        });
+    }
+
+    function showAreaRD() {
+        $('#recon-data-ct .preview-ct .area-ct .area-box').each(function () {
+            var clz = $(this).attr('class');
+            $(this).removeClass('area-hide');
+        });
+    }
+
+    function hideAreaRD() {
+        $('#recon-data-ct .preview-ct .area-ct .area-box').each(function () {
+            var clz = $(this).attr('class');
+            $(this).addClass('area-hide');
+        });
+    }
+
+    function change4ReconData() {
+        var scale = getScale(reconDataImgSelector);
+        updateAreaCtStyle4ReconData();
+        updateAreaBox4ReconData(scale);
+    }
+
+    function updateAreaBox4ReconData(scale) {
+        $('#recon-data-ct .area-ct .area-box').each(function () {
+            var x = $(this).attr('data-x');
+            var y = $(this).attr('data-y');
+            var w = $(this).attr('data-w');
+            var h = $(this).attr('data-h');
+            x = parseFloatRound(x) * scale;
+            y = parseFloatRound(y) * scale;
+            w = parseFloatRound(w) * scale;
+            h = parseFloatRound(h) * scale;
+            $(this).css('left', '' + x + 'px');
+            $(this).css('top', '' + y + 'px');
+            $(this).css('width', '' + w + 'px');
+            $(this).css('height', '' + h + 'px');
+        });
+    }
+</script>

@@ -3,7 +3,7 @@
 		<span class="title">Signature Recognition</span>
 		<div style="display: flex; height: calc(100% - 0px);">
 			<div class="left" style="width: 540px; overflow-y: auto;">
-				<form id="signUploadForm" class="form-inline" action="/tiny/ocr/signUpload.do" method="POST" style="margin-top: 10px; margin-bottom: 10px; margin-left: 10px;">
+				<form id="signUploadForm" class="form-inline" action="${WEB_CONTEXT_PATH}/ocr/signUpload.do" method="POST" style="margin-top: 10px; margin-bottom: 10px; margin-left: 10px;">
 					<div class="form-group" style="background: #eee; border-radius: 2px;">
 							<input type="file" accept=".tiff,.tif,.png,.jpg,.bmp,.ico,.pdf" name="file" style="overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 250px;width: 250px; height: 34px;"/>
 					</div>

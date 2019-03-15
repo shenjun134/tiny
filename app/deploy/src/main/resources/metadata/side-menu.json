@@ -1,0 +1,40 @@
+[
+  {
+    "label": "Home",
+    "url": "/home"
+  },
+  {
+    "label": "Fax-OCR",
+    "url": "#",
+    "children": [
+      {
+        "label": "Index",
+        "url": "/fax/index"
+      },
+      {
+        "label": "ETD-Index",
+        "url": "/fax/etd"
+      },
+      {
+        "label": "Category",
+        "url": "/fax/category"
+      },
+      {
+        "label": "Layout",
+        "url": "/fax/layout"
+      },
+      {
+        "label": "Signature",
+        "url": "/fax/signature"
+      }
+    ]
+  },
+  {
+    "label": "Contact",
+    "url": "#"
+  },
+  {
+    "label": "About",
+    "url": "#"
+  }
+]

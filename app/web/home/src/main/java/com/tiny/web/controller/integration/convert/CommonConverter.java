@@ -10,12 +10,14 @@ import com.tiny.web.controller.integration.util.RandomUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 public class CommonConverter {
@@ -80,6 +82,40 @@ public class CommonConverter {
         }
         return listList;
     }
+
+    /**
+     * @param rowColCell
+     * @return
+     */
+    public static List<List<RectangleVO>> convert2ListList(TreeMap<Integer, TreeMap<Integer, TableCell>> rowColCell) {
+        List<List<RectangleVO>> listList = new ArrayList<>();
+        for (TreeMap<Integer, TableCell> rowTree : rowColCell.values()) {
+            List<RectangleVO> row = new ArrayList<>();
+            for (TableCell tableCell : rowTree.values()) {
+                row.add(convert2Rect(tableCell));
+            }
+            listList.add(row);
+        }
+        return listList;
+    }
+
+    /**
+     * @param tableCell
+     * @return
+     */
+    public static RectangleVO convert2Rect(TableCell tableCell) {
+        RectangleVO rectangleVO = new RectangleVO();
+        rectangleVO.setText(StringUtils.join(tableCell.getTextList(), Constant.split));
+        rectangleVO.setHeight(tableCell.getHeight());
+        rectangleVO.setWidth(tableCell.getWidth());
+        rectangleVO.setXmin(tableCell.getPoint1().getX());
+        rectangleVO.setYmin(tableCell.getPoint1().getY());
+        rectangleVO.setXmax(tableCell.getPoint2().getX());
+        rectangleVO.setYmax(tableCell.getPoint2().getY());
+
+        return rectangleVO;
+    }
+
 
     /**
      * @param rectangle
@@ -320,19 +356,34 @@ public class CommonConverter {
     }
 
     public static com.tiny.web.controller.integration.entity.ContentResult mockContentResult(String srcJson) {
-        String path = "D:\\data\\code\\github-workspace\\tiny\\app\\web\\home\\src\\test\\resources\\table-result-2.json";
+        String filePath = "metadata/table-result-2.json";
         String jsonStr = null;
+        InputStream inputStream = null;
         try {
-            jsonStr = FileUtils.readFileToString(new File(path));
+            inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(filePath);
+            List<String> lines = IOUtils.readLines(inputStream);
+            StringBuilder stringBuilder = new StringBuilder();
+            for (String line : lines) {
+                stringBuilder.append(line);
+            }
+            jsonStr = stringBuilder.toString();
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
         return parseContentResult(jsonStr);
     }
 
     public static void main(String[] args) throws IOException {
 //        String path = "D:\\data\\code\\github-workspace\\tiny\\app\\web\\home\\src\\test\\resources\\table-result-2.json";
-        String path = "D:\\data\\code\\github-workspace\\tiny\\app\\web\\home\\src\\test\\resources\\022979.json";
+        String path = "C:\\Users\\e521907\\home\\code\\github_workspalce\\tiny\\app\\web\\home\\src\\test\\resources\\table-result-2.json";
         String jsonStr = FileUtils.readFileToString(new File(path));
 
         Object obj = parseContentResult(jsonStr);

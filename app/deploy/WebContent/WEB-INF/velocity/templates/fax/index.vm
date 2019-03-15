@@ -1,0 +1,384 @@
+<link
+    rel="stylesheet"
+    href="${WEB_CONTEXT_PATH}/resources/lib/jstree/dist/themes/default/style.min.css"
+    type="text/css">
+<link
+    rel="stylesheet"
+    href="${WEB_CONTEXT_PATH}/resources/lib/jstree/dist/themes/default-dark/style.min.css"
+    type="text/css">
+<script src="${WEB_CONTEXT_PATH}/resources/lib/jstree/dist/jstree.min.js"></script>
+
+<div class="fax-ct">
+    <div id="category-menu" class="left-ct" style="padding-top: 20px;">
+        <div id="category-tree"></div>
+    </div>
+    <div id="fax-pic-preview" class="rest-ct scroll-ct">
+        <div id="folder-event-result" style="padding-left: 10px;">
+            <div class="empty-tip">Plesae select a folder.</div>
+        </div>
+    </div>
+</div>
+
+<div id="category-template" style="display: none;">
+    <div id="temp-preview" class="fax-pic-preview-ct">
+        <div class="pic-ct filpInY animated">
+            <div class="pic-action hvr-hang" onclick="validateFaxPic(${pic-name}, ${pic-path});">
+                <span class="">Validate</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="temp-add" class="fax-pic-add-ct">
+        <div class="add-icon" onclick="uploadFaxPic();">
+            <div class="horizon-line"></div>
+            <div class="vertical-line"></div>
+        </div>
+        <div class="add-text" onclick="confirmUploadFaxPic();">Add new images</div>
+        <form
+            id="signUploadForm"
+            style=""
+            action="${WEB_CONTEXT_PATH}/ocr/signUpload.do?checkType="
+            method="POST">
+            <input
+                id="upload-pic-btn"
+                type="file"
+                accept=".png,.jpg,.bmp,.ico"
+                name="file"
+                style="width:0px; height: 0px; opacity: 0;"
+                onchange="onFileUploadChange();"/>
+        </form>
+    </div>
+    <p id="clicked-tree-node"></p>
+</div>
+
+<script>
+    var contextPath = '${WEB_CONTEXT_PATH}/';
+    var contextName = '${WEB_CONTEXT_PATH}';
+    var jumpUrl = '${jump-url}';
+    var categoryTreeSelector = '#category-tree';
+    //appendPicAddArea();
+    $(function () {
+        $(categoryTreeSelector).jstree({
+            'core': {
+                "themes": {
+                    "name": "default-dark",
+                    "dots": false,
+                    "icons": true
+                },
+                'data': [
+                    {
+                        'text': 'Root',
+                        'state': {
+                            'opened': true,
+                            'selected': false
+                        },
+                        'children': [
+                            {
+                                'text': 'Nov. 2018',
+                                'children': [
+                                    {
+                                        'text': 'US Audit Report'
+                                    }
+                                ]
+                            }, {
+                                'text': 'Dec. 2018',
+                                'children': [
+                                    {
+                                        'text': 'US Audit Report'
+                                    }
+                                ]
+                            }, {
+                                'text': 'Jan. 2019',
+                                'children': [
+                                    {
+                                        'text': 'Japan Audit Report'
+                                    }, {
+                                        'text': 'Hongkong Audit Report'
+                                    }, {
+                                        'text': 'US Audit Report',
+                                        'children': [
+                                            {
+                                                'text': 'Boston'
+                                            }
+                                        ]
+                                    }
+
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        });
+
+        $(categoryTreeSelector).on("changed.jstree", function (e, data) {
+            console.log('changed.jstree', data);
+            var instance = data.instance;
+            var currentId = data.selected[0];
+            var nodeChain = getNodeChain(instance, currentId);
+            var nodeChainText = convert2Text(nodeChain);
+
+            var htmlText = 'Selected: ' + nodeChainText.join(' > ');
+            console.log(htmlText);
+            serializeClickedNode(nodeChainText);
+            loadPicList(nodeChainText);
+        });
+        var currentNodeChainText = '$!{node-chain}';
+        var currentNode = '$!{current-node}';
+        setTimeout(function () {
+            console.log('activeNode--', currentNode);
+            if (isNotBlankStr(currentNode)) {
+                activeNode(currentNode);
+            }
+        }, 1000);
+
+    });
+
+    function activeNode(currentNode) {
+        var nodeElement = $(categoryTreeSelector + ' #' + currentNode);
+        if (nodeElement) {
+            nodeElement.click();
+        }
+    }
+
+    function serializeClickedNode(nodeChainText) {
+        var text = JSON.stringify(nodeChainText);
+        $('#clicked-tree-node').text(text);
+    }
+
+    function deserializeClickedNode() {
+        var htmlText = $('#clicked-tree-node').html();
+        return JSON.parse(htmlText);
+    }
+
+    function cleanEventResult() {
+        $('#folder-event-result').html('');
+    }
+
+    function loadPicList(folderChain) {
+        cleanEventResult();
+        var url = '/tiny/ocr/signLoad.do?';
+        var body = {
+            'folderPath': folderChain
+        };
+
+        showLoading();
+        $.ajax({
+            type: "POST",
+            url: url,
+            contentType: "application/json",
+            data: JSON.stringify(body),
+            dataType: 'json',
+            success: function (resp) {
+                hideLoading();
+                var type = resp.status
+                    ? 'success'
+                    : 'error';
+                var message = resp.message
+                    ? resp.message
+                    : 'Submit ' + type + ' !';
+
+                if (resp.status) {
+                    renderPicList(resp.data)
+                }
+                appendPicAddArea();
+                sendNotification(type, message);
+
+            },
+            error: function (err) {
+                hideLoading();
+                sendNotification('error', 'Load fail!');
+                appendPicAddArea();
+            }
+        });
+    }
+
+    function renderPicList(fileList) {
+        if (fileList && fileList.length > 0) {
+            for (var i = 0; i < fileList.length; i++) {
+                var fileInfo = fileList[i];
+                appendPicFile(fileInfo);
+            }
+        }
+        updateNiceScroll(200);
+    }
+
+    function appendPicFile(fileInfo) {
+        var tempPreviewElement = $('#category-template > #temp-preview');
+        var clonedTempPreview = tempPreviewElement.clone();
+        var picName = fileInfo.shortName;
+        var picPath = fileInfo.name;
+        clonedTempPreview.attr('id', '');
+        clonedTempPreview
+            .find('.pic-action')
+            .each(function () {
+                $(this).attr('onclick', 'validateFaxPic("' + picName + '", "' + picPath + '")');
+            });
+
+        var imgElement = '<img src="' + picPath + '" />';
+        var nameSpanElement = '<span class="pic-name">' + picName + '</span>';
+        //<img src="${pic-path}" width="100%" height="100%"/> <span class="pic-name">${pic-name}</span>
+        clonedTempPreview.append(imgElement);
+        clonedTempPreview.append(nameSpanElement);
+        clonedTempPreview.appendTo('#folder-event-result');
+    }
+
+    function appendPicAddArea() {
+        var tempAddElement = $('#category-template > #temp-add');
+        var clonedTempAdd = tempAddElement.clone();
+        clonedTempAdd.attr('id', '');
+        clonedTempAdd.appendTo('#folder-event-result');
+        console.log('appendPicAddArea');
+    }
+
+    function removePicAddArea() {
+        $('#folder-event-result .fax-pic-add-ct').remove();
+    }
+
+    function getNode(instance, id) {
+        return instance
+            ._model
+            .data[id];
+    }
+
+    function getNodeChain(instance, id) {
+        var nodeList = [];
+        var tempNode = getNode(instance, id);
+        while (tempNode) {
+            if (tempNode.parent && tempNode.padding != '#') {
+                nodeList.push(tempNode);
+                tempNode = getNode(instance, tempNode.parent);
+            } else {
+                break;
+            }
+        }
+        nodeList.reverse();
+        return nodeList;
+    }
+
+    function convert2Text(nodeList) {
+        var textList = [];
+        for (var i = 0; i < nodeList.length; i++) {
+            var node = nodeList[i];
+            textList.push(node.text);
+        }
+        return textList;
+    }
+
+    function validateFaxPic(picName, picPath) {
+        var nodeChain = deserializeClickedNode();
+        var chainText = JSON.stringify(nodeChain);
+        var currentNode = $(categoryTreeSelector + ' .jstree-clicked').attr('id');
+        console.log('validateFaxPic: picName=' + picName + ', picPath=' + picPath);
+        window.location.href = contextName + jumpUrl + '?imgPath=' + picPath + '&imgName=' + picName + '&no' +
+                'deChain=' + '' + '&currentNode=' + currentNode;
+    }
+
+    function uploadFaxPic() {
+        console.log('upload fax picture ...');
+        $("#folder-event-result input#upload-pic-btn").click();
+    }
+
+    function reloadClickedTreeNode() {
+        console.log('begin to reloadClickedTreeNode');
+        var nodeChainText = deserializeClickedNode();
+        loadPicList(nodeChainText);
+    }
+
+    function onFileUploadChange(e) {
+        var filename = $('#folder-event-result input#upload-pic-btn')
+            .val()
+            .split('\\')
+            .pop();
+        if (filename && filename.trim().length > 0) {
+            $('#folder-event-result .add-text').html(filename);
+            autoUpload();
+        } else {
+            $('#folder-event-result .add-text').html('Add new images');
+        }
+    }
+
+    function autoUpload() {
+        setTimeout(function () {
+            doUploadFaxPic();
+        }, 100);
+    }
+
+    function confirmUploadFaxPic() {
+        console.log('begin to show confirm upload fax picture');
+        var filename = $('#folder-event-result input#upload-pic-btn').val();
+        if (isBlankStr(filename)) {
+            sendNotification('warn', 'Please upload a file first!');
+            return;
+        }
+        $.confirm({
+            title: 'Confirm!',
+            content: 'Do you want to upload ' + filename + '!',
+            buttons: {
+                yes: {
+                    text: 'Yes',
+                    btnClass: 'btn-blue',
+                    action: function () {
+                        doUploadFaxPic();
+                        console.log('do upload');
+                    }
+                },
+                no: function () {
+                    console.log('Cancel upload');
+                }
+            }
+        });
+
+    }
+
+    function doUploadFaxPic() {
+        console.log('begin to upload fax picture');
+        var filename = $('#folder-event-result input#upload-pic-btn').val();
+        if (isBlankStr(filename)) {
+            sendNotification('warn', 'Please upload a file first!');
+            return;
+        }
+        showLoading();
+        var formData = $('#signUploadForm');
+        var newFormData = new FormData(formData[0]);
+        var url = formData.attr('action');
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: newFormData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            enctype: 'multipart/form-data',
+            success: function (resp) {
+                console.log('doUpload ret...', resp);
+                if (resp.status === false) {
+                    sendNotification('success', resp.message);
+                    hideLoading();
+                    return;
+                }
+                if (resp.data === undefined || resp.data === null) {
+                    sendNotification('warn', 'No File info Return....');
+                    hideLoading();
+                    return;
+                }
+                sendNotification('success', 'Upload successfully!');
+                //reloadClickedTreeNode();
+                appendFaxPic(resp);
+                hideLoading();
+            },
+            error: function (err) {
+                console.error('err handle', err);
+                hideLoading();
+                sendNotification('error', 'Upload failed - ' + err);
+            }
+        });
+    }
+
+    function appendFaxPic(resp) {
+        removePicAddArea();
+        appendPicFile(resp.data);
+        appendPicAddArea();
+    }
+</script>

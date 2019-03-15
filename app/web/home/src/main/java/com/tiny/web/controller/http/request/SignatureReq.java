@@ -3,6 +3,8 @@ package com.tiny.web.controller.http.request;
 import com.tiny.common.base.ToString;
 import com.tiny.web.controller.ocr.model.Box;
 
+import java.util.List;
+
 public class SignatureReq extends ToString {
 
     /**
@@ -40,6 +42,8 @@ public class SignatureReq extends ToString {
      *
      */
     private Box confirmArea;
+
+    private List<String> folderPath;
 
     public SignatureReq() {
 
@@ -117,6 +121,14 @@ public class SignatureReq extends ToString {
         this.validateId = validateId;
     }
 
+    public List<String> getFolderPath() {
+        return folderPath;
+    }
+
+    public void setFolderPath(List<String> folderPath) {
+        this.folderPath = folderPath;
+    }
+
     @Override
     public String toString() {
         return "SignatureReq{" +
@@ -129,6 +141,7 @@ public class SignatureReq extends ToString {
                 ", validateId='" + validateId + '\'' +
                 ", fixedArea=" + fixedArea +
                 ", confirmArea=" + confirmArea +
+                ", folderPath=" + folderPath +
                 '}';
     }
 }

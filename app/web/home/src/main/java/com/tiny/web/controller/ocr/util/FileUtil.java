@@ -8,6 +8,7 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
+import org.springframework.util.Assert;
 //import org.bytedeco.javacpp.opencv_core.Mat;
 
 public class FileUtil {
@@ -75,6 +76,7 @@ public class FileUtil {
     }
 
     public static String randomFileName(String originalFilename) {
+        Assert.hasText(originalFilename, "originalFilename is blank");
         String time = DateFormatUtils.format(new Date(), Constant.fullDateFormat);
 
         String type = originalFilename.substring(originalFilename.lastIndexOf("."));

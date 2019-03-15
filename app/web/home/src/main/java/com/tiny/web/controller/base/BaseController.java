@@ -60,8 +60,15 @@ abstract public class BaseController {
             String TEMP_SUB = "/ocr/tempSub.do";
 
             String SIGNATURE_VALIDATE = "/ocr/signVal.do";
+            String SIGNATURE_VALIDATE_2 = "/ocr/signVal2.do";
 
             String SIGNATURE_SUBMIT = "/ocr/signSub.do";
+
+            String BATCH_SIGNATURE_SUBMIT = "/ocr/batchSignSub.do";
+
+            String BATCH_SIGNATURE_SUBMIT_2 = "/ocr/batchSignSub2.do";
+
+            String SIGNATURE_LOAD = "/ocr/signLoad.do";
         }
 
         interface API {
@@ -70,6 +77,22 @@ abstract public class BaseController {
             String DETAIL_RECON = "/api/detail/recon.do";
 
             String SUBMIT_RECON = "/api/detail/subRecon.do";
+
+            String LAYOUT_RECON_2 = "/api/layout/recon2.do";
+
+            String DETAIL_RECON_2 = "/api/detail/recon2.do";
+        }
+
+        interface Fax {
+            String FAX_HOME = "/fax";
+            String FAX_PREFIX = FAX_HOME + "/";
+            String FAX_INDEX = FAX_PREFIX + "index";
+            String FAX_ETD_INDEX = FAX_PREFIX + "etd";
+            String FAX_ETD_VALIDATE = FAX_PREFIX + "etd/validate";
+            String FAX_VALIDATE = FAX_PREFIX + "validate";
+            String FAX_LAYOUT = FAX_PREFIX + "layout";
+            String FAX_SIGNATURE = FAX_PREFIX + "signature";
+            String FAX_CATEGORY = FAX_PREFIX + "category";
         }
     }
 

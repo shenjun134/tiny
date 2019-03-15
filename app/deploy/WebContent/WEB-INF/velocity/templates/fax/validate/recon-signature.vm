@@ -1,0 +1,294 @@
+<div id="recon-sign-ct" class="fax-validate-left">
+    <div class="preview-ct">
+        <img
+            src="$!{img-path}"
+            data-name="$!{img-name}"
+            data-path="$!{img-path}"
+            data-sign-validate-url="${WEB_CONTEXT_PATH}$!{sign-validate-url}"/>
+        <div class="area-ct"></div>
+    </div>
+    <div class="tool-ct bottom-bar flex-ct">
+        <div class="flex-ct" style="width: 200px; padding-top: 20px; padding-left: 20px;">
+            <span class="btn-icon" style="margin-top: -1px;">
+                <i class="fa fa-picture-o fa-little"></i>
+            </span>
+            <input type="range" id="img-scale" min="1" max="100" step="1" value="15"/>
+            <span class="btn-icon" style="margin-top: 1px;">
+                <i class="fa fa-picture-o fa-large"></i>
+            </span>
+        </div>
+        <div class="flex-fin-ct" style="width: calc(100% - 200px); padding-bottom: 16px; text-align: right;">
+            <span class="btn-text" onclick="rollbackSignRecon();">Reset</span>
+            <span class="btn-icon">
+                <i class="fa fa-reply-all "></i>
+            </span>
+            <span class="btn-icon">
+                <i class="fa fa-share"></i>
+            </span>
+            <span class="btn-icon">
+                <i class="fa fa-reply"></i>
+            </span>
+        </div>
+
+    </div>
+</div>
+<div class="fax-validate-right">
+    <div id="recon-sign-result" class="recon-ct">
+        <div class="status-bar">
+            <span>Best Matches (</span><span id="match-count">?</span><span>)</span>
+            <input id="validate-id" type="hidden" value=""/>
+        </div>
+        <table style="margin-top: 20px;">
+            <thead>
+                <tr>
+                    <th style="width: 10%; text-align:center;">Area No.</th>
+                    <th style="width: 50%;">Matched Name</th>
+                    <th style="width: 20%;">Override
+                        <i class="fa fa-question-circle" style="padding-left: 5px;"></i>
+                    </th>
+                    <th style="width: 20%;">Disgard
+                        <i class="fa fa-question-circle" style="padding-left: 5px;"></i>
+                    </th>
+                </tr>
+            </thead>
+        </table>
+        <div class="scroll-ct" style="width: 100%; height: calc(100% - 102px); margin-top: 0px;">
+            <table>
+                <tbody id="area-record"></tbody>
+            </table>
+        </div>
+    </div>
+    <div class="bottom-bar">
+        <span class="prev btn-hidden">
+            <i class="fa fa-angle-left"></i>
+            <span>Prev</span>
+        </span>
+        <span class="next btn-active" onclick="signSubmit();">
+            <span>Next</span>
+            <i class="fa fa-angle-right"></i>
+        </span>
+    </div>
+</div>
+
+<div id="sign-template" style="display: none;">
+    <table>
+        <tr class="temp-show-sign" onclick="areaRowClick(this);">
+            <td class="area-index" style="width: 10%; text-align:center;"></td>
+            <td class="recon-area-ct" style="width: 50%;">
+                <div class="area-label"></div>
+                <div class="area-sub-label"></div>
+            </td>
+            <td style="width: 20%;">
+                <span id="override-action" class="area-action" data-index="" onclick="override(this);">Override</span></td>
+            <td style="width: 20%;">
+                <span id="disgard-action" class="area-action" data-index="" onclick="disgard(this);">Disgard</span></td>
+        </tr>
+
+        <tr class="temp-add-sign">
+            <td class="add-area-ct" colspan="4">
+                <div
+                    class="area-action"
+                    style="width: 100%; text-align: center;"
+                    data-target="#dialog-image-draw"
+                    data-toggle="modal"
+                    onclick="drawSignCanvas();">+ Add Another Match
+                </div>
+                <div class="area-sub-label" style="width: 100%; text-align: center;">Capsture signature area manually</div>
+            </td>
+        </tr>
+    </table>
+    <div class="sign-name-ct">
+        <select name='standard' class='custom-select' onchange='onSignatureChange(this);'>
+            <option value=''>None - Please Select</option>
+            #foreach($temp in $writer-list)
+                <option value='$temp.id'>$temp.full</option>
+            #end
+        </select>
+    </div>
+    <div class="writer-list">
+        #foreach($temp in $writer-list)
+            <div class="writer-ct" id='$temp.id'>
+                <span id="first">$!{temp.first}</span>
+                <span id="second">$!{temp.second}</span>
+                <span id="full">$!{temp.full}</span>
+                <span id="email">$!{temp.email}</span>
+                <span id="rate">$!{temp.rate}</span>
+                <span id="comments">$!{temp.comments}</span>
+            </div>
+        #end
+    </div>
+    <div
+        id="dialog-image-draw"
+        class="modal fade"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="dialog-image-draw"
+        aria-hidden="true">
+        <div
+            class="modal-dialog"
+            role="document"
+            style="width: 80%; height: calc(100% - 160px); margin: 80px auto;">
+            <div class="modal-content" style="height: 100%;background: #10151e;">
+                <div class="modal-body" style="height: 100%; padding: 0px;">
+                    <div
+                        style="width: 100%; height: 60px; line-height: 60px; font-size: 24px; text-align: center; color: #bdc5d1;">Select an area</div>
+
+                    <div
+                        style="position:absolute;right: 30px; top: 30px;color: #bdc5d1; font-size: 20px; cursor: pointer;"
+                        class="hvs-pulse"
+                        data-dismiss="modal"
+                        onclick="rollbackSelect();">
+                        <i class="fa fa-times"></i>
+                    </div>
+                    <div
+                        class="draw-ct"
+                        style="height: calc(100% - 168px); padding: 0; margin-left: 48px; overflow: auto;">
+                        <img src="$!{img-path}" data-name="$!{img-name}" data-path="$!{img-path}"/>
+                        <canvas id="canvas" width="800" height="500"></canvas>
+                    </div>
+                    <div class="draw-output" style="width: 100%; height: 40px;">
+                        <span>Begin X:</span><input id="begin-x" value="" disabled="disabled"/>
+                        <span>Begin Y:</span><input id="begin-y" value="" disabled="disabled"/>
+                        <span>End X:</span><input id="fin-x" value="" disabled="disabled"/>
+                        <span>End Y:</span><input id="fin-y" value="" disabled="disabled"/>
+                        <span>Current-X:</span><input id="current-x" value="" disabled="disabled"/>
+                        <span>Current-Y:</span><input id="current-y" value="" disabled="disabled"/>
+                    </div>
+                    <div
+                        class="modal-sub-btn"
+                        style="width: 100%; height: 48px; line-height: 48px;
+                    font-size: 24px; text-align: center; position: absolute; bottom: 0px; left: 0; "
+                        onclick="confirmDrawSign();"
+                        data-dismiss="modal">
+                        CONFIRM
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+        var imageDialog = $('#dialog-image-draw');
+        imageDialog.insertAfter($('.app-main-ct'));
+    });
+
+    function signSubmit() {
+        console.log('signSubmit');
+        showLoading();
+        var validateId = $('#recon-sign-result input#validate-id').val();
+        var imageId = $('#recon-sign-ct img').attr('src');
+        var signSubRep = [];
+        $('#recon-sign-result .temp-show-sign').each(function () {
+            var displayStr = $(this).css('display')
+            if (displayStr === 'none') {
+                return
+            }
+            var strGuid = $(this).attr('id');
+            signSubRep.push(generateSignSub(strGuid, validateId, imageId));
+        });
+        if (signSubRep.length === 0) {
+            hideLoading();
+            //sendNotification('warn', 'No area match...');
+            skipSignValidate();
+            return;
+        }
+        var url = '${WEB_CONTEXT_PATH}${sign-fix-url}';
+        var body = {
+            'batchReq': signSubRep
+        };
+        $.ajax({
+            type: "POST",
+            url: url,
+            contentType: "application/json",
+            data: JSON.stringify(body),
+            dataType: 'json',
+            success: function (resp) {
+                hideLoading();
+                finishSignValidate();
+            },
+            error: function (err) {
+                console.error('signature submit fail!' + err);
+                hideLoading();
+                sendNotification('error', 'Submit fail!' + err);
+            }
+        });
+    }
+
+    function finishSignValidate() {
+        markStepDone(1);
+        go2Step(2);
+        doLayoutRecon();
+    }
+
+    function skipSignValidate() {
+        go2Step(2);
+        doLayoutRecon();
+    }
+
+    function generateSignSub(strGuid, validateId, imageId) {
+        var signMatch = $('#area-record #' + strGuid);
+        var writerId = signMatch.attr('data-name-id');
+        var dataNew = signMatch.attr('data-new');
+        var fixedArea = dataNew === 'true';
+
+        var nameInfo = getNameInfo(writerId);
+        var areaInfo = getAreaInfo(strGuid);
+        var signReq = {
+            'name': nameInfo.full,
+            'email': nameInfo.email,
+            'writerId': writerId,
+            'validateId': validateId,
+            'fixedImage': imageId,
+            'comments': ''
+        };
+        if (fixedArea) {
+            signReq.fixedArea = areaInfo;
+        } else {
+            signReq.confirmArea = areaInfo;
+        }
+        return signReq;
+    }
+
+    function getAreaInfo(strGuid) {
+        var areaElement = $('#recon-sign-ct .area-ct #' + strGuid);
+        var x = areaElement.attr('data-x');
+        var y = areaElement.attr('data-y');
+        var w = areaElement.attr('data-w');
+        var h = areaElement.attr('data-h');
+        x = parseFloatRound(x);
+        y = parseFloatRound(y);
+        w = parseFloatRound(w);
+        h = parseFloatRound(h);
+        //rate todo
+        return {'x': x, 'y': y, 'w': w, 'h': h, 'rate': '0'};
+    }
+
+    function change4ReconSign() {
+        var imageSelector = '#recon-sign-ct img';
+        var scale = getScale(imageSelector);
+        updateAreaBox4ReconSign(scale);
+    }
+
+    function updateAreaBox4ReconSign(scale) {
+        $('#recon-sign-ct .area-ct .area-box').each(function () {
+            var x = $(this).attr('data-x');
+            var y = $(this).attr('data-y');
+            var w = $(this).attr('data-w');
+            var h = $(this).attr('data-h');
+            x = parseFloatRound(x) * scale;
+            y = parseFloatRound(y) * scale;
+            w = parseFloatRound(w) * scale;
+            h = parseFloatRound(h) * scale;
+            $(this).css('left', '' + x + 'px');
+            $(this).css('top', '' + y + 'px');
+            $(this).css('width', '' + w + 'px');
+            $(this).css('height', '' + h + 'px');
+        });
+    }
+
+    function selectSignRow(e) {
+        var strGuid = $(e).attr('id');
+        $('#recon-sign-result tr#' + strGuid).click();
+    }
+</script>

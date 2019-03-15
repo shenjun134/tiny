@@ -1,17 +1,17 @@
 <div class="meny">
 	<h2>
-		<a href="/tiny/home" style="color: #fff; text-decoration:none;">
+		<a href="${WEB_CONTEXT_PATH}/home" style="color: #fff; text-decoration:none;">
 			<span class="glyphicon glyphicon-home" style="padding-right: 5px;"></span>
 		</a>
 		Menu
 	</h2>
 	<ul>
-		<li><a id="nav0" class="nav-link" href="/tiny/ocr/demo">Demo</a></li>
-		<li><a id="nav1" class="nav-link" href="/tiny/ocr/signature">Signature</a></li>
-		<li><a id="nav5" class="nav-link" href="/tiny/ocr/help">Help</a></li>
+		<li><a id="nav0" class="nav-link" href="${WEB_CONTEXT_PATH}/ocr/demo">Demo</a></li>
+		<li><a id="nav1" class="nav-link" href="${WEB_CONTEXT_PATH}/ocr/signature">Signature</a></li>
+		<li><a id="nav5" class="nav-link" href="${WEB_CONTEXT_PATH}/ocr/help">Help</a></li>
 	</ul>
 </div>
-<!-- <script src="/tiny/resources/lib/shuffle/js/shuffle-text.js"></script> -->
+<!-- <script src="${WEB_CONTEXT_PATH}/resources/lib/shuffle/js/shuffle-text.js"></script> -->
 <script type="text/javascript">
 
 	$(document).ready(function(){

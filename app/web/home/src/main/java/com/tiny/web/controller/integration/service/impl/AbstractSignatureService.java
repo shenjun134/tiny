@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 
 import javax.annotation.PostConstruct;
 
-public abstract class AbstractSignatureService implements SignatureService {
+public abstract class AbstractSignatureService extends AbstractIntegrationService implements SignatureService {
 
     /**
      * logger
@@ -28,6 +28,28 @@ public abstract class AbstractSignatureService implements SignatureService {
         try {
             scanBefore(imagePath, imageName);
             SignatureResp signatureResp = processScan(imagePath, imageName);
+            if (signatureResp == null || CollectionUtils.isEmpty(signatureResp.getMatchArea())) {
+                throw new RuntimeException("no matched area ... ");
+            }
+
+            scanAfter(imagePath, imageName);
+            baseJsonResult.markeSuccess("Congratulations, signature matched!", signatureResp);
+        } catch (Exception e) {
+            logger.error("scan error imagePath:" + imagePath, e);
+            baseJsonResult.marketFail("Oops, " + e.getMessage());
+        } finally {
+            logger.info("scan total used:" + (System.currentTimeMillis() - beginAt));
+        }
+        return baseJsonResult;
+    }
+
+    @Override
+    public BaseJsonResult scan2(String imagePath, String imageName) {
+        BaseJsonResult baseJsonResult = new BaseJsonResult();
+        Long beginAt = System.currentTimeMillis();
+        try {
+            scanBefore(imagePath, imageName);
+            SignatureResp signatureResp = processScan2(imagePath, imageName);
             if (signatureResp == null || CollectionUtils.isEmpty(signatureResp.getMatchArea())) {
                 throw new RuntimeException("no matched area ... ");
             }
@@ -63,6 +85,26 @@ public abstract class AbstractSignatureService implements SignatureService {
         return baseJsonResult;
     }
 
+    @Override
+    public BaseJsonResult fix2(FixedFax fixedFax) {
+        BaseJsonResult baseJsonResult = new BaseJsonResult();
+        Long beginAt = System.currentTimeMillis();
+        try {
+            fixBefore(fixedFax);
+
+            processFix2(fixedFax, baseJsonResult);
+
+            fixAfter(fixedFax);
+
+        } catch (Exception e) {
+            logger.error("fix error fixedFax:" + fixedFax, e);
+            baseJsonResult.marketFail("Oops, " + e.getMessage());
+        } finally {
+            logger.info("fix total used:" + (System.currentTimeMillis() - beginAt));
+        }
+        return baseJsonResult;
+    }
+
     /**
      * @param imagePath
      * @param imageName
@@ -75,6 +117,13 @@ public abstract class AbstractSignatureService implements SignatureService {
      * @return
      */
     protected abstract SignatureResp processScan(String imagePath, String imageName);
+
+    /**
+     * @param imagePath
+     * @param imageName
+     * @return
+     */
+    protected abstract SignatureResp processScan2(String imagePath, String imageName);
 
     /**
      * @param imagePath
@@ -97,6 +146,12 @@ public abstract class AbstractSignatureService implements SignatureService {
      * @param baseJsonResult
      */
     protected abstract void processFix(FixedFax fixedFax, BaseJsonResult baseJsonResult);
+
+    /**
+     * @param fixedFax
+     * @param baseJsonResult
+     */
+    protected abstract void processFix2(FixedFax fixedFax, BaseJsonResult baseJsonResult);
 
 
 }

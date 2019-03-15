@@ -339,6 +339,7 @@ public class GridLayoutUtil {
         return result;
     }
 
+
     public static GridLayoutResult generateGrid() {
         GridLayoutConfig config = new GridLayoutConfig();
         GridLayoutResult result = randomGrid(config);

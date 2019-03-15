@@ -1,0 +1,125 @@
+<script src="${WEB_CONTEXT_PATH}/resources/js/fax-validate.js"></script>
+<div class="fax-ct">
+    #foreach($temp in $pathInfoArr)
+        <div id='step-${temp.index}-ct' class='$temp.initCtClz'>
+            #parse($temp.path)
+        </div>
+    #end
+</div>
+<script>
+    $(function () {
+        var clonedNavElement = $('#valid-template > #temp-nav').clone();
+        clonedNavElement.attr('id', 'valid-nav');
+        clonedNavElement.insertBefore($('.app-main-ct'));
+    });
+    function stepFire(e) {
+        var stepIndex = $(e).attr('name-index');
+        var animatedClz = getAnimatedClz(stepIndex);
+        hiddenAllWorkflow();
+        hiddenAllStep();
+
+        var stepId = $(e).attr('id');
+        var workflowId = stepId + '-ct'
+        showWorkflow(workflowId, animatedClz);
+        showStep(stepId);
+    }
+
+    function getAnimatedClz(firedIndex) {
+        var currentActiveStep = $('#valid-nav .top-workflow-step .step-active');
+        var currentIndex = currentActiveStep.attr('name-index');
+        var leftClz = 'slideInLeft';
+        var rightClz = 'slideInRight';
+        return parseInt(firedIndex) > parseInt(currentIndex)
+            ? rightClz
+            : leftClz;
+    }
+
+    function hiddenAllWorkflow() {
+        $('.fax-ct .workflow-ct').each(function () {
+            //$(this).css('display', 'none'); $(this).attr('class', 'workflow-ct flex-ct ct-hidden');
+            $(this).removeClass('animated');
+            $(this).removeClass('slideInLeft');
+            $(this).removeClass('slideInRight');
+            $(this).addClass('ct-hidden');
+        });
+    }
+
+    function hiddenAllStep() {
+        $('#valid-nav .top-workflow-step .step-ct').each(function () {
+            //$(this).attr('class', 'step-ct');
+            $(this).removeClass('step-active');
+        });
+    }
+
+    function showWorkflow(id, animatedClz) {
+        $('.fax-ct #' + id).removeClass('ct-hidden');
+        $('.fax-ct #' + id).addClass(animatedClz);
+        $('.fax-ct #' + id).addClass('animated');
+    }
+
+    function showStep(id) {
+        $('#' + id).addClass('step-active');
+    }
+
+    function markStepDone(stepId) {
+        $('#step-' + stepId).addClass('step-done');
+    }
+
+    function undoMarkStepDone(stepId) {
+        $('#step-' + stepId).removeClass('step-done');
+    }
+
+    function go2Step(stepId) {
+        var stepElement = $('#step-' + stepId);
+        if (stepElement) {
+            stepElement.click();
+        }
+    }
+</script>
+
+<script>
+    /****************for each workflow*************/
+    $('.tool-ct input[type="range"]').on('input change', function () {
+        var val = ($(this).val() - $(this).attr('min')) / ($(this).attr('max') - $(this).attr('min'));
+
+        $(this).css(
+            'background-image',
+            '-webkit-gradient(linear, left top, right top, color-stop(' + val + ', #1567F9), color-stop(' +
+                    val + ', #8891a0))'
+        );
+    });
+</script>
+
+<div id="valid-template" style="display:none">
+    <div id="fax-index">${WEB_CONTEXT_PATH}/fax</div>
+    <div id="node-chain">$!{node-chain}</div>
+    <div id="current-node">$!{current-node}</div>
+    <div id="temp-nav">
+        <nav class="breadcrum">
+            <a href='${WEB_CONTEXT_PATH}${jump-url}?nodeChain=$!{node-chain}&currentNode=$!{current-node}'>
+                <span>$!{img-name}</span>
+                <i class="fa fa-caret-down "></i>
+            </a>
+        </nav>
+        <nav class="top-workflow-step">
+            #set($seq = 1)
+            #foreach($temp in $pathInfoArr)
+                <div
+                    id='step-${temp.index}'
+                    class="step-ct ${temp.initStepClz}"
+                    onclick="stepFire(this);"
+                    name-index='${temp.index}'>
+                    <span class="step-icon">${temp.index}</span>
+                    <span class="step-label">${temp.label}</span>
+                    <span class="step-border"></span>
+                </div>
+                #if($seq != $pathInfoArr.size())
+                    <span class="step-arrow">
+                        <i class="fa fa-angle-right"></i>
+                    </span>
+                #end
+                #set($seq = $seq + 1)
+            #end
+        </nav>
+    </div>
+</div>

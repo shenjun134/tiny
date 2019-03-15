@@ -60,6 +60,21 @@ public class ApiController extends OCRController {
         return baseJsonResult;
     }
 
+    @RequestMapping(path = UrlCenter.API.LAYOUT_RECON_2, method = RequestMethod.POST)
+    @ResponseBody
+    public Object layoutRecon2(@RequestBody RecognitionReq recognitionReq) {
+        LogUtil.info(logger, "begin to layoutRecon with - {0}", recognitionReq);
+        BaseJsonResult baseJsonResult = new BaseJsonResult();
+        try {
+            setAbsPath(recognitionReq);
+            return baseJsonResult.markeSuccess("Layout recognition successfully", apiFactory.getService().recognitionLayout2(recognitionReq));
+        } catch (Exception e) {
+            logger.error("layoutRecon error - " + recognitionReq, e);
+            baseJsonResult.marketFail(e.getLocalizedMessage());
+        }
+        return baseJsonResult;
+    }
+
     @RequestMapping(path = UrlCenter.API.DETAIL_RECON, method = RequestMethod.POST)
     @ResponseBody
     public Object detailRecon(@RequestBody RecognitionReq recognitionReq) {
@@ -68,6 +83,21 @@ public class ApiController extends OCRController {
         try {
             setAbsPath(recognitionReq);
             return baseJsonResult.markeSuccess("Detail recognition successfully", apiFactory.getService().recognitionContent(recognitionReq));
+        } catch (Exception e) {
+            logger.error("detailRecon error - " + recognitionReq, e);
+            baseJsonResult.marketFail(e.getLocalizedMessage());
+        }
+        return baseJsonResult;
+    }
+
+    @RequestMapping(path = UrlCenter.API.DETAIL_RECON_2, method = RequestMethod.POST)
+    @ResponseBody
+    public Object detailRecon2(@RequestBody RecognitionReq recognitionReq) {
+        LogUtil.info(logger, "begin to detailRecon with - {0}", recognitionReq);
+        BaseJsonResult baseJsonResult = new BaseJsonResult();
+        try {
+            setAbsPath(recognitionReq);
+            return baseJsonResult.markeSuccess("Detail recognition successfully", apiFactory.getService().recognitionContent2(recognitionReq));
         } catch (Exception e) {
             logger.error("detailRecon error - " + recognitionReq, e);
             baseJsonResult.marketFail(e.getLocalizedMessage());
