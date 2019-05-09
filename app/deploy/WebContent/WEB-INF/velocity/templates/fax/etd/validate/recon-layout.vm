@@ -642,6 +642,7 @@
 
     function buildContentPostBody() {
         var layoutList = [];
+        var newAddCount = 0;
         $('#recon-layout-result .temp-show-layout').each(function () {
             var displayStr = $(this).css('display')
             if (displayStr === 'none') {
@@ -649,6 +650,10 @@
             }
             var id = $(this).attr('data-layout-id');
             var newArea = $(this).attr('data-new');
+            if(newArea === 'true'){
+                id = 'new-' + newAddCount;
+                newAddCount++;
+            }
             var type = '';
             var tag = ''
             var width = $(this).attr('data-layout-w');

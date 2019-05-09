@@ -47,7 +47,11 @@ public enum SystemPropertyEnum implements EnumBase {
 
     FACADE_TEMPLATE_RECON_URL("facade.template.recon.url"),
 
+    FACADE_TEMPLATE_RECON2_URL("facade.template.recon2.url"),
+
     FACADE_OCR_RECON_URL("facade.ocr.recon.url"),
+
+    FACADE_OCR_RECON2_URL("facade.ocr.recon2.url"),
 
     SIGNATURE_MODE("signature.impl.mode"),
 

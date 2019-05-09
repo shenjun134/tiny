@@ -11,6 +11,7 @@ public class TableLayoutResult extends LayoutResult {
         TableLayoutResult result = new TableLayoutResult();
         result.copy(layoutResult);
         result.setType(LayoutEnum.TABLE.getCode());
+        result.setTag(LayoutEnum.TABLE.getMessage());
         return result;
     }
 
@@ -18,6 +19,7 @@ public class TableLayoutResult extends LayoutResult {
 
     public TableLayoutResult() {
         this.type = LayoutEnum.TABLE.getCode();
+        this.tag = LayoutEnum.TABLE.getMessage();
     }
 
     public List<List<RectangleVO>> getAllList() {

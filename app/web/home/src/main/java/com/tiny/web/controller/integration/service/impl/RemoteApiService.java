@@ -8,11 +8,10 @@ import com.tiny.common.util.LogUtil;
 import com.tiny.common.util.SystemUtils;
 import com.tiny.web.controller.http.request.RecognitionReq;
 import com.tiny.web.controller.integration.convert.CommonConverter;
-import com.tiny.web.controller.integration.convert.FaxResultConverter;
 import com.tiny.web.controller.integration.entity.ContentResult;
+import com.tiny.web.controller.integration.entity.GridLayoutResult;
 import com.tiny.web.controller.integration.entity.LayoutResult;
 import com.tiny.web.controller.integration.entity.LayoutWrapper;
-import com.tiny.web.controller.integration.entity.RectangleVO;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -34,7 +33,6 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 @Component("remoteApiService")
@@ -119,8 +117,49 @@ public class RemoteApiService extends AbstractApiService {
 
     @Override
     protected LayoutWrapper doLayoutRecon2(RecognitionReq request) {
-        //TODO
-        return null;
+        String imagePath = request.getImageAbsPath();
+        String imageName = request.getReconImage();
+        LogUtil.info(logger, "begin doLayoutRecon with path: {0}, name: {1}", imagePath, imageName);
+        CloseableHttpClient httpClient = null;
+        String url = SystemUtils.getSystemProperty(SystemPropertyEnum.FACADE_TEMPLATE_RECON2_URL);
+        try {
+            httpClient = HttpClients.custom().build();
+            HttpPost httpPost = new HttpPost(url);
+
+            MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
+            multipartEntityBuilder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+            String join = "/";
+            if (StringUtils.endsWith(imagePath, "/") || StringUtils.endsWith(imagePath, "\\")) {
+                join = "";
+            }
+            multipartEntityBuilder.addBinaryBody("file", new File(imagePath + join + imageName), ContentType.DEFAULT_BINARY, imageName);
+            httpPost.setEntity(multipartEntityBuilder.build());
+
+            HttpResponse response = httpClient.execute(httpPost);
+
+            StatusLine statusLine = response.getStatusLine();
+            LogUtil.info(logger, "post image： {0} {1}, result: {2}", imagePath, imageName, statusLine);
+
+            boolean sendSucc = statusLine != null && statusLine.getStatusCode() == 200;
+            if (sendSucc) {
+                logger.info("post successfully!");
+                String jsonResult = EntityUtils.toString(response.getEntity(), "UTF-8");
+                LogUtil.info(logger, "{0}", jsonResult);
+                return CommonConverter.parseLayoutResult2(jsonResult);
+            }
+            throw new RuntimeException("image layout recon fail:" + statusLine);
+        } catch (Exception e) {
+            LogUtil.error(logger, e, "http post error with path: {0}, name: {1}, facade.template.recon.url: {2}", imagePath, imageName, url);
+            throw new RuntimeException(e.getMessage(), e);
+        } finally {
+            if (httpClient != null) {
+                try {
+                    httpClient.close();
+                } catch (IOException e) {
+                    logger.error("httpClient close error", e);
+                }
+            }
+        }
     }
 
     @Override
@@ -174,26 +213,33 @@ public class RemoteApiService extends AbstractApiService {
     protected List<ContentResult> doContentRecon2(RecognitionReq request) {
         List<Map<String, Object>> reconLayoutList = new ArrayList<>();
         List<Map<String, Object>> newLayoutList = new ArrayList<>();
+        String area_id = "";
         for (LayoutResult layout : request.getSelectedLayout()) {
             boolean isNew = Boolean.valueOf(layout.getNewArea());
             Map<String, Object> resultMap = convert(layout);
             if (isNew) {
-                resultMap.put("id", "");
+                String id = "new-" + newLayoutList.size();
+                resultMap.put("id", id);
                 newLayoutList.add(resultMap);
+                layout.setId(id);
             } else {
-                newLayoutList.add(resultMap);
+                reconLayoutList.add(resultMap);
+                area_id = area_id + layout.getId() + " ";
             }
         }
 
         Map<String, Object> postBody = new HashMap<>();
-        postBody.put("layoutList", reconLayoutList);
-        postBody.put("addList", newLayoutList);
-        postBody.put("validateId", request.getLayoutId());
+//        postBody.put("layoutList", reconLayoutList);
+//        postBody.put("addList", newLayoutList);
+        postBody.put("area_id", area_id);
+        postBody.put("fax_id", request.getLayoutId());
+        postBody.put("new_add", newLayoutList);
+
 
         LogUtil.info(logger, "doContentRecon2 build post body - {0}", postBody);
 
         CloseableHttpClient httpClient = null;
-        String url = "??????????????????????";
+        String url = SystemUtils.getSystemProperty(SystemPropertyEnum.FACADE_OCR_RECON2_URL);
         try {
             httpClient = HttpClients.custom().build();
             HttpPost httpPost = new HttpPost(url);
@@ -216,9 +262,35 @@ public class RemoteApiService extends AbstractApiService {
 
             boolean sendSucc = statusLine != null && statusLine.getStatusCode() == 200;
             if (!sendSucc) {
-                throw new RuntimeException("doContentRecon2 fail!");
+                throw new RuntimeException("doContentRecon2 fail! - " + statusLine);
             }
-            //TODO
+            List<ContentResult> results = CommonConverter.parseContentResult2(jsonResult);
+            Map<String, ContentResult> resultMap = new HashMap<>();
+            for(ContentResult contentResult : results){
+                resultMap.put(contentResult.getResult().getId(), contentResult);
+            }
+            System.out.println("resultMap-" + resultMap.keySet());
+//            results.forEach(item -> { resultMap.put(item.getId(), item); });
+
+            for(LayoutResult layout : request.getSelectedLayout()){
+                System.out.println("mapping-" + layout.getId());
+                ContentResult temp = resultMap.get(layout.getId());
+                System.out.println("temp-" + temp);
+                if(temp != null){
+                    temp.getResult().setX(layout.getX());
+                    temp.getResult().setY(layout.getY());
+                    temp.getResult().setWidth(layout.getWidth());
+                    temp.getResult().setHeight(layout.getHeight());
+                    continue;
+                }
+                ContentResult mocked = new ContentResult();
+                mocked.setId(layout.getId());
+                GridLayoutResult gridLayoutResult = new GridLayoutResult();
+                gridLayoutResult.copy(layout);
+                mocked.setResult(gridLayoutResult);
+                results.add(mocked);
+            }
+            return results;
 
         } catch (Exception e) {
             LogUtil.error(logger, e, "doContentRecon2 error - request:{0}", request);
@@ -232,7 +304,6 @@ public class RemoteApiService extends AbstractApiService {
                 }
             }
         }
-        return null;
     }
 
     @Override
@@ -269,10 +340,12 @@ public class RemoteApiService extends AbstractApiService {
     private Map<String, Object> convert(LayoutResult layout) {
         Map<String, Object> map = new HashMap<>();
         map.put("id", layout.getId());
-        map.put("width", layout.getWidth());
-        map.put("height", layout.getHeight());
+//        map.put("width", layout.getWidth());
+//        map.put("height", layout.getHeight());
         map.put("xmin", layout.getX());
         map.put("ymin", layout.getY());
+        map.put("xmax", layout.getX() + layout.getWidth());
+        map.put("ymax", layout.getY() + layout.getHeight());
         return map;
     }
 

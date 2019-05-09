@@ -12,6 +12,7 @@ public class GridLayoutResult extends LayoutResult {
         GridLayoutResult result = new GridLayoutResult();
         result.copy(layoutResult);
         result.setType(LayoutEnum.GRID.getCode());
+        result.setTag(LayoutEnum.GRID.getMessage());
         return result;
     }
 
@@ -23,6 +24,7 @@ public class GridLayoutResult extends LayoutResult {
 
     public GridLayoutResult() {
         this.type = LayoutEnum.GRID.getCode();
+        this.tag =  LayoutEnum.GRID.getMessage();
     }
 
     public List<RectangleVO> getAllList() {

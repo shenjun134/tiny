@@ -2,10 +2,12 @@ package com.tiny.web.controller.integration.convert;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.tiny.common.entity.*;
 import com.tiny.common.entity.GridLayoutResult;
 import com.tiny.common.util.LogUtil;
 import com.tiny.web.controller.integration.entity.*;
+import com.tiny.web.controller.integration.enums.LayoutEnum;
 import com.tiny.web.controller.integration.util.RandomUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -173,6 +175,54 @@ public class CommonConverter {
         return list;
     }
 
+    public static LayoutWrapper parseLayoutResult2(String inputJson) {
+        String json = StringUtils.replace(inputJson, "\\\"", "\"");
+        json = StringUtils.removeStart(json, "\"");
+        json = StringUtils.removeEnd(json, "\"");
+        System.out.println(inputJson);
+        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        System.out.println(json);
+
+        LayoutWrapper wrapper = new LayoutWrapper();
+        if (StringUtils.isBlank(json)) {
+            return wrapper;
+        }
+        JSONObject jsonObject = JSONObject.fromObject(json);
+        Object faxesObj = jsonObject.get("fax_id");
+        if (faxesObj == null) {
+            return wrapper;
+        }
+        wrapper.setId(faxesObj.toString());
+        JSONObject areas = jsonObject.getJSONObject("areas");
+        Iterator<String> keys = areas.keys();
+        if(keys == null ){
+            return wrapper;
+        }
+        while(keys.hasNext()){
+            String key = keys.next();
+            Object obj = areas.get(key);
+            JSONObject jsonO = (JSONObject) obj;
+            LayoutResult layoutResult = new LayoutResult();
+            layoutResult.setProbability("" + 100 * NumberUtils.toDouble(jsonO.get("score").toString()));
+            LayoutEnum layoutEnum = LayoutEnum.codeOf(jsonO.get("tag").toString() + "-ly");
+            layoutEnum = layoutEnum == null ? LayoutEnum.GRID : layoutEnum;
+            layoutResult.setType(layoutEnum.getCode());
+            layoutResult.setTag(layoutEnum.getMessage());
+            layoutResult.setId(key);
+            double xmin = NumberUtils.toDouble(jsonO.get("xmin").toString());
+            double ymin = NumberUtils.toDouble(jsonO.get("ymin").toString());
+            double xmax = NumberUtils.toDouble(jsonO.get("xmax").toString());
+            double ymax = NumberUtils.toDouble(jsonO.get("ymax").toString());
+            layoutResult.setWidth(xmax - xmin);
+            layoutResult.setHeight(ymax -ymin);
+            layoutResult.setX(xmin);
+            layoutResult.setY(ymin);
+            layoutResult.setComments("from remote api");
+            wrapper.getLayoutList().add(layoutResult);
+        }
+        return wrapper;
+    }
+
     public static com.tiny.web.controller.integration.entity.ContentResult parseContentResult(String srcJson) {
         if (StringUtils.isBlank(srcJson)) {
             return null;
@@ -259,6 +309,99 @@ public class CommonConverter {
         return contentResult;
     }
 
+    public static List<com.tiny.web.controller.integration.entity.ContentResult> parseContentResult2(String inputJson) {
+        String srcJson = StringUtils.replace(inputJson, "\\\"", "\"");
+        srcJson = StringUtils.removeStart(srcJson, "\"");
+        srcJson = StringUtils.removeEnd(srcJson, "\"");
+        System.out.println(inputJson);
+        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        System.out.println(srcJson);
+
+        List<com.tiny.web.controller.integration.entity.ContentResult> list = new ArrayList<>();
+        if (StringUtils.isBlank(srcJson)) {
+            return list;
+        }
+        String json = srcJson;
+        for (Map.Entry<String, String> entry : Constant.replaceMap.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            json = StringUtils.replace(json, key, value);
+        }
+
+        JSONObject jsonObject = JSONObject.fromObject(json);
+        Iterator<String> keyIt = jsonObject.keys();
+        if(keyIt == null){
+            return list;
+        }
+        while(keyIt.hasNext()){
+            String id = keyIt.next();
+            JSONObject jsonO = jsonObject.getJSONObject(id);
+            String tag = getString(jsonO, "tag");
+            double xmin = NumberUtils.toDouble(jsonO.get("xmin").toString());
+            double ymin = NumberUtils.toDouble(jsonO.get("ymin").toString());
+            double xmax = NumberUtils.toDouble(jsonO.get("xmax").toString());
+            double ymax = NumberUtils.toDouble(jsonO.get("ymax").toString());
+            double width = xmax - xmin;
+            double height = ymax - ymin;
+
+            if(StringUtils.equalsIgnoreCase(tag, "table")){
+                com.tiny.web.controller.integration.entity.TableLayoutResult tableLayoutResult = new com.tiny.web.controller.integration.entity.TableLayoutResult();
+                tableLayoutResult.setId(id);
+                tableLayoutResult.setX(xmin);
+                tableLayoutResult.setY(ymin);
+                tableLayoutResult.setWidth(width);
+                tableLayoutResult.setHeight(height);
+
+                JSONArray cellsArr = (JSONArray) jsonO.get("cells");
+                if (cellsArr == null || cellsArr.size() == 0) {
+                    continue;
+                }
+                List<RectangleVO> rectangleVOS = new ArrayList<>();
+                for (Object cellObj : cellsArr) {
+                    JSONObject cell = (JSONObject) cellObj;
+                    RectangleVO rectangleVO = parseRect2(cell);
+                    rectangleVOS.add(rectangleVO);
+                }
+                //TODO
+                int fixedCol = 4;
+                int fixedRow = rectangleVOS.size() % fixedCol == 0 ? rectangleVOS.size() / fixedCol : rectangleVOS.size() / fixedCol + 1;
+                for(int i = 0; i < fixedRow ;i++){
+                    int begin = 0;
+                    int end = 0;
+                    begin = i * fixedCol;
+                    end = begin + fixedCol;
+                    if(i == fixedRow -1){
+                        end = rectangleVOS.size();
+                    }
+                    List<RectangleVO> rows = new ArrayList<>(rectangleVOS.subList(begin, end));
+                    if(i == fixedRow -1 && end - begin != fixedCol ){
+                        //TODO to fix miss some col...
+                        int miss = fixedCol - (end - begin);
+                        for(int j = 0 ;j < miss; j++){
+                            RectangleVO rectangleVO = new RectangleVO();
+                            rectangleVO.setText("-Miss-");
+                            rows.add(rectangleVO);
+                        }
+                    }
+                    tableLayoutResult.getAllList().add(rows);
+                }
+                ContentResult contentResult = new ContentResult();
+                contentResult.setResult(tableLayoutResult);
+                list.add(contentResult);
+            }else {
+                com.tiny.web.controller.integration.entity.GridLayoutResult gridLayoutResult = new com.tiny.web.controller.integration.entity.GridLayoutResult();
+                gridLayoutResult.setId(id);
+                RectangleVO rectangleVO = parseRect2(jsonO);
+                gridLayoutResult.getAllList().add(rectangleVO);
+
+                ContentResult contentResult = new ContentResult();
+                contentResult.setResult(gridLayoutResult);
+                list.add(contentResult);
+            }
+        }
+        return list;
+    }
+
 
     /**
      * @param gridResult
@@ -283,6 +426,56 @@ public class CommonConverter {
         }
         return tableResult;
     }
+
+    private static RectangleVO parseRect2(JSONObject cell) {
+        RectangleVO rectangleVO = new RectangleVO();
+        JSONArray ocrArr = (JSONArray) cell.get("ocr");
+        double score = getDouble(cell,"score");
+        double xmin = getDouble(cell,"xmin");
+        double ymin = getDouble(cell,"ymin");
+        double xmax = getDouble(cell,"xmax");
+        double ymax = getDouble(cell,"ymax");
+        double width = xmax - xmin;
+        double height = ymax - ymin;
+        rectangleVO.setWidth(width);
+        rectangleVO.setHeight(height);
+        rectangleVO.setScore("" + score * 100);
+        rectangleVO.setXmax(xmin + width);
+        rectangleVO.setYmax(ymin + height);
+        rectangleVO.setXmin(xmin);
+        rectangleVO.setYmin(ymin);
+        List<CharVO> list = new ArrayList<>(ocrArr.size());
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Object obj : ocrArr) {
+            JSONObject ocrObj = (JSONObject) obj;
+            CharVO charVO = parseChar(ocrObj);
+            stringBuilder.append(charVO.getStr());
+            list.add(charVO);
+        }
+        rectangleVO.setText(stringBuilder.toString());
+        rectangleVO.setCharList(list);
+        return rectangleVO;
+    }
+
+    public static double getDouble(JSONObject jsonObject, String key){
+        Object object = jsonObject.get(key);
+        if(object == null){
+            return 0;
+        }
+        if(NumberUtils.isNumber(object.toString())){
+            return NumberUtils.toDouble(object.toString(), 0);
+        }
+        return 0;
+    }
+
+    public static String getString(JSONObject jsonObject, String key){
+        Object object = jsonObject.get(key);
+        if(object == null){
+            return null;
+        }
+        return object.toString();
+    }
+
 
     private static RectangleVO parseRect(JSONObject cell) {
         RectangleVO rectangleVO = new RectangleVO();
@@ -339,11 +532,11 @@ public class CommonConverter {
 
     private static CharVO parseChar(JSONObject ocrObj) {
         CharVO charVO = new CharVO();
-        double width = ocrObj.getDouble("width");
-        double height = ocrObj.getDouble("height");
-        double xmin = ocrObj.getDouble("xmin");
-        double ymin = ocrObj.getDouble("ymin");
-        String str = ocrObj.getString("char");
+        double width = getDouble(ocrObj, "width");
+        double height = getDouble(ocrObj,"height");
+        double xmin = getDouble(ocrObj,"xmin");
+        double ymin = getDouble(ocrObj,"ymin");
+        String str = getString(ocrObj,"char");
 
         charVO.setHeight(height);
         charVO.setWidth(width);
@@ -351,7 +544,7 @@ public class CommonConverter {
         charVO.setYmin(ymin);
         charVO.setXmax(xmin + width);
         charVO.setYmax(ymin + height);
-        charVO.setStr(str);
+        charVO.setStr(str == null ? "" : str);
         return charVO;
     }
 
@@ -383,10 +576,10 @@ public class CommonConverter {
 
     public static void main(String[] args) throws IOException {
 //        String path = "D:\\data\\code\\github-workspace\\tiny\\app\\web\\home\\src\\test\\resources\\table-result-2.json";
-        String path = "C:\\Users\\e521907\\home\\code\\github_workspalce\\tiny\\app\\web\\home\\src\\test\\resources\\table-result-2.json";
+        String path = "D:\\data\\code\\github-workspace\\tiny\\app\\web\\home\\src\\test\\resources\\table-result-2.json";
         String jsonStr = FileUtils.readFileToString(new File(path));
-
-        Object obj = parseContentResult(jsonStr);
+//        Object obj = parseLayoutResult2(jsonStr);
+        Object obj = parseContentResult2(jsonStr);
         System.out.println(obj);
 
     }
