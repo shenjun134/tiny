@@ -358,9 +358,14 @@ public class CommonConverter {
                 }
                 List<RectangleVO> rectangleVOS = new ArrayList<>();
                 for (Object cellObj : cellsArr) {
-                    JSONObject cell = (JSONObject) cellObj;
-                    RectangleVO rectangleVO = parseRect2(cell);
-                    rectangleVOS.add(rectangleVO);
+                    JSONArray jsonArray = (JSONArray) cellObj;
+                    if(jsonArray == null || jsonArray.size() == 0){
+                        continue;
+                    }
+                    for(Object cell : jsonArray){
+                        RectangleVO rectangleVO = parseRect2((JSONObject) cell);
+                        rectangleVOS.add(rectangleVO);
+                    }
                 }
                 //TODO
                 int fixedCol = 4;
@@ -576,7 +581,7 @@ public class CommonConverter {
 
     public static void main(String[] args) throws IOException {
 //        String path = "D:\\data\\code\\github-workspace\\tiny\\app\\web\\home\\src\\test\\resources\\table-result-2.json";
-        String path = "D:\\data\\code\\github-workspace\\tiny\\app\\web\\home\\src\\test\\resources\\table-result-2.json";
+        String path = "D:\\data\\code\\github-workspace\\tiny\\app\\web\\home\\src\\test\\resources\\table-result-3.json";
         String jsonStr = FileUtils.readFileToString(new File(path));
 //        Object obj = parseLayoutResult2(jsonStr);
         Object obj = parseContentResult2(jsonStr);
